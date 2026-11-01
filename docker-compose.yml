@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medusa-store
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d medusa-store"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+  medusa:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        MEDUSA_BACKEND_URL: https://api.channelkhan.com
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "9000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/medusa-store
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET:?Set COOKIE_SECRET}
+      STORE_CORS: https://shop.channelkhan.com
+      ADMIN_CORS: https://shopadmin.channelkhan.com,https://api.channelkhan.com
+      AUTH_CORS: https://shop.channelkhan.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
+      MEDUSA_BACKEND_URL: https://api.channelkhan.com
+    volumes:
+      - uploads:/server/apps/backend/.medusa/server/static
+volumes:
+  postgres_data:
+  uploads:

@@ -38,10 +38,10 @@ export default async function Nav() {
           </div>
 
           <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <Search />
-            <div className="hidden small:flex items-center gap-x-6 h-full">
+            <div className="hidden small:block"><Search /></div>
+            <div className="flex items-center gap-x-6 h-full">
               <LocalizedClientLink
-                className="hover:text-ui-fg-base"
+                className="ink-account-link"
                 href="/account"
                 data-testid="nav-account-link"
               >

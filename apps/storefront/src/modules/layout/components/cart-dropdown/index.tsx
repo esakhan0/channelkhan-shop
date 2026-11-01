@@ -2,7 +2,6 @@
 
 import {
   Popover,
-  PopoverButton,
   PopoverPanel,
   Transition,
 } from "@headlessui/react"
@@ -108,13 +107,13 @@ const CartDropdown = ({
       onMouseLeave={close}
     >
       <Popover className="relative h-full">
-        <PopoverButton className="h-full">
+        <div className="h-full flex items-center">
           <LocalizedClientLink
             className="hover:text-ui-fg-base"
             href="/cart"
             data-testid="nav-cart-link"
           >{`Cart (${totalItems})`}</LocalizedClientLink>
-        </PopoverButton>
+        </div>
         <Transition
           show={cartDropdownOpen}
           as={Fragment}

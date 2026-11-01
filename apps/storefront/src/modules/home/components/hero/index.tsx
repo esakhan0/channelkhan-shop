@@ -1,25 +1,25 @@
-import { listProducts } from "@lib/data/products"
-import { getRegion } from "@lib/data/regions"
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-export default async function Hero({ countryCode }: { countryCode: string }) {
-  const region = await getRegion(countryCode)
-  const products = region ? (await listProducts({ regionId: region.id, queryParams: { limit: 1, fields: "*variants.calculated_price" } })).response.products : []
-  const featured = products[0]
-  return <section className="joy-hero content-container">
-    <div className="joy-hero-copy"><p className="mukky-eyebrow">INDEPENDENT SPIRIT. PRINTED IN 3D. / EST. 2026</p>
-      <h1>Everyday things.<br /><em>Extraordinary</em><br />personality.</h1>
-      <p>Small objects with a big sense of fun. Welcome to Mukky&apos;s — making joy, one layer at a time.</p>
-      <LocalizedClientLink href="/store" className="joy-shop-button">Discover the shop <span>↗</span></LocalizedClientLink>
-      <div className="joy-hero-meta"><span>Two brothers. One big idea.</span><span>Making joy since 2026</span></div>
-    </div>
-    <div className="joy-feature">
-      <div className="joy-feature-top"><span>{featured ? "IN THE SHOP" : "MEET MUKKY’S"}</span><span>✳</span></div>
-      <LocalizedClientLink href={featured ? `/products/${featured.handle}` : "/store"} className="joy-feature-image">
-        <Image src={featured?.thumbnail || "/brand/mukkys-logo.png"} alt={featured?.title || "Mukky’s 3D Shop"} fill sizes="(max-width: 900px) 90vw, 45vw" priority className="object-contain" />
-      </LocalizedClientLink>
-      <div className="joy-feature-bottom"><span>{featured?.title || "A little imagination. A lot of layers."}</span><LocalizedClientLink href={featured ? `/products/${featured.handle}` : "/store"} aria-label="Explore featured item">↗</LocalizedClientLink></div>
-    </div>
-  </section>
+export default function Hero({ countryCode: _countryCode }: { countryCode: string }) {
+  return <>
+    <div className="ink-announcement">Small-batch spirit. Big imagination. <span>✳</span> Est. 2026</div>
+    <section className="ink-hero content-container">
+      <div className="ink-hero-copy">
+        <p className="ink-kicker">A LITTLE DIFFERENT. A LOT MORE YOU.</p>
+        <h1 className="ink-lettering"><span className="sr-only">Making joy.</span><Image src="/brand/making-joy.png" alt="" width={1536} height={1024} priority sizes="(max-width: 800px) 90vw, 50vw" /></h1>
+        <p>Playful prints. Useful little things. Objects with a personality all of their own.</p>
+        <div className="ink-hero-actions"><LocalizedClientLink href="/store" className="ink-button">Find your happy <span aria-hidden="true">↗</span></LocalizedClientLink><a href="#latest" className="ink-underlined">Explore the collection</a></div>
+      </div>
+      <div className="ink-workshop">
+        <span className="ink-tape">MADE OF IDEAS (&amp; A FEW LAYERS)</span>
+        <svg className="ink-doodle ink-doodle-one" viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M40 4 47 28 72 20 54 40 74 58 49 53 40 77 32 53 7 60 25 40 7 19 33 28Z" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" /></svg>
+        <Image src="/brand/mukkys-logo.png" alt="Our cheerful Mukky’s printer mascot, printing a golden star" width={1792} height={896} className="ink-mascot" priority />
+        <div className="ink-sticker">100%<br /><span>little-shop energy</span></div>
+        <svg className="ink-doodle ink-doodle-two" viewBox="0 0 100 70" fill="none" aria-hidden="true"><path d="M5 10C70 0 95 35 45 40C5 45 35 70 87 58M75 48 90 58 78 67" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+        <p className="ink-workshop-caption">Two brothers. One printer. Endless possibilities.</p>
+      </div>
+    </section>
+    <div className="ink-ribbon"><span>USEFUL LITTLE THINGS</span><b>✳</b><span>PERSONALITY INCLUDED</span><b>✳</b><span>MAKING JOY SINCE 2026</span></div>
+  </>
 }

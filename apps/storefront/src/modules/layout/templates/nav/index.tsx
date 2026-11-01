@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import BrandLogo from "@modules/common/components/brand-logo"
 
 import { listLocales } from "@lib/data/locales"
 import { getLocale } from "@lib/data/locale-actions"
@@ -18,7 +19,7 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
+      <header className="mukky-nav relative h-24 mx-auto border-b duration-200 border-ui-border-base">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
           <div className="flex-1 basis-0 h-full flex items-center">
             <div className="h-full">
@@ -29,10 +30,10 @@ export default async function Nav() {
           <div className="flex items-center h-full">
             <LocalizedClientLink
               href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
+              className="mukky-brand-link"
               data-testid="nav-store-link"
             >
-              Medusa Store
+              <BrandLogo />
             </LocalizedClientLink>
           </div>
 

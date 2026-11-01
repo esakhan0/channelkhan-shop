@@ -1,31 +1,36 @@
-import { Github } from "@medusajs/icons";
-import { Button, Heading } from "@modules/common/components/ui";
-const Hero = () => {
-  return (
-    <div className="h-[75vh] w-full border-b border-ui-border-base relative bg-ui-bg-subtle">
-      <div className="absolute inset-0 z-10 flex flex-col justify-center items-center text-center small:p-32 gap-6">
-        <span>
-          <Heading
-            level="h1"
-            className="text-3xl leading-10 text-ui-fg-base font-normal"
-          >
-            Ecommerce Starter Template
-          </Heading>
-          <Heading
-            level="h2"
-            className="text-3xl leading-10 text-ui-fg-subtle font-normal"
-          >
-            Powered by Medusa and Next.js
-          </Heading>
-        </span>
-        <a href="https://github.com/medusajs/dtc-starter" target="_blank">
-          <Button variant="secondary">
-            View on GitHub <Github />
-          </Button>
-        </a>
+import BrandLogo from "@modules/common/components/brand-logo"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+
+const Hero = () => (
+  <section className="mukky-hero" aria-labelledby="mukky-title">
+    <div className="content-container mukky-hero-grid">
+      <div className="mukky-intro">
+        <p className="mukky-eyebrow">Welcome to our little print shop</p>
+        <h1 id="mukky-title">Small prints.<br /><span>Big personality.</span></h1>
+        <p className="mukky-description">
+          A little imagination. A lot of layers. Discover playful 3D-printed
+          finds from Mukky&apos;s, a shop started by two brothers and one printer.
+        </p>
+        <div className="mukky-actions">
+          <LocalizedClientLink href="/store" className="mukky-button">
+            Explore the shop <span aria-hidden="true">↗</span>
+          </LocalizedClientLink>
+          <LocalizedClientLink href="/contact" className="mukky-text-link">Say hello</LocalizedClientLink>
+        </div>
+        <p className="mukky-footnote">Little objects. Plenty of character.</p>
+      </div>
+      <div className="mukky-comic-panel">
+        <span className="mukky-panel-caption">Meanwhile, at Mukky&apos;s...</span>
+        <BrandLogo animated />
+        <span className="mukky-panel-note">Good things take a few layers.</span>
       </div>
     </div>
-  );
-};
+    <div className="mukky-paper-strip" aria-label="About the shop">
+      <span>Two brothers</span><span aria-hidden="true">✳</span>
+      <span>One printer</span><span aria-hidden="true">✳</span>
+      <span>A whole lot of ideas</span>
+    </div>
+  </section>
+)
 
-export default Hero;
+export default Hero

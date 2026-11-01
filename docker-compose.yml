@@ -57,6 +57,27 @@ services:
       timeout: 5s
       start_period: 120s
       retries: 5
+  storefront:
+    build:
+      context: .
+      dockerfile: Dockerfile.storefront
+      args:
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.channelkhan.com
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:?Set MEDUSA_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_BASE_URL: https://shop.channelkhan.com
+        NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+    restart: unless-stopped
+    depends_on:
+      medusa:
+        condition: service_healthy
+    expose:
+      - "8000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.channelkhan.com
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:?Set MEDUSA_PUBLISHABLE_KEY}
+      NEXT_PUBLIC_BASE_URL: https://shop.channelkhan.com
+      NEXT_PUBLIC_DEFAULT_REGION: gb
 volumes:
   postgres_data:
   uploads:

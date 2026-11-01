@@ -1,13 +1,29 @@
-FROM node:22-alpine
+FROM node:22-alpine AS base
 WORKDIR /server
 RUN corepack enable && corepack prepare pnpm@10.11.1 --activate
-COPY . .
-RUN pnpm install --frozen-lockfile
+
+FROM base AS dependencies
+# Only dependency metadata affects this installation layer.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/backend/package.json ./apps/backend/package.json
+COPY apps/storefront/package.json ./apps/storefront/package.json
+RUN --mount=type=cache,id=channelkhan-pnpm,target=/pnpm/store,sharing=locked \
+    pnpm --filter @dtc/backend... install --frozen-lockfile --store-dir /pnpm/store --package-import-method copy
+
+FROM dependencies AS build
+COPY apps/backend ./apps/backend
 ARG MEDUSA_BACKEND_URL=https://api.channelkhan.com
 ENV MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL
 RUN pnpm --filter @dtc/backend build
+
+FROM base AS runtime
 WORKDIR /server/apps/backend/.medusa/server
-RUN pnpm install --prod --ignore-workspace --no-frozen-lockfile
+# Copy the generated manifest separately so source edits do not reinstall
+# production dependencies when this manifest is unchanged.
+COPY --from=build /server/apps/backend/.medusa/server/package.json ./package.json
+RUN --mount=type=cache,id=channelkhan-pnpm,target=/pnpm/store,sharing=locked \
+    pnpm install --prod --ignore-workspace --no-frozen-lockfile --store-dir /pnpm/store --package-import-method copy
+COPY --from=build /server/apps/backend/.medusa/server/ ./
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=9000

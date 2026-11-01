@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
+import ShopShowcase from "@modules/home/components/shop-showcase"
 import Hero from "@modules/home/components/hero"
 import { listCollections } from "@lib/data/collections"
 import { getRegion, listRegions } from "@lib/data/regions"
@@ -88,7 +88,8 @@ export default async function Home(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: toJsonLd(structuredData) }}
       />
-      <Hero />
+      <Hero countryCode={countryCode} />
+      <ShopShowcase countryCode={countryCode} />
       <section className="content-container mukky-story" aria-labelledby="mukky-story-title">
         <p className="mukky-eyebrow">Hello from our little corner of the world</p>
         <h2 id="mukky-story-title">Big ideas. Little layers.</h2>
@@ -97,11 +98,8 @@ export default async function Home(props: {
           Welcome to Mukky&apos;s. We&apos;re just getting started.</p>
         <span className="mukky-est-stamp">Making joy<br />Est. 2026</span>
       </section>
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
-      </div>
+
     </>
   )
 }
+

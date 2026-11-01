@@ -81,7 +81,7 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
               <li key={hit.objectID}>
                 <LocalizedClientLink
                   href={`/products/${hit.handle}`}
-                  className="group"
+                  className="group mukky-product-card"
                 >
                   <div data-testid="product-wrapper">
                     <Thumbnail thumbnail={hit.thumbnail} size="full" />

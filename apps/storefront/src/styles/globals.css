@@ -157,3 +157,50 @@ body { background: #fbf7ee; color: #24221e; }
   .mukky-logo-small, .mukky-button { transition: none; }
   .mukky-motion-button { display: none; }
 }
+
+@font-face {
+  font-family: 'Mukky Chewy';
+  src: url('/fonts/chewy-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+:root { --mukky-display: 'Mukky Chewy', 'Comic Sans MS', cursive; }
+.mukky-intro h1 { font-family: var(--mukky-display); font-weight: 400; letter-spacing: -.025em; font-size: clamp(96px, 11vw, 166px); line-height: .92; }
+.mukky-intro h1 span { font-style: normal; display: inline-block; transform: rotate(-5deg); color: #966200; }
+.mukky-eyebrow span { padding: 0 10px; }
+.mukky-heading, .mukky-store-heading h1, .mukky-story h2 { font-family: var(--mukky-display); font-weight: 400; letter-spacing: .01em; }
+.mukky-store-heading { padding: 44px 0 48px; border-bottom: 2px solid #24221e; margin-bottom: 36px; }
+.mukky-store-heading h1 { font-size: clamp(40px, 6vw, 76px); line-height: 1.1; margin-bottom: 16px; }
+.mukky-store-heading > p:last-child { color: #625c52; }
+.mukky-product-card { display: block; background: #fffdf7; padding: 12px 12px 20px; border: 2px solid #24221e; border-radius: 12px 16px 10px 14px; box-shadow: 3px 3px 0 #24221e; transition: transform .2s ease, box-shadow .2s ease; }
+.mukky-product-card:hover { transform: translateY(-4px) rotate(-1deg); box-shadow: 5px 7px 0 #24221e; }
+.mukky-product-card:focus-visible { outline: 3px solid #966200; outline-offset: 5px; }
+.mukky-product-card [data-testid='product-title'] { font-weight: 700; color: #24221e; }
+.mukky-ui-button { border: 2px solid #24221e; border-radius: 6px 10px 7px 9px; box-shadow: 2px 2px 0 #a69779; }
+.mukky-ui-button:disabled { box-shadow: none; }
+.mukky-story { position: relative; padding-top: 85px; padding-bottom: 85px; padding-right: 250px; border-bottom: 1px dashed #a69779; }
+.mukky-story h2 { font-size: clamp(38px, 5vw, 64px); line-height: 1.1; margin-bottom: 24px; }
+.mukky-story > p:not(.mukky-eyebrow) { max-width: 650px; color: #625c52; line-height: 1.9; font-size: 16px; }
+.mukky-est-stamp { position: absolute; right: 45px; top: 85px; display: grid; place-content: center; width: 150px; height: 150px; border: 3px dashed #24221e; border-radius: 50%; background: #f6d75d; text-align: center; font-family: var(--mukky-display); font-size: 26px; line-height: 1.3; transform: rotate(12deg); }
+.mukky-footer { background: #f1c94b; border-top: 2px solid #24221e; padding-top: 65px; margin-top: 50px; }
+.mukky-footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 45px; padding-bottom: 65px; }
+.mukky-footer-wordmark { font-family: var(--mukky-display); font-size: 76px; line-height: 1.2; display: inline-block; transform: rotate(-3deg); margin-bottom: 15px; }
+.mukky-footer h2 { font-family: var(--mukky-display); font-size: 26px; margin-bottom: 20px; }
+.mukky-footer-top > div:not(:first-child) > a { display: block; padding: 7px 0; font-size: 14px; }
+.mukky-footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.mukky-footer-est { display: inline-block; border: 1px solid #24221e; padding: 5px 12px; margin-top: 20px; border-radius: 50%; font-size: 12px; transform: rotate(-5deg); }
+.mukky-footer-bottom { display: flex; gap: 24px; flex-wrap: wrap; justify-content: space-between; padding: 25px 0; border-top: 1px solid #24221e; font-size: 11px; }
+.mukky-footer-bottom > div { display: flex; gap: 20px; }
+@media (max-width: 700px) {
+  .mukky-story { padding: 55px 24px; }
+  .mukky-est-stamp { position: static; width: 110px; height: 110px; font-size: 21px; margin-top: 30px; }
+  .mukky-footer-top { grid-template-columns: 1fr 1fr; gap: 35px; }
+  .mukky-footer-top > div:first-child { grid-column: 1 / -1; }
+  .mukky-product-card { padding: 7px 7px 15px; }
+  .mukky-product-card [data-testid='product-title'] { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mukky-product-card { transition: none; }
+  .mukky-product-card:hover { transform: none; }
+}

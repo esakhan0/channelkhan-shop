@@ -18,7 +18,7 @@ export async function generateMetadata(props: {
   const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
 
   return {
-    title: "Mukky's 3D Shop | Small prints. Big personality.",
+    title: "Mukky's 3D Shop | Making joy. Est. 2026",
     description:
       "Discover playful 3D-printed finds at Mukky's 3D Shop, started by two brothers and one printer.",
     alternates: {
@@ -89,6 +89,14 @@ export default async function Home(props: {
         dangerouslySetInnerHTML={{ __html: toJsonLd(structuredData) }}
       />
       <Hero />
+      <section className="content-container mukky-story" aria-labelledby="mukky-story-title">
+        <p className="mukky-eyebrow">Hello from our little corner of the world</p>
+        <h2 id="mukky-story-title">Big ideas. Little layers.</h2>
+        <p>We&apos;re two brothers turning our ideas into things you can hold.
+          One printer, plenty of curiosity, and a soft spot for objects with personality.
+          Welcome to Mukky&apos;s. We&apos;re just getting started.</p>
+        <span className="mukky-est-stamp">Making joy<br />Est. 2026</span>
+      </section>
       <div className="py-12">
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />

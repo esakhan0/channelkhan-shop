@@ -5,8 +5,8 @@ const Hero = () => (
   <section className="mukky-hero" aria-labelledby="mukky-title">
     <div className="content-container mukky-hero-grid">
       <div className="mukky-intro">
-        <p className="mukky-eyebrow">Welcome to our little print shop</p>
-        <h1 id="mukky-title">Small prints.<br /><span>Big personality.</span></h1>
+        <p className="mukky-eyebrow">Mukky&apos;s 3D Shop <span aria-hidden="true">✳</span> Est. 2026</p>
+        <h1 id="mukky-title">Making<br /><span>joy.</span></h1>
         <p className="mukky-description">
           A little imagination. A lot of layers. Discover playful 3D-printed
           finds from Mukky&apos;s, a shop started by two brothers and one printer.
@@ -17,7 +17,7 @@ const Hero = () => (
           </LocalizedClientLink>
           <LocalizedClientLink href="/contact" className="mukky-text-link">Say hello</LocalizedClientLink>
         </div>
-        <p className="mukky-footnote">Little objects. Plenty of character.</p>
+        <p className="mukky-footnote">Small prints. Big personality. Since 2026.</p>
       </div>
       <div className="mukky-comic-panel">
         <span className="mukky-panel-caption">Meanwhile, at Mukky&apos;s...</span>

@@ -113,8 +113,11 @@
 
 
 @font-face{font-family:'Mukky Chewy';src:url('/fonts/chewy-regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
-:root{--ink:#282323;--paper:#fffdf5;--yellow:#f4d34c;--lilac:#ded2f5;--mukky-display:'Mukky Chewy',cursive}
-body{background:var(--paper);color:var(--ink)}
+@font-face{font-family:'Mukky Fraunces';src:url('/fonts/fraunces-variable.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Mukky Space';src:url('/fonts/space-grotesk-variable.ttf') format('truetype');font-weight:300 700;font-style:normal;font-display:swap}
+:root{--ink:#282323;--paper:#fffdf5;--yellow:#f4d34c;--lilac:#ded2f5;--mukky-display:'Mukky Fraunces',Georgia,serif;--mukky-body:'Mukky Space',Arial,sans-serif}
+body{background:var(--paper);color:var(--ink);font-family:var(--mukky-body)}
+button,input,select,textarea{font-family:inherit}
 .content-container{max-width:1400px;padding-left:48px;padding-right:48px}
 a:focus-visible,button:focus-visible{outline:3px solid #7852af;outline-offset:5px}
 .mukky-nav{background:var(--paper);border-bottom:2px solid var(--ink)}
@@ -152,3 +155,31 @@ a:focus-visible,button:focus-visible{outline:3px solid #7852af;outline-offset:5p
 
 
 @media(max-width:480px){.mukky-header-logo{width:105px}.mukky-nav nav>div:last-child{gap:7px}.ink-account-link,[data-testid="nav-cart-link"]{font-size:11px;padding:8px}.ink-empty-bag h2{font-size:28px}.ink-login-form{min-width:0}}
+
+/* Expressive type and motion share the same printed-paper visual language. */
+.ink-type-headline{font:850 clamp(76px,8.5vw,126px)/.88 var(--mukky-display);letter-spacing:-.065em;font-variation-settings:"SOFT" 100,"WONK" 1; margin:30px 0 34px}
+.ink-type-headline>span:first-of-type{display:inline-block;position:relative;color:#7852af}
+.ink-type-headline svg{position:absolute;width:108%;height:24px;left:-2%;bottom:-19px;color:var(--ink);stroke-dasharray:600;stroke-dashoffset:0;animation:ink-draw 1.2s .35s backwards ease-out}
+.ink-type-dot{color:var(--yellow);text-shadow:2px 2px 0 var(--ink)}
+.ink-hero-copy>p.ink-handnote{font:18px/1.4 'Mukky Chewy',cursive;color:var(--ink);transform:rotate(-2deg);margin:0 0 25px;max-width:none}
+.ink-section-head h2,.mukky-story h2,.ink-page-heading h1,.ink-login-aside h2,.ink-empty-bag h2,.ink-coming h3{font-weight:750;letter-spacing:-.045em;font-variation-settings:"SOFT" 80,"WONK" 1}
+.ink-workshop-stage{min-width:0;position:relative;padding-bottom:36px}
+.ink-workshop{transition:transform .25s ease-out;box-shadow:8px 8px 0 #28232312}
+.ink-wiggle-button{position:absolute;bottom:0;left:50%;transform:translateX(-50%) rotate(-3deg);font:17px 'Mukky Chewy',cursive;white-space:nowrap;padding:8px 14px;border-radius:30px;border:1.5px dashed #7852af;background:var(--paper);transition:background .2s}
+.ink-wiggle-button:hover{background:var(--yellow)}
+.ink-wiggle-button span{display:inline-block;font:25px var(--mukky-body);margin-left:8px}
+.ink-doodle-one{animation:ink-star-turn 1.4s .3s both ease-out}
+.ink-sticker{animation:ink-stamp-in .7s .5s backwards cubic-bezier(.2,1.5,.5,1);font-weight:800}
+.ink-product-reveal{min-width:0;display:flex}.ink-product-reveal>.mukky-product-card{width:100%}
+.ink-product-reveal:nth-child(2n) .mukky-product-card{background:#fff1bc}.ink-product-reveal:nth-child(3n) .mukky-product-card{background:#e1ead9}
+.mukky-product-card{transition:transform .25s,box-shadow .25s;box-shadow:0 0 0 var(--ink)}
+.mukky-product-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:5px 7px 0 var(--ink)}
+.ink-account-link,[data-testid='nav-cart-link']{transition:transform .2s,box-shadow .2s}
+.ink-account-link:hover,[data-testid='nav-cart-link']:hover{transform:translateY(-2px);box-shadow:2px 3px 0 var(--ink)}
+.ink-login-layout,.ink-empty-bag{animation:ink-arrive .65s ease-out}
+.ink-button span{transition:transform .2s}.ink-button:hover span{transform:translate(3px,-3px)}
+@keyframes ink-draw{from{stroke-dashoffset:600}to{stroke-dashoffset:0}}
+@keyframes ink-star-turn{from{transform:rotate(-100deg) scale(.5);opacity:0}to{transform:rotate(12deg) scale(1);opacity:1}}
+@keyframes ink-stamp-in{from{transform:rotate(12deg) scale(.7);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
+@media(max-width:750px){.ink-type-headline{font-size:clamp(78px,17vw,116px);margin-top:25px}.ink-hero-copy>p.ink-handnote{font-size:16px}.ink-workshop-stage{margin-top:10px}}
+@media(prefers-reduced-motion:reduce){.ink-type-headline svg,.ink-doodle-one,.ink-sticker,.ink-login-layout,.ink-empty-bag{animation:none}.ink-workshop,.ink-account-link,[data-testid='nav-cart-link'],.ink-button span{transition:none}.ink-wiggle-button{display:none}.ink-product-reveal .mukky-product-card:hover,.ink-account-link:hover,[data-testid='nav-cart-link']:hover,.ink-button:hover span{transform:none}}

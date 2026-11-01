@@ -3,6 +3,7 @@ import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Reveal from "@modules/common/components/reveal"
 
 export default async function ShopShowcase({ countryCode }: { countryCode: string }) {
   const region = await getRegion(countryCode)
@@ -13,6 +14,6 @@ export default async function ShopShowcase({ countryCode }: { countryCode: strin
   const visible = products.filter(p => !/^medusa\s/i.test(p.title)).slice(0, 8)
   return <section className="content-container ink-products" id="latest">
     <div className="ink-section-head"><div><p className="ink-kicker">SMALL OBJECTS. SERIOUS CHARACTER.</p><h2>{popular ? "Popular products" : "Fresh from the workshop"}<span aria-hidden="true"> ✳</span></h2></div><LocalizedClientLink href="/store" className="ink-underlined">Shop all prints ↗</LocalizedClientLink></div>
-    {visible.length ? <div className="joy-product-grid">{visible.map(product => <ProductPreview key={product.id} product={product} region={region} />)}</div> : <div className="ink-coming"><span aria-hidden="true">✳</span><h3>The first little joys are on their way.</h3><p>We’re getting our first collection ready. Check back soon for the good stuff.</p><LocalizedClientLink href="/contact" className="ink-underlined">Say hello to the makers ↗</LocalizedClientLink></div>}
+    {visible.length ? <div className="joy-product-grid">{visible.map((product, index) => <Reveal key={product.id} className="ink-product-reveal" delay={(index % 4) * 65}><ProductPreview product={product} region={region} /></Reveal>)}</div> : <Reveal className="ink-coming"><span aria-hidden="true">✳</span><h3>The first little joys are on their way.</h3><p>We’re getting our first collection ready. Check back soon for the good stuff.</p><LocalizedClientLink href="/contact" className="ink-underlined">Say hello to the makers ↗</LocalizedClientLink></Reveal>}
   </section>
 }

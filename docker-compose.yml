@@ -47,6 +47,16 @@ services:
       MEDUSA_BACKEND_URL: https://api.channelkhan.com
     volumes:
       - uploads:/server/apps/backend/.medusa/server/static
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:9000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
 volumes:
   postgres_data:
   uploads:

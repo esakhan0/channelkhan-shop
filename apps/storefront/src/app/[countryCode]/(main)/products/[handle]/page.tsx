@@ -16,8 +16,7 @@ type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
-export const dynamic = "force-static"
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
@@ -29,6 +28,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   const product = await listProducts({
+    fresh: true,
     countryCode: params.countryCode,
     queryParams: { handle },
   }).then(({ response }) => response.products[0])
@@ -112,6 +112,7 @@ export default async function ProductPage(props: Props) {
   }
 
   const pricedProduct = await listProducts({
+    fresh: true,
     countryCode: params.countryCode,
     queryParams: { handle: params.handle },
   }).then(({ response }) => response.products[0])

@@ -5,7 +5,7 @@ import { getRequestOrigin } from "@lib/util/site"
 
 const HEADERS = {
   "Content-Type": "text/markdown; charset=utf-8",
-  "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
+  "Cache-Control": "no-store",
   Vary: "Accept",
 }
 
@@ -17,7 +17,7 @@ export async function GET(
   const { countryCode, handle } = await params
   const region = await getRegion(countryCode)
   const product = region
-    ? await listProducts({ countryCode, queryParams: { handle } })
+    ? await listProducts({ countryCode, queryParams: { handle }, fresh: true })
         .then(({ response }) => response.products[0])
         .catch(() => undefined)
     : undefined

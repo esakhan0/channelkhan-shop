@@ -35,14 +35,14 @@ export default function SideMenu({ regions, locales, currentLocale }: SideMenuPr
         <DialogPanel className="joy-menu-panel" data-testid="nav-menu-popup">
           <div className="joy-menu-top">
             <DialogTitle className="sr-only">Explore Mukky’s shop</DialogTitle>
-            <Image src="/brand/mukkys-logo-v2.png" alt="Mukky’s 3D Shop" width={1938} height={811} className="joy-menu-logo" />
+            <Image src="/brand/mukkys-logo-v3.png" alt="Mukky’s 3D Shop" width={1024} height={409} className="joy-menu-logo" sizes="190px" />
             <button type="button" className="joy-menu-close" onClick={() => setOpen(false)} aria-label="Close menu" data-testid="close-menu-button">×</button>
           </div>
           <p className="ink-kicker">COME ON IN. FIND YOUR LITTLE HAPPY.</p>
           <nav aria-label="Main menu"><ul className="joy-menu-links">
             {links.map(([label, href], i) => <li key={href}><LocalizedClientLink href={href} onClick={() => setOpen(false)} aria-current={pathname === href ? "page" : undefined}><span className="joy-menu-number">0{i + 1}</span>{label}<span className="joy-menu-arrow" aria-hidden="true">↗</span></LocalizedClientLink></li>)}
           </ul></nav>
-          <div className="joy-menu-help"><LocalizedClientLink href="/shipping" onClick={() => setOpen(false)}>Shipping</LocalizedClientLink><LocalizedClientLink href="/returns" onClick={() => setOpen(false)}>Returns</LocalizedClientLink><LocalizedClientLink href="/search" onClick={() => setOpen(false)}>Search</LocalizedClientLink></div>
+          <div className="joy-menu-help"><LocalizedClientLink href="/shipping" onClick={() => setOpen(false)}>Shipping</LocalizedClientLink><LocalizedClientLink href="/returns" onClick={() => setOpen(false)}>Returns</LocalizedClientLink></div>
           <div className="joy-menu-bottom">
             {!!locales?.length && <div onMouseEnter={languageToggle.open} onMouseLeave={languageToggle.close}><LanguageSelect toggleState={languageToggle} locales={locales} currentLocale={currentLocale} /></div>}
             {regions && <CountrySelect toggleState={countryToggle} regions={regions} />}

@@ -16,7 +16,7 @@ const StoreTemplate = ({ currencyCode }: { currencyCode: string }) => {
     <div className="py-6 content-container mukky-store" data-testid="category-container">
       <div className="mukky-store-heading">
         <p className="mukky-eyebrow">A little something to make you smile</p>
-        <h1 data-testid="store-page-title"><span className="sr-only">Find your joy — shop all prints</span><Image src="/brand/find-your-joy.png" alt="" width={1536} height={1024} priority sizes="280px" /></h1>
+        <h1 data-testid="store-page-title"><span className="sr-only">Find your joy — shop all prints</span><Image src="/brand/find-your-joy-v2.png" alt="" width={800} height={400} priority sizes="280px" /></h1>
         <p>Find your next favourite little thing.</p>
       </div>
 

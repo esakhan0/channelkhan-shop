@@ -4,11 +4,9 @@ import Reveal from "@modules/common/components/reveal"
 
 export default function Hero({ countryCode: _countryCode }: { countryCode: string }) {
   return <>
-    <div className="ink-announcement">Small-batch spirit. Big imagination. <span aria-hidden="true">✳</span> Est. 2026</div>
     <nav aria-label="Explore the shop" className="joy-browse-nav content-container">
       <LocalizedClientLink href="/store">Shop all prints</LocalizedClientLink>
       <a href="#latest">Fresh from the workshop</a>
-      <a href="#our-story">Meet the makers</a>
     </nav>
     <section className="joy-editorial-hero content-container">
       <Reveal className="joy-artwork">

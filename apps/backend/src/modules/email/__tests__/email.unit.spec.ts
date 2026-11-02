@@ -24,7 +24,7 @@ describe("Branded shop email", () => {
     for (const template of ["order-placed", "order-shipped", "order-delivered", "order-canceled", "refund-requested", "refund-updated", "order-transfer", "smtp-test"]) {
       const mail = renderShopEmail(template, { order_number: 42 }, options)
       expect(mail.html).toContain('name="viewport"')
-      expect(mail.html).toContain("mukkys-logo-v2.png")
+      expect(mail.html).toContain("mukkys-logo-v3.png")
       expect(mail.text).toContain("Order #42")
       expect(mail.subject).toContain("#42")
     }

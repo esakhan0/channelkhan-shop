@@ -29,7 +29,7 @@ export default function CheckoutLayout({
             className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
             data-testid="store-link"
           >
-            <Image src="/brand/mukkys-logo-v2.png" alt="Mukky’s 3D Shop — home" width={1938} height={811} className="joy-checkout-logo" sizes="140px" />
+            <Image src="/brand/mukkys-logo-v3.png" alt="Mukky’s 3D Shop — home" width={1024} height={409} className="joy-checkout-logo" sizes="140px" />
           </LocalizedClientLink>
           <div className="joy-checkout-note flex-1 basis-0">Checkout</div>
         </nav>

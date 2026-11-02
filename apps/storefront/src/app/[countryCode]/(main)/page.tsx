@@ -90,15 +90,6 @@ export default async function Home(props: {
       />
       <Hero countryCode={countryCode} />
       <ShopShowcase countryCode={countryCode} />
-      <section id="our-story" className="content-container mukky-story" aria-labelledby="mukky-story-title">
-        <p className="mukky-eyebrow">Hello from our little corner of the world</p>
-        <h2 id="mukky-story-title">Big ideas. Little layers.</h2>
-        <p>At Mukky&apos;s, we turn playful ideas into things you can hold.
-          Thoughtful details, a little curiosity, and plenty of personality go into every design.
-          Find something that makes your everyday a little more joyful.</p>
-        <span className="mukky-est-stamp">Making joy<br />Est. 2026</span>
-      </section>
-
     </>
   )
 }

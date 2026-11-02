@@ -2,37 +2,31 @@ import { HttpTypes } from "@medusajs/types"
 import { getPercentageDiff } from "./get-percentage-diff"
 import { convertToLocale } from "./money"
 
-type VariantWithPrice = HttpTypes.StoreProductVariant & {
-  calculated_price?: {
-    calculated_amount: number
-    original_amount: number
-    currency_code: string
-    calculated_price: {
-      price_list_type: string
-    }
-  }
-}
+type VariantWithPrice = HttpTypes.StoreProductVariant
 
 export const getPricesForVariant = (variant: VariantWithPrice) => {
-  if (!variant?.calculated_price?.calculated_amount) {
+  if (typeof variant?.calculated_price?.calculated_amount !== "number" ||
+      !Number.isFinite(variant.calculated_price.calculated_amount) ||
+      !variant.calculated_price.currency_code) {
     return null
   }
 
+  const originalAmount = variant.calculated_price.original_amount ?? variant.calculated_price.calculated_amount
   return {
     calculated_price_number: variant.calculated_price.calculated_amount,
     calculated_price: convertToLocale({
       amount: variant.calculated_price.calculated_amount,
       currency_code: variant.calculated_price.currency_code,
     }),
-    original_price_number: variant.calculated_price.original_amount,
+    original_price_number: originalAmount,
     original_price: convertToLocale({
-      amount: variant.calculated_price.original_amount,
+      amount: originalAmount,
       currency_code: variant.calculated_price.currency_code,
     }),
     currency_code: variant.calculated_price.currency_code,
-    price_type: variant.calculated_price.calculated_price.price_list_type,
+    price_type: variant.calculated_price.calculated_price?.price_list_type ?? "default",
     percentage_diff: getPercentageDiff(
-      variant.calculated_price.original_amount,
+      originalAmount,
       variant.calculated_price.calculated_amount
     ),
   }
@@ -55,7 +49,7 @@ export function getProductPrice({
     }
 
     const cheapestVariant = (product.variants as VariantWithPrice[])
-      .filter((v) => !!v.calculated_price)
+      .filter((v) => getPricesForVariant(v) !== null)
       .sort((a, b) => {
         return (
           (a.calculated_price?.calculated_amount ?? 0) -

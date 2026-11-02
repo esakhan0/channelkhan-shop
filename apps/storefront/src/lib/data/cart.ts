@@ -157,6 +157,27 @@ export async function addToCart({
     .catch(medusaError)
 }
 
+// Return expected cart failures as data so production server actions can display them.
+export async function addToCartWithFeedback(input: {
+  variantId: string
+  quantity: number
+  countryCode: string
+}): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    await addToCart(input)
+    return { success: true }
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : ""
+    if (/price|currency/.test(message)) {
+      return { success: false, error: "This option is currently unavailable in your currency. Please contact us for help." }
+    }
+    if (/inventory|stock/.test(message)) {
+      return { success: false, error: "There isn’t enough stock for this option. Please choose another option or quantity." }
+    }
+    return { success: false, error: "We couldn’t add this item to your bag. Please try again." }
+  }
+}
+
 export async function updateLineItem({
   lineId,
   quantity,

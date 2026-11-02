@@ -17,6 +17,9 @@ type MobileActionsProps = {
   options: Record<string, string | undefined>
   updateOptions: (title: string, value: string) => void
   inStock?: boolean
+  hasPrice: boolean
+  cartError: string | null
+  added: boolean
   handleAddToCart: () => void
   isAdding?: boolean
   show: boolean
@@ -29,6 +32,9 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   options,
   updateOptions,
   inStock,
+  hasPrice,
+  cartError,
+  added,
   handleAddToCart,
   isAdding,
   show,
@@ -47,8 +53,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     }
     const { variantPrice, cheapestPrice } = price
 
-    return variantPrice || cheapestPrice || null
-  }, [price])
+    return variant ? variantPrice : cheapestPrice
+  }, [price, variant])
 
   const isSimple = isSimpleProduct(product)
 
@@ -95,7 +101,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   </span>
                 </div>
               ) : (
-                <div></div>
+                <span className="text-small-regular">Currently unavailable</span>
               )}
             </div>
             <div className={clx("grid grid-cols-2 w-full gap-x-4", {
@@ -120,7 +126,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               <Button
                 type="button"
                 onClick={handleAddToCart}
-                disabled={!inStock || !variant}
+                disabled={!inStock || !variant || !hasPrice || isAdding || optionsDisabled}
                 className="w-full"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
@@ -129,9 +135,13 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   ? "Select variant"
                   : !inStock
                   ? "Out of stock"
+                  : !hasPrice
+                  ? "Currently unavailable"
                   : "Add to cart"}
               </Button>
             </div>
+            {cartError && <p role="alert" className="text-small-regular text-ui-fg-error">{cartError}</p>}
+            {added && <p role="status" className="text-small-regular">Added to your bag.</p>}
           </div>
         </Transition>
       </div>

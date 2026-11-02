@@ -7,6 +7,21 @@ module.exports = defineConfig({
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
   modules: [
+    ...(process.env.STRIPE_API_KEY && process.env.STRIPE_WEBHOOK_SECRET ? [{
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [{
+          resolve: "@medusajs/medusa/payment-stripe",
+          id: "stripe",
+          options: {
+            apiKey: process.env.STRIPE_API_KEY,
+            webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+            capture: true,
+            automatic_payment_methods: true,
+          },
+        }],
+      },
+    }] : []),
     {
       resolve: "@medusajs/medusa/file",
       options: {

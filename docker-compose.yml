@@ -42,6 +42,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
       COOKIE_SECRET: ${COOKIE_SECRET:?Set COOKIE_SECRET}
       AUTH_MFA_ENCRYPTION_KEY: ${AUTH_MFA_ENCRYPTION_KEY:-}
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STORE_CORS: https://shop.channelkhan.com
       ADMIN_CORS: https://shopadmin.channelkhan.com,https://api.channelkhan.com
       AUTH_CORS: https://shop.channelkhan.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
@@ -79,6 +81,7 @@ services:
       NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:?Set MEDUSA_PUBLISHABLE_KEY}
       NEXT_PUBLIC_BASE_URL: https://shop.channelkhan.com
       NEXT_PUBLIC_DEFAULT_REGION: gb
+      NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
     healthcheck:
       test:
         - CMD

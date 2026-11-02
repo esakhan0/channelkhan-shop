@@ -1,9 +1,10 @@
 "use client"
 
-import { addToCart } from "@lib/data/cart"
+import { addToCartWithFeedback } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { notifyCartUpdated } from "@lib/util/cart-events"
-import { isVariantInStock } from "@lib/util/inventory"
+import { getVariantStockLabel, isVariantInStock } from "@lib/util/inventory"
+import { getPricesForVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import Divider from "@modules/common/components/divider"
@@ -24,7 +25,7 @@ type ProductActionsProps = {
 const optionsAsKeymap = (
   variantOptions: HttpTypes.StoreProductVariant["options"]
 ) => {
-  return variantOptions?.reduce((acc: Record<string, string>, varopt) => {
+  return (variantOptions ?? []).reduce((acc: Record<string, string>, varopt) => {
     if (varopt.option_id) acc[varopt.option_id] = varopt.value
     return acc
   }, {})
@@ -40,12 +41,14 @@ export default function ProductActions({
   const router = useRouter()
   const pathname = usePathname()
   // Preselected on the server so the form posts a valid variant without JavaScript.
-  // The page is statically rendered, so `?v_id=` is applied after hydration.
+  // Apply `?v_id=` after hydration to keep the client and initial form consistent.
   const [options, setOptions] = useState<Record<string, string | undefined>>(
     () => optionsAsKeymap(getDefaultVariant(product)?.options ?? null) ?? {}
   )
   const [isUrlVariantApplied, setIsUrlVariantApplied] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
+  const [cartError, setCartError] = useState<string | null>(null)
+  const [added, setAdded] = useState(false)
   const countryCode = useParams().countryCode as string
 
   const selectedVariant = useMemo(() => {
@@ -61,6 +64,8 @@ export default function ProductActions({
 
   // update the options when a variant is selected
   const setOptionValue = (optionId: string, value: string) => {
+    setCartError(null)
+    setAdded(false)
     setOptions((prev) => ({
       ...prev,
       [optionId]: value,
@@ -109,6 +114,7 @@ export default function ProductActions({
     () => isVariantInStock(selectedVariant),
     [selectedVariant]
   )
+  const hasPrice = !!selectedVariant && getPricesForVariant(selectedVariant) !== null
 
   const actionsRef = useRef<HTMLDivElement>(null)
 
@@ -116,18 +122,24 @@ export default function ProductActions({
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
-
+    if (!selectedVariant?.id || !hasPrice || !inStock || isAdding || disabled) return
+    setCartError(null)
+    setAdded(false)
     setIsAdding(true)
-
-    await addToCart({
-      variantId: selectedVariant.id,
-      quantity: 1,
-      countryCode,
-    })
-    notifyCartUpdated()
-
-    setIsAdding(false)
+    try {
+      const result = await addToCartWithFeedback({ variantId: selectedVariant.id, quantity: 1, countryCode })
+      if (!result.success) {
+        setCartError(result.error)
+        return
+      }
+      setAdded(true)
+      notifyCartUpdated()
+      router.refresh()
+    } catch {
+      setCartError("We couldn’t reach the shop. Please try again.")
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -186,7 +198,7 @@ export default function ProductActions({
               className="text-small-regular text-ui-fg-subtle"
               data-testid="product-availability"
             >
-              {inStock ? "In stock" : "Out of stock"}
+              {getVariantStockLabel(selectedVariant)}
             </p>
           )}
 
@@ -194,6 +206,7 @@ export default function ProductActions({
             type="submit"
             disabled={
               !inStock ||
+              !hasPrice ||
               !selectedVariant ||
               !!disabled ||
               isAdding ||
@@ -208,8 +221,12 @@ export default function ProductActions({
               ? "Select variant"
               : !inStock || !isValidVariant
               ? "Out of stock"
+              : !hasPrice
+              ? "Currently unavailable"
               : "Add to cart"}
           </Button>
+          {cartError && <p role="alert" className="text-small-regular text-ui-fg-error" data-testid="cart-error">{cartError}</p>}
+          {added && <p role="status" className="text-small-regular" data-testid="cart-success">Added to your bag.</p>}
         </form>
         <MobileActions
           product={product}
@@ -217,6 +234,9 @@ export default function ProductActions({
           options={options}
           updateOptions={setOptionValue}
           inStock={inStock}
+          hasPrice={hasPrice}
+          cartError={cartError}
+          added={added}
           handleAddToCart={handleAddToCart}
           isAdding={isAdding}
           show={!inView}

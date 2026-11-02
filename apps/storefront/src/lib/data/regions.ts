@@ -7,6 +7,7 @@ import { getCacheOptions } from "./cookies"
 export const listRegions = async () => {
   const next = {
     ...(await getCacheOptions("regions")),
+    revalidate: 60,
   }
 
   return await sdk.client
@@ -21,6 +22,7 @@ export const listRegions = async () => {
 export const retrieveRegion = async (id: string) => {
   const next = {
     ...(await getCacheOptions(["regions", id].join("-"))),
+    revalidate: 60,
   }
 
   return await sdk.client
@@ -32,28 +34,15 @@ export const retrieveRegion = async (id: string) => {
     .then(({ region }) => region)
 }
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>()
-
 export const getRegion = async (countryCode: string) => {
-  if (regionMap.has(countryCode)) {
-    return regionMap.get(countryCode)
-  }
-
   const regions = await listRegions()
 
   if (!regions) {
     return null
   }
 
-  regions.forEach((region) => {
-    region.countries?.forEach((c) => {
-      regionMap.set(c?.iso_2 ?? "", region)
-    })
-  })
-
-  const region = countryCode
-    ? regionMap.get(countryCode)
-    : regionMap.get("us")
-
-  return region
+  // Do not keep a permanent process-wide country map: region edits must take effect.
+  return regions.find(region =>
+    region.countries?.some(country => country.iso_2 === (countryCode || "us").toLowerCase())
+  )
 }

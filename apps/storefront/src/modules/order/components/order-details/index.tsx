@@ -6,24 +6,23 @@ type OrderDetailsProps = {
   showStatus?: boolean
 }
 
-const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
+const OrderDetails = ({ order, showStatus = true }: OrderDetailsProps) => {
   const formatStatus = (str: string) => {
-    const formatted = str.split("_").join(" ")
+    const formatted = (str || "pending").split("_").join(" ")
 
     return formatted.slice(0, 1).toUpperCase() + formatted.slice(1)
   }
 
   return (
-    <div>
+    <div className="joy-order-meta">
       <Text>
-        We have sent the order confirmation details to{" "}
+        Order contact:{" "}
         <span
           className="text-ui-fg-medium-plus font-semibold"
           data-testid="order-email"
         >
           {order.email}
         </span>
-        .
       </Text>
       <Text className="mt-2">
         Order date:{" "}
@@ -35,20 +34,20 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
         Order number: <span data-testid="order-id">{order.display_id}</span>
       </Text>
 
-      <div className="flex items-center text-compact-small gap-x-4 mt-4">
+      <div className="joy-order-statuses flex flex-wrap items-center text-compact-small gap-2 mt-3">
         {showStatus && (
           <>
-            <Text>
-              Order status:{" "}
+            <Text className="joy-status-pill">
+              Fulfillment:{" "}
               <span className="text-ui-fg-subtle " data-testid="order-status">
                 {formatStatus(order.fulfillment_status)}
               </span>
             </Text>
-            <Text>
+            <Text className="joy-status-pill">
               Payment status:{" "}
               <span
                 className="text-ui-fg-subtle "
-                sata-testid="order-payment-status"
+                data-testid="order-payment-status"
               >
                 {formatStatus(order.payment_status)}
               </span>

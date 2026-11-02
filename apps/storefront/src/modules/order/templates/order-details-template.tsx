@@ -9,6 +9,8 @@ import OrderDetails from "@modules/order/components/order-details"
 import OrderSummary from "@modules/order/components/order-summary"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import React from "react"
+import RefreshOrder from "../components/refresh-order"
+import PaymentDetails from "../components/payment-details"
 
 type OrderDetailsTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -18,7 +20,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
   order,
 }) => {
   return (
-    <div className="flex flex-col justify-center gap-y-4">
+    <div className="joy-order-page flex flex-col gap-y-4">
       <div className="flex gap-2 justify-between items-center">
         <h1 className="text-2xl-semi">Order details</h1>
         <LocalizedClientLink
@@ -26,18 +28,26 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
           className="flex gap-2 items-center text-ui-fg-subtle hover:text-ui-fg-base"
           data-testid="back-to-overview-button"
         >
-          <XMark /> Back to overview
+          <XMark /> All orders
         </LocalizedClientLink>
       </div>
       <div
-        className="flex flex-col gap-4 h-full bg-white w-full"
+        className="joy-order-panel joy-order-compact"
         data-testid="order-details-container"
       >
-        <OrderDetails order={order} showStatus />
-        <Items order={order} />
-        <ShippingDetails order={order} />
-        <OrderSummary order={order} />
-        <Help />
+        <div className="joy-order-header"><OrderDetails order={order} showStatus /></div>
+        <RefreshOrder orders={[order]} />
+        <div className="joy-order-columns">
+          <div className="joy-order-main">
+            <section aria-label="Ordered items"><h2>In your order</h2><Items order={order} /></section>
+            <ShippingDetails order={order} />
+          </div>
+          <aside className="joy-order-aside" aria-label="Order summary">
+            <OrderSummary order={order} />
+            <PaymentDetails order={order} />
+            <Help orderNumber={order.display_id} />
+          </aside>
+        </div>
       </div>
     </div>
   )

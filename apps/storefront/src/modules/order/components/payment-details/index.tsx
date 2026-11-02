@@ -10,14 +10,15 @@ type PaymentDetailsProps = {
 }
 
 const PaymentDetails = ({ order }: PaymentDetailsProps) => {
-  const payment = order.payment_collections?.[0].payments?.[0]
+  const payment = order.payment_collections?.[0]?.payments?.[0]
 
   return (
-    <div>
+    <section className="joy-order-payment" aria-label="Payment details">
       <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
         Payment
       </Heading>
       <div>
+        {!payment && <Text>Payment status: {order.payment_status.replaceAll("_", " ")}</Text>}
         {payment && (
           <div className="flex items-start gap-x-1 w-full">
             <div className="flex flex-col w-1/3">
@@ -45,7 +46,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
                     : `${convertToLocale({
                         amount: payment.amount,
                         currency_code: order.currency_code,
-                      })} paid at ${new Date(
+                      })} · ${new Date(
                         payment.created_at ?? ""
                       ).toLocaleString()}`}
                 </Text>
@@ -56,7 +57,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
       </div>
 
       <Divider className="mt-8" />
-    </div>
+    </section>
   )
 }
 

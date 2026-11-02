@@ -24,7 +24,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
   }, [order])
 
   return (
-    <div className="bg-white flex flex-col" data-testid="order-card">
+    <div className="joy-order-card flex flex-col" data-testid="order-card">
       <div className="uppercase text-large-semi mb-1">
         #<span data-testid="order-display-id">{order.display_id}</span>
       </div>
@@ -42,6 +42,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
           numberOfLines > 1 ? "items" : "item"
         }`}</span>
       </div>
+      <div className="flex flex-wrap gap-2 my-3"><span className="joy-status-pill">Payment: {(order.payment_status || "pending").replaceAll("_", " ")}</span><span className="joy-status-pill">Delivery: {(order.fulfillment_status || "not_fulfilled").replaceAll("_", " ")}</span></div>
       <div className="grid grid-cols-2 small:grid-cols-4 gap-4 my-4">
         {order.items?.slice(0, 3).map((i) => {
           return (
@@ -64,10 +65,10 @@ const OrderCard = ({ order }: OrderCardProps) => {
             </div>
           )
         })}
-        {numberOfProducts > 4 && (
+        {numberOfProducts > 3 && (
           <div className="w-full h-full flex flex-col items-center justify-center">
             <span className="text-small-regular text-ui-fg-base">
-              + {numberOfLines - 4}
+              + {numberOfProducts - 3}
             </span>
             <span className="text-small-regular text-ui-fg-base">more</span>
           </div>

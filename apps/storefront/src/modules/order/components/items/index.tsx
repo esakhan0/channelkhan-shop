@@ -19,7 +19,7 @@ const Items = ({ order }: ItemsProps) => {
       <Table>
         <Table.Body data-testid="products-table">
           {items?.length
-            ? items
+            ? [...items]
                 .sort((a, b) => {
                   return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
                 })

@@ -35,3 +35,47 @@
 @media(max-width:400px){.joy-menu-trigger{gap:6px;font-size:11px}.joy-browse-nav{gap:12px;font-size:9px}.mukky-store-heading h1 img{width:120px}.mukky-store-heading>p:last-child{font-size:21px}.joy-checkout-note{font-size:10px}.joy-checkout-logo{width:110px}}
 @media(prefers-reduced-motion:reduce){.joy-menu-panel,.joy-menu-backdrop{animation:none}.joy-menu-links a{transition:none}}
 
+
+.joy-order-panel{background:#fffdf5;border:1px solid #28232345;border-top:6px solid var(--yellow);border-radius:12px;padding:32px}.joy-order-card{background:#fffdf5;border:1px solid #28232335;border-radius:10px;padding:22px}.joy-status-pill{background:#e8dff4;border-radius:20px;padding:7px 13px;font-size:12px;text-transform:capitalize;display:inline-block;width:fit-content}.joy-tracking{background:#f2ecfb;border-radius:10px;margin-top:24px;padding:24px;font-size:14px;line-height:1.8}.joy-tracking h3{font:700 25px/1.2 var(--mukky-display);margin-bottom:14px}.joy-tracking-parcel+.joy-tracking-parcel{border-top:1px solid #bcb2c8;padding-top:16px;margin-top:16px}.joy-tracking a{text-decoration:underline;text-underline-offset:3px}.joy-order-refresh{align-self:flex-end;border:1px solid var(--ink);border-radius:20px;padding:8px 16px;font-size:13px}.joy-order-refresh:disabled{opacity:.5}@media(max-width:640px){.joy-order-panel{padding:20px}}
+.joy-order-page{min-width:0}
+.joy-order-page>div:first-child>h1{font-size:24px;line-height:1.25}
+.joy-order-compact{padding:24px}
+.joy-order-compact h2{font:650 18px/1.3 var(--mukky-body);margin:0 0 12px}
+.joy-order-thanks{font:700 clamp(24px,3vw,32px)/1.2 var(--mukky-display);margin:0 0 18px}
+.joy-order-header{padding-bottom:16px;border-bottom:1px solid #28232324}
+.joy-order-meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;overflow-wrap:anywhere}
+.joy-order-meta>p{margin:0;font-size:13px}
+.joy-order-statuses{flex-basis:100%;margin-top:6px}
+.joy-order-statuses .joy-status-pill{font-size:12px;padding:5px 10px}
+.joy-order-columns{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:24px;margin-top:20px;align-items:start}
+.joy-order-main,.joy-order-aside{min-width:0}
+.joy-order-aside{background:#f7f0dd;border-radius:8px;padding:18px}
+.joy-order-compact table{table-layout:fixed;width:100%}
+.joy-order-compact td{padding:10px 6px;overflow-wrap:anywhere}
+.joy-order-compact td:first-child{width:62px}
+.joy-order-compact td:first-child>div{width:48px}
+.joy-order-compact td:last-child{width:100px}
+.joy-order-compact td p{font-size:13px}
+.joy-order-delivery{margin-top:20px}
+.joy-order-address-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.joy-order-address-grid p{font-size:13px;line-height:1.6}
+.joy-order-address-grid>div:last-child{grid-column:1/-1}
+.joy-order-compact .joy-tracking{margin-top:16px;padding:14px;font-size:13px;line-height:1.6}
+.joy-order-compact .joy-tracking h3{font:650 16px var(--mukky-body);margin-bottom:8px}
+.joy-order-compact .joy-tracking-parcel+.joy-tracking-parcel{padding-top:10px;margin-top:10px}
+.joy-order-compact .joy-order-delivery>div:last-child,.joy-order-compact .joy-order-payment>div:last-child{display:none}
+.joy-order-payment{margin-top:18px;border-top:1px solid #28232324;padding-top:16px;overflow-wrap:anywhere}
+.joy-order-payment>div>div{flex-direction:column;gap:10px}
+.joy-order-payment>div>div>div{width:100%}
+.joy-order-payment p{font-size:13px}
+.joy-order-help{margin-top:16px;border-top:1px solid #28232324;padding-top:14px}
+.joy-order-help ul{flex-direction:row;flex-wrap:wrap;gap:10px 18px;font-size:13px}
+.joy-order-help a{text-decoration:underline;text-underline-offset:3px}
+.joy-order-updates{margin:12px 0;font-size:12px}
+.joy-order-update-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#625959}
+.joy-order-refresh{flex-shrink:0;align-self:center;min-height:40px;background:transparent;color:var(--ink)}
+.joy-order-notice{display:flex;align-items:center;gap:14px;margin-top:10px;padding:12px 14px;background:#e8dff4;border:1px solid #bcb2c8;border-radius:8px;color:var(--ink)}
+.joy-order-notice a{text-decoration:underline;text-underline-offset:3px;flex:1}
+.joy-order-notice button{min-height:40px;min-width:40px;font-size:24px}
+@media(max-width:1100px){.joy-order-columns{grid-template-columns:1fr}.joy-order-aside{display:grid;grid-template-columns:1fr 1fr;gap:18px}.joy-order-payment{border:0;padding:0;margin:0}.joy-order-help{grid-column:1/-1;margin:0}}
+@media(max-width:550px){.joy-order-compact{padding:16px}.joy-order-columns{gap:18px}.joy-order-aside{display:block;padding:14px}.joy-order-payment,.joy-order-help{border-top:1px solid #28232324;padding-top:14px;margin-top:14px}.joy-order-update-controls{align-items:flex-start;flex-direction:column;gap:8px}.joy-order-refresh{align-self:flex-start}.joy-order-address-grid{gap:12px}.joy-order-compact td:last-child{width:84px}.joy-order-compact td:first-child{width:52px}.joy-order-compact td:first-child>div{width:40px}}

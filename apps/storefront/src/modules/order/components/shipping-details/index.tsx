@@ -2,6 +2,7 @@ import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@modules/common/components/ui"
 
+import TrackingDetails from "../tracking-details"
 import Divider from "@modules/common/components/divider"
 
 type ShippingDetailsProps = {
@@ -10,13 +11,13 @@ type ShippingDetailsProps = {
 
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {
   return (
-    <div>
+    <section className="joy-order-delivery" aria-label="Delivery details">
       <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
         Delivery
       </Heading>
-      <div className="flex items-start gap-x-8">
+      <div className="joy-order-address-grid">
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col min-w-0 break-words"
           data-testid="shipping-address-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -40,7 +41,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
         </div>
 
         <div
-          className="flex flex-col w-1/3 "
+          className="flex flex-col min-w-0 break-words "
           data-testid="shipping-contact-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">Contact</Text>
@@ -51,7 +52,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
         </div>
 
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col min-w-0 break-words"
           data-testid="shipping-method-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">Method</Text>
@@ -65,8 +66,8 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
           </Text>
         </div>
       </div>
-      <Divider className="mt-8" />
-    </div>
+      <TrackingDetails order={order} /><Divider className="mt-8" />
+    </section>
   )
 }
 

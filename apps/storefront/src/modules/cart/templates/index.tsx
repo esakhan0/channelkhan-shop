@@ -4,6 +4,7 @@ import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const CartTemplate = ({
   cart,
@@ -15,9 +16,9 @@ const CartTemplate = ({
   return (
     <div className="py-12 ink-cart">
       <div className="content-container" data-testid="cart-container">
-        <div className="ink-page-heading"><p className="ink-kicker">GOOD CHOICES, BY THE WAY.</p><h1>Your bag of joy.</h1><p>A little something to look forward to.</p></div>
+        <div className="ink-page-heading"><p className="ink-kicker">GOOD CHOICES, BY THE WAY.</p><h1>Your bag of joy.</h1><LocalizedClientLink href="/store" className="ink-underlined">← Keep exploring</LocalizedClientLink></div>
         {cart?.items?.length ? (
-          <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-10 gap-y-8">
+          <div className="joy-cart-grid">
             <div className="ink-cart-items flex flex-col p-6 gap-y-6">
               {!customer && (
                 <>

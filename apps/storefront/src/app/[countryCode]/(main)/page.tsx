@@ -90,7 +90,7 @@ export default async function Home(props: {
       />
       <Hero countryCode={countryCode} />
       <ShopShowcase countryCode={countryCode} />
-      <section className="content-container mukky-story" aria-labelledby="mukky-story-title">
+      <section id="our-story" className="content-container mukky-story" aria-labelledby="mukky-story-title">
         <p className="mukky-eyebrow">Hello from our little corner of the world</p>
         <h2 id="mukky-story-title">Big ideas. Little layers.</h2>
         <p>We&apos;re two brothers turning our ideas into things you can hold.

@@ -22,7 +22,7 @@ export default async function Nav() {
       <header className="mukky-nav relative h-24 mx-auto border-b duration-200 border-ui-border-base">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
           <div className="flex-1 basis-0 h-full flex items-center">
-            <div className="h-full">
+            <div className="h-full flex items-center">
               <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
             </div>
           </div>

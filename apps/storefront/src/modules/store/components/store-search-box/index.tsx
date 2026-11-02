@@ -40,7 +40,7 @@ const StoreSearchBox = () => {
   }
 
   return (
-    <div className="mb-6 flex items-center gap-x-3 border-b border-ui-border-base">
+    <div className="joy-store-search mb-6 flex items-center gap-x-3">
       <MagnifyingGlass className="shrink-0 text-ui-fg-muted" />
       <input
         type="search"

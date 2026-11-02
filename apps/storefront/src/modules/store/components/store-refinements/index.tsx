@@ -2,7 +2,6 @@
 
 import { useSortBy } from "react-instantsearch"
 
-import FilterRadioGroup from "@modules/common/components/filter-radio-group"
 import {
   CATEGORY_ATTRIBUTE,
   LABELS_ATTRIBUTE,
@@ -19,19 +18,18 @@ const SortProducts = ({ currencyCode }: { currencyCode: string }) => {
   const { currentRefinement, refine } = useSortBy({ items })
 
   return (
-    <FilterRadioGroup
-      title="Sort by"
-      items={items}
-      value={currentRefinement}
-      handleChange={refine}
-      data-testid="sort-by-container"
-    />
+    <label className="joy-sort-label">Sort by
+      <select value={currentRefinement} onChange={event => refine(event.target.value)} data-testid="sort-by-container">
+        {items.map(item => <option value={item.value} key={item.value}>{item.label}</option>)}
+      </select>
+    </label>
   )
 }
 
 const StoreRefinements = ({ currencyCode }: { currencyCode: string }) => {
   return (
-    <div className="flex flex-col gap-12 py-4 mb-8 small:px-0 pl-6 small:w-[250px] small:shrink-0 small:ml-[1.675rem]">
+    <aside className="joy-store-filters" aria-label="Product filters">
+      <h2>Make it your kind of joy.</h2>
       <SortProducts currencyCode={currencyCode} />
       <CurrentRefinements currencyCode={currencyCode} />
       <OptionRefinements />
@@ -39,7 +37,7 @@ const StoreRefinements = ({ currencyCode }: { currencyCode: string }) => {
       <OnSaleToggle currencyCode={currencyCode} />
       <RefinementGroup attribute={CATEGORY_ATTRIBUTE} title="Category" />
       <RefinementGroup attribute={LABELS_ATTRIBUTE} title="Labels" />
-    </div>
+    </aside>
   )
 }
 

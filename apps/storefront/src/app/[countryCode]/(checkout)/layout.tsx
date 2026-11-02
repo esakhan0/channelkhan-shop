@@ -1,6 +1,6 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
-import MedusaCTA from "@modules/layout/components/medusa-cta"
+import Image from "next/image"
 
 export default function CheckoutLayout({
   children,
@@ -8,8 +8,8 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="w-full bg-white relative small:min-h-screen">
-      <div className="h-16 bg-white border-b ">
+    <div className="joy-checkout w-full relative small:min-h-screen">
+      <div className="joy-checkout-header">
         <nav className="flex h-full items-center content-container justify-between">
           <LocalizedClientLink
             href="/cart"
@@ -18,7 +18,7 @@ export default function CheckoutLayout({
           >
             <ChevronDown className="rotate-90" size={16} />
             <span className="mt-px hidden small:block txt-compact-plus text-ui-fg-subtle hover:text-ui-fg-base ">
-              Back to shopping cart
+              Back to your bag
             </span>
             <span className="mt-px block small:hidden txt-compact-plus text-ui-fg-subtle hover:text-ui-fg-base">
               Back
@@ -29,14 +29,14 @@ export default function CheckoutLayout({
             className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
             data-testid="store-link"
           >
-            Medusa Store
+            <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop — home" width={1792} height={896} className="joy-checkout-logo" sizes="140px" />
           </LocalizedClientLink>
-          <div className="flex-1 basis-0" />
+          <div className="joy-checkout-note flex-1 basis-0">Checkout</div>
         </nav>
       </div>
       <div className="relative" data-testid="checkout-container">{children}</div>
       <div className="py-4 w-full flex items-center justify-center">
-        <MedusaCTA />
+        <p className="joy-checkout-footer">A little shop. A lot of care. <LocalizedClientLink href="/contact">Need a hand?</LocalizedClientLink></p>
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 import { listCollections } from "@lib/data/collections"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Image from "next/image"
 
 const serviceLinks = [
   ["Shipping", "/shipping"], ["Returns", "/returns"],
@@ -14,19 +15,19 @@ export default async function Footer() {
         <div className="mukky-footer-top">
           <div>
             <p className="mukky-eyebrow">A little print shop with big ideas</p>
-            <LocalizedClientLink href="/" className="mukky-footer-wordmark">Mukky&apos;s.</LocalizedClientLink>
+            <LocalizedClientLink href="/" className="joy-footer-logo"><Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop — home" width={1792} height={896} sizes="280px" /></LocalizedClientLink>
             <p>Making joy, one layer at a time.</p>
             <span className="mukky-footer-est">Est. 2026</span>
           </div>
           <div>
-            <h2>Find your joy</h2>
+            <h2 className="joy-footer-art"><span className="sr-only">Find your joy</span><Image src="/brand/find-your-joy.png" alt="" width={1536} height={1024} sizes="200px" /></h2>
             <LocalizedClientLink href="/store">Shop everything</LocalizedClientLink>
             {collections?.slice(0, 4).map(c => (
               <LocalizedClientLink key={c.id} href={`/collections/${c.handle}`}>{c.title}</LocalizedClientLink>
             ))}
           </div>
           <div>
-            <h2>A helping hand</h2>
+            <h2 className="joy-footer-art"><span className="sr-only">A helping hand</span><Image src="/brand/helping-hand.png" alt="" width={1728} height={960} sizes="220px" /></h2>
             {serviceLinks.map(([label, href]) => (
               <LocalizedClientLink key={href} href={href}>{label}</LocalizedClientLink>
             ))}

@@ -1,23 +1,17 @@
 "use client"
 
-import { Popover, PopoverPanel, Transition } from "@headlessui/react"
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
+import { useState } from "react"
+import Image from "next/image"
+import { usePathname } from "next/navigation"
 import useToggleState from "@lib/hooks/use-toggle-state"
-import { ArrowRightMini, XMark } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { Text, clx } from "@modules/common/components/ui"
-import { Fragment } from "react"
 import CountrySelect from "../country-select"
 import LanguageSelect from "../language-select"
 import { Locale } from "@lib/data/locales"
 
-
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Account: "/account",
-  Cart: "/cart",
-}
+const links = [["Home", "/"], ["Shop all prints", "/store"], ["Your account", "/account"], ["Your bag", "/cart"], ["Contact the makers", "/contact"]]
 
 type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
@@ -25,125 +19,37 @@ type SideMenuProps = {
   currentLocale: string | null
 }
 
-const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
-  const countryToggleState = useToggleState()
-  const languageToggleState = useToggleState()
+export default function SideMenu({ regions, locales, currentLocale }: SideMenuProps) {
+  const [open, setOpen] = useState(false)
+  const countryToggle = useToggleState()
+  const languageToggle = useToggleState()
+  const pathname = usePathname().replace(/^\/[^/]+/, "") || "/"
 
-  return (
-    <div className="h-full">
-      <div className="flex items-center h-full">
-        <Popover className="h-full flex">
-          {({ open, close }) => (
-            <>
-              <div className="relative flex h-full">
-                <Popover.Button
-                  data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
-                >
-                  Menu
-                </Popover.Button>
-              </div>
-
-              {open && (
-                <div
-                  className="fixed inset-0 z-[50] bg-black/0 pointer-events-auto"
-                  onClick={close}
-                  data-testid="side-menu-backdrop"
-                />
-              )}
-
-              <Transition
-                show={open}
-                as={Fragment}
-                enter="transition ease-out duration-150"
-                enterFrom="opacity-0"
-                enterTo="opacity-100 backdrop-blur-2xl"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 backdrop-blur-2xl"
-                leaveTo="opacity-0"
-              >
-                <PopoverPanel className="flex flex-col absolute w-full pr-4 sm:pr-0 sm:w-1/3 2xl:w-1/4 sm:min-w-min h-[calc(100vh-1rem)] z-[51] inset-x-0 text-sm text-ui-fg-on-color m-2 backdrop-blur-2xl">
-                  <div
-                    data-testid="nav-menu-popup"
-                    className="flex flex-col h-full bg-[rgba(3,7,18,0.5)] rounded-rounded justify-between p-6"
-                  >
-                    <div className="flex justify-end" id="xmark">
-                      <button
-                        data-testid="close-menu-button"
-                        onClick={close}
-                        aria-label="Close menu"
-                      >
-                        <XMark />
-                      </button>
-                    </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
-                        return (
-                          <li key={name}>
-                            <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
-                              onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
-                            >
-                              {name}
-                            </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                    <div className="flex flex-col gap-y-6">
-                      {!!locales?.length && (
-                        <div
-                          className="flex justify-between"
-                          onMouseEnter={languageToggleState.open}
-                          onMouseLeave={languageToggleState.close}
-                        >
-                          <LanguageSelect
-                            toggleState={languageToggleState}
-                            locales={locales}
-                            currentLocale={currentLocale}
-                          />
-                          <ArrowRightMini
-                            className={clx(
-                              "transition-transform duration-150",
-                              languageToggleState.state ? "-rotate-90" : ""
-                            )}
-                          />
-                        </div>
-                      )}
-                      <div
-                        className="flex justify-between"
-                        onMouseEnter={countryToggleState.open}
-                        onMouseLeave={countryToggleState.close}
-                      >
-                        {regions && (
-                          <CountrySelect
-                            toggleState={countryToggleState}
-                            regions={regions}
-                          />
-                        )}
-                        <ArrowRightMini
-                          className={clx(
-                            "transition-transform duration-150",
-                            countryToggleState.state ? "-rotate-90" : ""
-                          )}
-                        />
-                      </div>
-                      <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
-                        reserved.
-                      </Text>
-                    </div>
-                  </div>
-                </PopoverPanel>
-              </Transition>
-            </>
-          )}
-        </Popover>
+  return <>
+    <button type="button" className="joy-menu-trigger" onClick={() => setOpen(true)} aria-expanded={open} aria-haspopup="dialog" data-testid="nav-menu-button">
+      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" aria-hidden="true"><path d="M2 4h16M2 9h12M2 14h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg><span>Menu</span>
+    </button>
+    <Dialog open={open} onClose={setOpen} className="joy-menu-dialog">
+      <div className="joy-menu-backdrop" aria-hidden="true" data-testid="side-menu-backdrop" />
+      <div className="joy-menu-position">
+        <DialogPanel className="joy-menu-panel" data-testid="nav-menu-popup">
+          <div className="joy-menu-top">
+            <DialogTitle className="sr-only">Explore Mukky’s shop</DialogTitle>
+            <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop" width={1792} height={896} className="joy-menu-logo" />
+            <button type="button" className="joy-menu-close" onClick={() => setOpen(false)} aria-label="Close menu" data-testid="close-menu-button">×</button>
+          </div>
+          <p className="ink-kicker">COME ON IN. FIND YOUR LITTLE HAPPY.</p>
+          <nav aria-label="Main menu"><ul className="joy-menu-links">
+            {links.map(([label, href], i) => <li key={href}><LocalizedClientLink href={href} onClick={() => setOpen(false)} aria-current={pathname === href ? "page" : undefined}><span className="joy-menu-number">0{i + 1}</span>{label}<span className="joy-menu-arrow" aria-hidden="true">↗</span></LocalizedClientLink></li>)}
+          </ul></nav>
+          <div className="joy-menu-help"><LocalizedClientLink href="/shipping" onClick={() => setOpen(false)}>Shipping</LocalizedClientLink><LocalizedClientLink href="/returns" onClick={() => setOpen(false)}>Returns</LocalizedClientLink><LocalizedClientLink href="/search" onClick={() => setOpen(false)}>Search</LocalizedClientLink></div>
+          <div className="joy-menu-bottom">
+            {!!locales?.length && <div onMouseEnter={languageToggle.open} onMouseLeave={languageToggle.close}><LanguageSelect toggleState={languageToggle} locales={locales} currentLocale={currentLocale} /></div>}
+            {regions && <CountrySelect toggleState={countryToggle} regions={regions} />}
+            <p>Making joy, one layer at a time. <span>Est. 2026</span></p>
+          </div>
+        </DialogPanel>
       </div>
-    </div>
-  )
+    </Dialog>
+  </>
 }
-
-export default SideMenu

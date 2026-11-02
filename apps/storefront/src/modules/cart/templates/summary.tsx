@@ -28,11 +28,12 @@ const Summary = ({ cart }: SummaryProps) => {
   return (
     <div className="flex flex-col gap-y-4">
       <Heading level="h2" className="text-[2rem] leading-[2.75rem]">
-        Summary
+        Order summary
       </Heading>
       <DiscountCode cart={cart} />
       <Divider />
       <CartTotals totals={cart} />
+      <p className="joy-summary-note">Delivery options and any applicable taxes are confirmed at checkout.</p>
       <LocalizedClientLink
         href={"/checkout?step=" + step}
         data-testid="checkout-button"

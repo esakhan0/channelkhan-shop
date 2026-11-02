@@ -1,11 +1,7 @@
-import { Metadata } from "next"
-
 import LoginTemplate from "@modules/account/templates/login-template"
 
-export const metadata: Metadata = {
-  title: "Sign in",
-  description: "Sign in to your Medusa Store account.",
-}
+// Account titles belong to the shared layout and dashboard pages. This parallel
+// slot also resolves when hidden, so it must not override their metadata.
 
 export default function Login() {
   return <LoginTemplate />

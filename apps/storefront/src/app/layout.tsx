@@ -1,10 +1,15 @@
 import { getBaseURL } from "@lib/util/env"
+import { STORE_NAME } from "@lib/util/site"
 import { Metadata } from "next"
 import "styles/globals.css"
 import "styles/brand-refresh.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
+  title: {
+    default: STORE_NAME,
+    template: `%s | ${STORE_NAME}`,
+  },
   icons: {
     icon: [
       { url: "/favicon.ico?v=mukky-20261102", sizes: "any" },

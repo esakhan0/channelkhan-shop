@@ -18,7 +18,7 @@ export async function generateMetadata(props: {
   const [origin, regions] = await Promise.all([getSiteOrigin(), listRegions()])
 
   return {
-    title: "Mukky's 3D Shop | Making joy. Est. 2026",
+    title: { absolute: "Mukky's 3D Shop | Making joy. Est. 2026" },
     description:
       "Discover playful 3D-printed finds at Mukky's 3D Shop. Useful little things with plenty of personality.",
     alternates: {

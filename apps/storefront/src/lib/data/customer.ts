@@ -85,11 +85,13 @@ export async function signup(
 ): Promise<CustomerAuthState> {
   const password = formData.get("password") as string
   const customerForm = {
-    email: formData.get("email") as string,
+    email: (formData.get("email") as string).trim(),
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     phone: formData.get("phone") as string,
   }
+
+  let existingIdentity = false
 
   try {
     await sdk.auth.register("customer", "emailpass", {
@@ -102,11 +104,12 @@ export async function signup(
     // expected and handled: the customer can still log in to link a customer
     // record. Any other error is surfaced.
     if (
-      fetchError.statusText !== "Unauthorized" ||
+      fetchError.status !== 401 ||
       fetchError.message !== "Identity with email already exists"
     ) {
       return { state: "error", error: String(error) }
     }
+    existingIdentity = true
   }
 
   // Persist the extra signup fields. The customer record is created during
@@ -116,14 +119,14 @@ export async function signup(
 
   // Continue by logging in. The login response tells us whether the backend
   // requires email verification — we don't need a storefront-side flag.
-  return completeLogin(customerForm.email, password)
+  return completeLogin(customerForm.email, password, existingIdentity)
 }
 
 export async function login(
   _currentState: unknown,
   formData: FormData
 ): Promise<CustomerAuthState> {
-  const email = formData.get("email") as string
+  const email = (formData.get("email") as string).trim()
   const password = formData.get("password") as string
 
   return completeLogin(email, password)
@@ -134,13 +137,26 @@ export async function login(
 // email verification is enabled.
 async function completeLogin(
   email: string,
-  password: string
+  password: string,
+  existingIdentity = false
 ): Promise<CustomerAuthState> {
   let result: Awaited<ReturnType<typeof sdk.auth.login>>
 
   try {
     result = await sdk.auth.login("customer", "emailpass", { email, password })
   } catch (error) {
+    const fetchError = error as FetchError
+    if (
+      fetchError.status === 401 &&
+      fetchError.message === "Invalid email or password"
+    ) {
+      return {
+        state: "error",
+        error: existingIdentity
+          ? "We couldn't create an account with these details. If you've used this email before, use its existing password or sign up with a different email."
+          : "The email or password wasn't recognised. Check your details and try again.",
+      }
+    }
     return { state: "error", error: String(error) }
   }
 

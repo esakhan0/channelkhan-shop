@@ -7,6 +7,16 @@ module.exports = defineConfig({
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
   modules: [
+    {
+      resolve: "@medusajs/medusa/locking",
+      options: {
+        providers: [{
+          resolve: "@medusajs/medusa/locking-postgres",
+          id: "locking-postgres",
+          is_default: true,
+        }],
+      },
+    },
     ...(process.env.STRIPE_API_KEY && process.env.STRIPE_WEBHOOK_SECRET ? [{
       resolve: "@medusajs/medusa/payment",
       options: {

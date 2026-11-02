@@ -3,9 +3,17 @@ import { MedusaError } from "@medusajs/framework/utils"
 export type ShopEmailData = {
   order_number?: string | number
   first_name?: string
-  items?: { title: string; quantity: number; total?: string }[]
+  items?: { title: string; variant?: string; quantity: number; total?: string }[]
   total?: string
+  subtotal?: string
   shipping?: string
+  tax?: string
+  discount?: string
+  credit?: string
+  address?: string[]
+  contact_email?: string
+  shipping_method?: string
+  payment_method?: string
   tracking?: { number: string; url?: string }[]
   action_url?: string
   response?: string
@@ -47,8 +55,19 @@ export function renderShopEmail(template: string, data: ShopEmailData, brand: Em
   // Account/approval links can only lead to this shop. Carrier links are separate below.
   const candidate = safeHttpsUrl(data.action_url)
   const actionUrl = candidate && new URL(candidate).origin === new URL(base).origin ? candidate : `${base.replace(/\/$/, "")}/gb/account/orders`
-  const logoUrl = `${base.replace(/\/$/, "")}/brand/mukkys-logo-v3.png`
-  const rows = (data.items ?? []).map((item) => `<tr><td style="padding:14px 0;border-bottom:1px solid #ddd7cb;overflow-wrap:anywhere">${escapeHtml(item.title)}<br><span style="color:#69645d;font-size:13px">Quantity: ${escapeHtml(item.quantity)}</span></td><td align="right" style="padding:14px 0;border-bottom:1px solid #ddd7cb;white-space:nowrap">${escapeHtml(item.total)}</td></tr>`).join("")
+  const logoUrl = `${base.replace(/\/$/, "")}/brand/mukkys-logo.png`
+  const rows = (data.items ?? []).map((item) => `<tr><td style="padding:14px 12px 14px 0;border-bottom:1px solid #ddd7cb;overflow-wrap:anywhere">${escapeHtml(item.title)}<br><span style="color:#69645d;font-size:13px">${item.variant ? `Variant: ${escapeHtml(item.variant)}<br>` : ""}Quantity: ${escapeHtml(item.quantity)}</span></td><td align="right" style="padding:14px 0;border-bottom:1px solid #ddd7cb;white-space:nowrap">${escapeHtml(item.total)}</td></tr>`).join("")
+  const totals = [
+    { label: "Subtotal (excl. shipping and taxes)", value: data.subtotal },
+    { label: "Shipping (excl. tax)", value: data.shipping },
+    { label: "Discount", value: data.discount && `−${data.discount}` },
+    { label: "Taxes", value: data.tax },
+    { label: "Credit", value: data.credit && `−${data.credit}` },
+    { label: "Total", value: data.total },
+  ].filter((row) => row.value !== undefined && row.value !== "")
+  const summary = totals.length ? `<h2 style="font-size:19px;margin:26px 0 12px">Order summary</h2><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:14px;line-height:1.5">${totals.map((row) => `<tr style="${row.label === "Total" ? "font-size:19px;font-weight:bold" : ""}"><td style="padding:9px 12px 9px 0;${row.label === "Total" ? "border-top:1px solid #ddd7cb" : ""}">${escapeHtml(row.label)}</td><td align="right" style="padding:9px 0;white-space:nowrap;${row.label === "Total" ? "border-top:1px solid #ddd7cb" : ""}">${escapeHtml(row.value)}</td></tr>`).join("")}</table>` : ""
+  const delivery = data.address?.length || data.shipping_method || data.contact_email ? `<h2 style="font-size:19px;margin:28px 0 12px">Delivery</h2><div style="font-size:14px;line-height:1.7;overflow-wrap:anywhere">${data.address?.length ? `<p><strong>Shipping address</strong><br>${data.address.map(escapeHtml).join("<br>")}</p>` : ""}${data.contact_email ? `<p><strong>Contact</strong><br>${escapeHtml(data.contact_email)}</p>` : ""}${data.shipping_method ? `<p><strong>Shipping method</strong><br>${escapeHtml(data.shipping_method)}</p>` : ""}</div>` : ""
+  const payment = data.payment_method ? `<h2 style="font-size:19px;margin:28px 0 12px">Payment method</h2><p style="font-size:14px;line-height:1.7">${escapeHtml(data.payment_method)}</p>` : ""
   const tracking = (data.tracking ?? []).map((label) => {
     const url = safeHttpsUrl(label.url)
     return `<p style="margin:12px 0">Tracking: ${url ? `<a style="color:#292421" href="${escapeHtml(url)}">${escapeHtml(label.number || "Track your parcel")}</a>` : escapeHtml(label.number)}</p>`
@@ -70,8 +89,7 @@ export function renderShopEmail(template: string, data: ShopEmailData, brand: Em
 <tr><td style="padding:30px 24px"><h1 style="font-family:Georgia,serif;font-size:34px;line-height:1.15;margin:0 0 22px;letter-spacing:-1px">${escapeHtml(message.title)}</h1>
 <p style="font-size:16px;line-height:1.7">${data.first_name ? `Hi ${escapeHtml(data.first_name)},<br>` : ""}${escapeHtml(message.intro)}</p>
 ${rows ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:15px;line-height:1.5;margin:24px 0">${rows}</table>` : ""}
-${data.shipping ? `<p style="text-align:right">Delivery: ${escapeHtml(data.shipping)}</p>` : ""}
-${data.total ? `<p style="text-align:right;font-size:20px;font-weight:bold">Order total: ${escapeHtml(data.total)}</p>` : ""}
+${summary}${delivery}${payment}
 ${details}${tracking}
 <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:28px"><tr><td bgcolor="#f9d84b" style="border:2px solid #292421;border-radius:10px"><a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#292421;text-decoration:none;font-weight:bold;font-size:15px">${escapeHtml(message.button)} &rarr;</a></td></tr></table>
 <p style="font-size:13px;line-height:1.6;color:#69645d;margin-top:24px">${template === "order-transfer" ? "Opening the link won't approve the request. You'll choose on the next page. Keep this link private." : "Checked out as a guest? Your updates will still arrive by email. You can reply here for help."}</p>
@@ -79,8 +97,11 @@ ${details}${tracking}
 <tr><td align="center" style="padding:26px 16px;font-size:13px;line-height:1.8;color:#69645d">${escapeHtml(brand.from_name)} &middot; Making joy, one layer at a time.<br>Need a helping hand? Reply to this email.<br><a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/returns")}" style="color:#69645d">Returns &amp; refunds</a> &nbsp; / &nbsp; <a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/privacy")}" style="color:#69645d">Privacy</a></td></tr>
 </table></td></tr></table></body></html>`
   const text = [brand.from_name, orderLabel, message.title, message.intro,
-    ...(data.items ?? []).map((item) => `${item.quantity} × ${item.title}${item.total ? ` — ${item.total}` : ""}`),
-    data.shipping && `Delivery: ${data.shipping}`, data.total && `Order total: ${data.total}`,
+    ...(data.items ?? []).map((item) => `${item.quantity} × ${item.title}${item.variant ? ` (${item.variant})` : ""}${item.total ? ` — ${item.total}` : ""}`),
+    ...totals.map((row) => `${row.label}: ${row.value}`),
+    data.address?.length && `Shipping address:\n${data.address.join("\n")}`,
+    data.contact_email && `Contact: ${data.contact_email}`, data.shipping_method && `Shipping method: ${data.shipping_method}`,
+    data.payment_method && `Payment method: ${data.payment_method}`,
     data.status && `Request status: ${data.status}`, data.requested_by && `Requested account: ${data.requested_by}`, data.response,
     ...(data.tracking ?? []).map((label) => `Tracking: ${label.number} ${safeHttpsUrl(label.url) ?? ""}`),
     `${message.button}: ${actionUrl}`, "Need help? Reply to this email.",

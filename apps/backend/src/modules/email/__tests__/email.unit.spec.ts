@@ -24,7 +24,7 @@ describe("Branded shop email", () => {
     for (const template of ["order-placed", "order-shipped", "order-delivered", "order-canceled", "refund-requested", "refund-updated", "order-transfer", "smtp-test"]) {
       const mail = renderShopEmail(template, { order_number: 42 }, options)
       expect(mail.html).toContain('name="viewport"')
-      expect(mail.html).toContain("mukkys-logo-v3.png")
+      expect(mail.html).toContain("mukkys-logo.png")
       expect(mail.text).toContain("Order #42")
       expect(mail.subject).toContain("#42")
     }
@@ -39,6 +39,22 @@ describe("Branded shop email", () => {
     expect(sendMail.mock.calls[0][0]).toMatchObject({ from: { address: options.from }, replyTo: options.reply_to })
     expect(sendMail.mock.calls[0][0].bcc).toBeUndefined()
     expect(sendMail.mock.calls[0][0].html).not.toBe("override")
+  })
+  it("includes zero tax and delivery details safely in both email formats", () => {
+    const mail = renderShopEmail("order-placed", {
+      subtotal: "£4.00", shipping: "£2.00", tax: "£0.00", total: "£6.00",
+      address: ["<script>address</script>"], contact_email: "guest@example.com",
+      shipping_method: "Royal Mail", payment_method: "Debit / credit card or wallet",
+      items: [{ title: "Phone stand", variant: "<Blue>", quantity: 1, total: "£4.00" }],
+    }, options)
+    expect(mail.html).toContain("Taxes")
+    expect(mail.html).toContain("£0.00")
+    expect(mail.html).not.toContain("<script>")
+    expect(mail.html).toContain("&lt;Blue&gt;")
+    expect(mail.text).toContain("Subtotal (excl. shipping and taxes): £4.00")
+    expect(mail.text).toContain("Taxes: £0.00")
+    expect(mail.text).toContain("Shipping method: Royal Mail")
+    expect(mail.text).toContain("Payment method: Debit / credit card or wallet")
   })
   it("rejects multiple recipients and hides SMTP errors containing secrets", async () => {
     const provider = new SmtpNotificationProviderService({}, options)

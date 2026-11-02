@@ -15,7 +15,7 @@ export default async function Footer() {
         <div className="mukky-footer-top">
           <div>
             <p className="mukky-eyebrow">A little print shop with big ideas</p>
-            <LocalizedClientLink href="/" className="joy-footer-logo"><Image src="/brand/mukkys-logo-v3.png" alt="Mukky’s 3D Shop — home" width={1024} height={409} sizes="280px" /></LocalizedClientLink>
+            <LocalizedClientLink href="/" className="joy-footer-logo"><Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop — home" width={1792} height={896} sizes="280px" /></LocalizedClientLink>
             <p>Making joy, one layer at a time.</p>
             <span className="mukky-footer-est">Est. 2026</span>
           </div>

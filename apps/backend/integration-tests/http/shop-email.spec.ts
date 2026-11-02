@@ -51,6 +51,28 @@ medusaIntegrationTestRunner({
       expect(records).toHaveLength(1)
       expect(records[0].status).toBe("success")
     })
+    it.each([false, true])("uses native discounted totals without double-counting shipping tax (tax inclusive: %s)", async (inclusive) => {
+      const container = getContainer()
+      const order = await container.resolve(Modules.ORDER).createOrders({
+        email: "guest@example.com", currency_code: "gbp",
+        shipping_address: { first_name: "Alex", last_name: "Example", address_1: "1 Example Road", city: "London", postal_code: "SW1A 1AA", country_code: "gb" },
+        items: [{ title: "Phone stand", variant_title: "Blue", quantity: 2, unit_price: inclusive ? 12 : 10, is_tax_inclusive: inclusive,
+          tax_lines: [{ rate: 20, code: "test-tax" }], adjustments: [{ amount: 2, code: "TEST" }] }],
+        shipping_methods: [{ name: "Test delivery", amount: inclusive ? 6 : 5, is_tax_inclusive: inclusive, tax_lines: [{ rate: 20, code: "test-tax" }] }],
+      })
+      const email = await prepareShopEmail(container, { name: "order.placed", id: order.id })
+      const data = email!.data
+      expect(data.subtotal).toBe("£20.00")
+      expect(data.shipping).toBe("£5.00")
+      const amount = (value?: string) => Number(value?.replace(/[^0-9.-]/g, ""))
+      expect(amount(data.subtotal) + amount(data.shipping) - amount(data.discount) + amount(data.tax)).toBeCloseTo(amount(data.total), 2)
+      expect(amount(data.tax)).toBeGreaterThan(0)
+      expect(data.address).toContain("1 Example Road")
+      expect(data.shipping_method).toBe("Test delivery")
+      expect(data.items?.[0].variant).toBe("Blue")
+      const transfer = await prepareShopEmail(container, { name: "order.canceled", id: order.id })
+      expect(transfer?.data.address).toBeUndefined()
+    })
     it("honours no-notification and the disabled transfer-email gate", async () => {
       const container = getContainer(), count = sent().mock.calls.length
       await sendShopEmailWorkflow(container).run({ input: { name: "order.placed", id: orderId, no_notification: true } })

@@ -79,3 +79,28 @@
 .joy-order-notice button{min-height:40px;min-width:40px;font-size:24px}
 @media(max-width:1100px){.joy-order-columns{grid-template-columns:1fr}.joy-order-aside{display:grid;grid-template-columns:1fr 1fr;gap:18px}.joy-order-payment{border:0;padding:0;margin:0}.joy-order-help{grid-column:1/-1;margin:0}}
 @media(max-width:550px){.joy-order-compact{padding:16px}.joy-order-columns{gap:18px}.joy-order-aside{display:block;padding:14px}.joy-order-payment,.joy-order-help{border-top:1px solid #28232324;padding-top:14px;margin-top:14px}.joy-order-update-controls{align-items:flex-start;flex-direction:column;gap:8px}.joy-order-refresh{align-self:flex-start}.joy-order-address-grid{gap:12px}.joy-order-compact td:last-child{width:84px}.joy-order-compact td:first-child{width:52px}.joy-order-compact td:first-child>div{width:40px}}
+
+/* Compact account order list. */
+.joy-orders-page{min-width:0}
+.joy-order-list-card{padding:16px 18px}
+.joy-order-list-heading{display:flex;align-items:center;gap:16px;padding-bottom:12px;border-bottom:1px solid #28232320}
+.joy-order-list-reference{display:flex;align-items:baseline;gap:12px;flex:1;min-width:0}
+.joy-order-list-reference strong{font-size:15px}
+.joy-order-list-reference>span{font-size:12px;color:#625959}
+.joy-order-list-total{font-size:16px;white-space:nowrap}
+.joy-order-list-link{display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #28232370;border-radius:24px;padding:9px 14px;min-height:40px;font-size:12px;font-weight:600;white-space:nowrap}
+.joy-order-list-link:hover{background:var(--yellow)}
+.joy-order-list-content{display:flex;align-items:center;gap:20px;padding-top:12px}
+.joy-order-list-items{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.joy-order-list-item{display:flex;align-items:center;gap:10px;min-width:0}
+.joy-order-list-thumbnail{width:42px;flex-shrink:0}
+.joy-order-list-item>div:last-child{min-width:0}
+.joy-order-list-item-title{display:block;font-size:13px;font-weight:600;overflow-wrap:anywhere}
+.joy-order-list-item-quantity,.joy-order-list-more{display:block;font-size:12px;color:#625959;margin-top:3px}
+.joy-order-list-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:12px;color:#625959;flex-shrink:0}
+.joy-order-list-status .joy-status-pill{padding:4px 9px;font-size:11px;color:var(--ink)}
+.joy-order-transfer{margin-top:20px;padding:14px 0;border-top:1px solid #28232330;font-size:13px}
+.joy-order-transfer>summary{cursor:pointer;width:fit-content;padding:7px 0;font-weight:600}
+.joy-order-transfer[open]>summary{margin-bottom:14px}
+@media(max-width:650px){.joy-order-list-card{padding:14px}.joy-order-list-heading{flex-wrap:wrap;gap:10px}.joy-order-list-reference{flex-direction:column;gap:3px}.joy-order-list-link{padding:8px 12px}.joy-order-list-content{align-items:stretch;flex-direction:column;gap:10px}.joy-order-list-status{flex-direction:row;align-items:center;flex-wrap:wrap;gap:6px}.joy-order-list-status>span:first-child{margin-right:4px}.joy-order-list-total{font-size:14px}}
+@media(max-width:360px){.joy-order-list-reference{flex-basis:60%}.joy-order-list-link{margin-left:auto}.joy-order-list-thumbnail{width:36px}}

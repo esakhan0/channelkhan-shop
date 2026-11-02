@@ -35,7 +35,7 @@ export default function SideMenu({ regions, locales, currentLocale }: SideMenuPr
         <DialogPanel className="joy-menu-panel" data-testid="nav-menu-popup">
           <div className="joy-menu-top">
             <DialogTitle className="sr-only">Explore Mukky’s shop</DialogTitle>
-            <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop" width={1792} height={896} className="joy-menu-logo" />
+            <Image src="/brand/mukkys-logo-v2.png" alt="Mukky’s 3D Shop" width={1938} height={811} className="joy-menu-logo" />
             <button type="button" className="joy-menu-close" onClick={() => setOpen(false)} aria-label="Close menu" data-testid="close-menu-button">×</button>
           </div>
           <p className="ink-kicker">COME ON IN. FIND YOUR LITTLE HAPPY.</p>

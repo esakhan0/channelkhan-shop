@@ -1,4 +1,5 @@
 import repeat from "@lib/util/repeat"
+import { retrieveCartStock } from "@lib/data/cart-stock"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Table } from "@modules/common/components/ui"
 
@@ -9,8 +10,9 @@ type ItemsTemplateProps = {
   cart?: HttpTypes.StoreCart
 }
 
-const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
+const ItemsTemplate = async ({ cart }: ItemsTemplateProps) => {
   const items = cart?.items
+  const stockLimits = cart ? await retrieveCartStock(cart) : {}
   return (
     <div>
       <div className="pb-3 flex items-center">
@@ -41,6 +43,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
                     <Item
                       key={item.id}
                       item={item}
+                      stockLimit={stockLimits[item.id]}
                       currencyCode={cart?.currency_code}
                     />
                   )

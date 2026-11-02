@@ -1,48 +1,27 @@
 "use client"
 
 import { Table, Text, clx } from "@modules/common/components/ui"
-import { updateLineItem } from "@lib/data/cart"
+import { updateCartQuantity } from "@lib/data/cart-stock"
+import { notifyCartUpdated } from "@lib/util/cart-events"
+import { useRouter } from "next/navigation"
+import QuantityControl from "@modules/cart/components/quantity-control"
 import { HttpTypes } from "@medusajs/types"
-import CartItemSelect from "@modules/cart/components/cart-item-select"
-import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { useState } from "react"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
   type?: "full" | "preview"
   currencyCode: string
+  stockLimit?: number | null
 }
 
-const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
-  const [updating, setUpdating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const changeQuantity = async (quantity: number) => {
-    setError(null)
-    setUpdating(true)
-
-    await updateLineItem({
-      lineId: item.id,
-      quantity,
-    })
-      .catch((err) => {
-        setError(err.message)
-      })
-      .finally(() => {
-        setUpdating(false)
-      })
-  }
-
-  // TODO: Update this to grab the actual max inventory
-  const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+const Item = ({ item, type = "full", currencyCode, stockLimit }: ItemProps) => {
+  const router = useRouter()
 
   return (
     <Table.Row className="w-full" data-testid="product-row">
@@ -74,31 +53,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
       {type === "full" && (
         <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
+          <div className="flex gap-2 items-start">
             <DeleteButton id={item.id} data-testid="product-delete-button" />
-            <CartItemSelect
-              value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
-              data-testid="product-select-button"
-              aria-label={`Quantity for ${item.product_title}`}
-            >
-              {/* TODO: Update this with the v2 way of managing inventory */}
-              {Array.from(
-                {
-                  length: Math.min(maxQuantity, 10),
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
-                  </option>
-                )
-              )}
-
-            </CartItemSelect>
-            {updating && <Spinner />}
+            <QuantityControl key={item.quantity} quantity={item.quantity} limit={stockLimit} title={item.product_title || item.title || "item"}
+              onUpdate={(quantity) => updateCartQuantity({ lineId: item.id, quantity })}
+              onRefresh={() => { notifyCartUpdated(); router.refresh() }} />
           </div>
-          <ErrorMessage error={error} data-testid="product-error-message" />
         </Table.Cell>
       )}
 

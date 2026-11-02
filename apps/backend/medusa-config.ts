@@ -8,6 +8,32 @@ module.exports = defineConfig({
   },
   modules: [
     { resolve: "./src/modules/refund-request" },
+    ...(process.env.REDIS_URL ? [{
+      resolve: "@medusajs/medusa/event-bus-redis",
+      options: {
+        redisUrl: process.env.REDIS_URL,
+        jobOptions: { attempts: 5, backoff: { type: "exponential", delay: 30000 }, removeOnComplete: { age: 86400 }, removeOnFail: { age: 604800 } },
+      },
+    }] : []),
+    ...(process.env.SHOP_EMAIL_ENABLED === "true" ? [{
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          { resolve: "@medusajs/medusa/notification-local", id: "local", options: { channels: ["feed"] } },
+          {
+            resolve: "./src/modules/email", id: "shop-smtp",
+            options: {
+              channels: ["email"], host: process.env.SMTP_HOST || "smtp.gmail.com",
+              port: Number(process.env.SMTP_PORT || 587), user: process.env.SMTP_USER,
+              password: process.env.SMTP_PASSWORD, from: process.env.SMTP_FROM || process.env.SMTP_USER,
+              from_name: process.env.SMTP_FROM_NAME || "Mukky's 3D Shop",
+              reply_to: process.env.SMTP_REPLY_TO || process.env.SMTP_FROM || process.env.SMTP_USER,
+              storefront_url: process.env.STOREFRONT_URL || "https://shop.channelkhan.com",
+            },
+          },
+        ],
+      },
+    }] : []),
     {
       resolve: "@medusajs/medusa/locking",
       options: {

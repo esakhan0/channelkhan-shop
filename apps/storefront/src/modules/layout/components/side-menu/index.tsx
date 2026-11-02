@@ -26,7 +26,7 @@ export default function SideMenu({ regions, locales, currentLocale }: SideMenuPr
   const pathname = usePathname().replace(/^\/[^/]+/, "") || "/"
 
   return <>
-    <button type="button" className="joy-menu-trigger" onClick={() => setOpen(true)} aria-expanded={open} aria-haspopup="dialog" data-testid="nav-menu-button">
+    <button type="button" className="joy-menu-trigger" onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open} aria-haspopup="dialog" data-testid="nav-menu-button">
       <svg width="20" height="18" viewBox="0 0 20 18" fill="none" aria-hidden="true"><path d="M2 4h16M2 9h12M2 14h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg><span>Menu</span>
     </button>
     <Dialog open={open} onClose={setOpen} className="joy-menu-dialog">

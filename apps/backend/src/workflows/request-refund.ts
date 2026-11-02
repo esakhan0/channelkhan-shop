@@ -4,6 +4,7 @@ import { REFUND_REQUEST_MODULE } from "../modules/refund-request"
 import RefundRequestModuleService from "../modules/refund-request/service"
 import { CustomerRefundInput } from "../modules/refund-request/validation"
 import { ownedRefundOrder, requestableQuantity } from "../modules/refund-request/order"
+import { emitEventStep } from "@medusajs/medusa/core-flows"
 
 const saveRefundRequestStep = createStep("save-refund-request", async (
   input: CustomerRefundInput & { customer_id: string }, { container }
@@ -35,4 +36,8 @@ const saveRefundRequestStep = createStep("save-refund-request", async (
 // Intake only. Native Medusa admin workflows still own all refunds, cancellations and inventory changes.
 export const requestRefundWorkflow = createWorkflow("request-refund", (
   input: CustomerRefundInput & { customer_id: string }
-) => new WorkflowResponse(saveRefundRequestStep(input)))
+) => {
+  const request = saveRefundRequestStep(input)
+  emitEventStep({ eventName: "shop.refund-requested", data: { id: request.id } })
+  return new WorkflowResponse(request)
+})

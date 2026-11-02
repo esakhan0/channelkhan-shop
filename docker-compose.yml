@@ -16,6 +16,9 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    command: [redis-server, --appendonly, "yes"]
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: [CMD, redis-cli, ping]
       interval: 10s
@@ -44,6 +47,16 @@ services:
       AUTH_MFA_ENCRYPTION_KEY: ${AUTH_MFA_ENCRYPTION_KEY:-}
       STRIPE_API_KEY: ${STRIPE_API_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      SHOP_EMAIL_ENABLED: ${SHOP_EMAIL_ENABLED:-false}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Mukky's 3D Shop}
+      SMTP_REPLY_TO: ${SMTP_REPLY_TO:-}
+      STOREFRONT_URL: https://shop.channelkhan.com
+      ORDER_TRANSFER_EMAIL_ENABLED: ${ORDER_TRANSFER_EMAIL_ENABLED:-false}
       STORE_CORS: https://shop.channelkhan.com
       ADMIN_CORS: https://shopadmin.channelkhan.com,https://api.channelkhan.com
       AUTH_CORS: https://shop.channelkhan.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
@@ -95,3 +108,4 @@ services:
 volumes:
   postgres_data:
   uploads:
+  redis_data:

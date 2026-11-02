@@ -42,7 +42,7 @@ const VariantImageGallery = ({
     [product, variantId]
   )
 
-  return <ImageGallery images={images} />
+  return <ImageGallery key={images.map((image) => image.id).join(",")} images={images} />
 }
 
 export default VariantImageGallery

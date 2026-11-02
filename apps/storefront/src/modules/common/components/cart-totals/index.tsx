@@ -26,7 +26,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
   } = totals
 
   return (
-    <div>
+    <div className="joy-cart-totals">
       <div className="flex flex-col gap-y-2 txt-medium text-ui-fg-subtle ">
         <div className="flex items-center justify-between">
           <span>Subtotal (excl. shipping and taxes)</span>

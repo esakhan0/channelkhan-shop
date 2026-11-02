@@ -3,6 +3,7 @@ import { STORE_NAME } from "@lib/util/site"
 import { Metadata } from "next"
 import "styles/globals.css"
 import "styles/brand-refresh.css"
+import "styles/mobile.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),

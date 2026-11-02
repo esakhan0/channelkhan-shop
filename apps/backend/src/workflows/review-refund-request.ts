@@ -1,4 +1,5 @@
-import { createStep, createWorkflow, StepResponse, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+import { createStep, createWorkflow, StepResponse, WorkflowResponse, transform } from "@medusajs/framework/workflows-sdk"
+import { emitEventStep } from "@medusajs/medusa/core-flows"
 import { REFUND_REQUEST_MODULE } from "../modules/refund-request"
 import RefundRequestModuleService from "../modules/refund-request/service"
 
@@ -11,5 +12,9 @@ const reviewRefundRequestStep = createStep("review-refund-request", async (input
   return new StepResponse(request)
 })
 
-export const reviewRefundRequestWorkflow = createWorkflow("review-refund-request", (input: ReviewInput) =>
-  new WorkflowResponse(reviewRefundRequestStep(input)))
+export const reviewRefundRequestWorkflow = createWorkflow("review-refund-request", (input: ReviewInput) => {
+  const request = reviewRefundRequestStep(input)
+  const event = transform(request, (value) => ({ id: value.id, version: new Date(value.updated_at).toISOString() }))
+  emitEventStep({ eventName: "shop.refund-updated", data: event })
+  return new WorkflowResponse(request)
+})

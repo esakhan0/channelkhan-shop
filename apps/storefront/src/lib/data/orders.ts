@@ -70,17 +70,23 @@ export const createTransferRequest = async (
 
   const headers = await getAuthHeaders()
 
+  if (!headers.authorization) {
+    return { success: false, error: "Please sign in before linking an order.", order: null }
+  }
+
   return await sdk.store.order
     .requestTransfer(
       id,
       {},
       {
-        fields: "id, email",
+        fields: "id",
       },
       headers
     )
     .then(({ order }) => ({ success: true, error: null, order }))
-    .catch((err) => ({ success: false, error: err.message, order: null }))
+    .catch((err) => ({ success: false, error: err.status === 503
+      ? "Guest order linking is not available yet. Please contact the shop for help."
+      : "We couldn’t request the link. Check the order reference or contact the shop.", order: null }))
 }
 
 export const acceptTransferRequest = async (id: string, token: string) => {

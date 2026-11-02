@@ -5,6 +5,21 @@ import { allowFields, authenticate, configureStoreSearch, defineMiddlewares } fr
 export default defineMiddlewares({
   routes: [
     {
+      matcher: "/store/orders/:id/transfer/request", method: ["POST"],
+      middlewares: [authenticate("customer", ["session", "bearer"]), (_req, res, next) => {
+        // Enable only after the native transfer-requested email subscriber/provider is configured and tested.
+        if (process.env.ORDER_TRANSFER_EMAIL_ENABLED !== "true") {
+          res.status(503).json({ message: "Guest order linking is not available yet. Please contact the shop for help." })
+          return
+        }
+        next()
+      }],
+    },
+    {
+      matcher: "/store/account/refund-requests*", method: ["GET", "POST"],
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
       matcher: "/store/returns", method: ["POST"],
       middlewares: [authenticate("customer", ["session", "bearer"])],
     },

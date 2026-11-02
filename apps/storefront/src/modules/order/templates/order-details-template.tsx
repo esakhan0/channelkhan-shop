@@ -45,7 +45,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
           <aside className="joy-order-aside" aria-label="Order summary">
             <OrderSummary order={order} />
             <PaymentDetails order={order} />
-            <LocalizedClientLink className="joy-return-order-link" href={`/account/orders/details/${order.id}/return`}>Request a return ↗</LocalizedClientLink>
+            <LocalizedClientLink className="joy-return-order-link" href={`/account/orders/details/${order.id}/refund`}>Request a refund ↗</LocalizedClientLink>
             <Help orderNumber={order.display_id} />
           </aside>
         </div>

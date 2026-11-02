@@ -7,6 +7,7 @@ module.exports = defineConfig({
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
   modules: [
+    { resolve: "./src/modules/refund-request" },
     {
       resolve: "@medusajs/medusa/locking",
       options: {

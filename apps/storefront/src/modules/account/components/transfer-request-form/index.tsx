@@ -27,11 +27,11 @@ export default function TransferRequestForm() {
       <div className="grid sm:grid-cols-2 items-center gap-x-8 gap-y-4 w-full">
         <div className="flex flex-col gap-y-1">
           <Heading level="h3" className="!text-sm font-semibold text-neutral-950">
-            Order transfers
+            Link a guest order
           </Heading>
           <p className="text-small-regular text-neutral-500">
             Can&apos;t find the order you are looking for?
-            <br /> Connect an order to your account.
+            <br /> Linking requires approval through the original order email. An order ID alone does not give access.
           </p>
         </div>
         <form
@@ -45,7 +45,7 @@ export default function TransferRequestForm() {
               size="small"
               className="w-fit whitespace-nowrap self-end"
             >
-              Request transfer
+              Request email confirmation
             </SubmitButton>
           </div>
         </form>
@@ -64,7 +64,7 @@ export default function TransferRequestForm() {
                 Transfer for order {state.order?.id} requested
               </Text>
               <Text className="text-base-regular text-neutral-600">
-                Transfer request email sent to {state.order?.email}
+                Check the original order email for confirmation instructions. Ownership changes only after approval.
               </Text>
             </div>
           </div>

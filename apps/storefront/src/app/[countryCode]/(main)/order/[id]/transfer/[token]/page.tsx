@@ -1,6 +1,11 @@
 import { Heading, Text } from "@modules/common/components/ui"
 import TransferActions from "@modules/order/components/transfer-actions"
 import TransferImage from "@modules/order/components/transfer-image"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Confirm order linking", robots: { index: false, follow: false }, referrer: "no-referrer",
+}
 
 export default async function TransferPage({
   params,
@@ -10,7 +15,7 @@ export default async function TransferPage({
   const { id, token } = await params
 
   return (
-    <div className="flex flex-col gap-y-4 items-start w-2/5 mx-auto mt-10 mb-20">
+    <div className="flex flex-col gap-y-4 items-start w-full max-w-xl px-6 mx-auto mt-10 mb-20">
       <TransferImage />
       <div className="flex flex-col gap-y-6">
         <Heading level="h1" className="text-xl text-zinc-900">

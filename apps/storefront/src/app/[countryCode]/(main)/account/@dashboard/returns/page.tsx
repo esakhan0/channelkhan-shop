@@ -10,7 +10,8 @@ export default async function ReturnsPage({ searchParams }: { searchParams: Prom
   const result = await listCustomerReturns((page - 1) * 20)
   return <div className="joy-returns-page">
     <h1>My Returns</h1>
-    <p>Track your return requests here. To start one, open an order and choose “Request a return”.</p>
+    <p>Previously arranged physical returns are shown here. For a new refund or cancellation request, choose an order and select “Request a refund”.</p>
+    <LocalizedClientLink href="/account/refunds">View My Refunds ↗</LocalizedClientLink>
     <LocalizedClientLink href="/account/orders" className="joy-returns-orders">Choose an order ↗</LocalizedClientLink>
     {result.returns.length ? <ReturnHistory returns={result.returns} /> : <div className="joy-return-message">No return requests yet.</div>}
     <nav aria-label="Returns pages" className="joy-return-pagination">

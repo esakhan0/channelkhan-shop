@@ -17,7 +17,7 @@ export default function Hero({ countryCode: _countryCode }: { countryCode: strin
       <Reveal className="joy-editorial-copy" delay={100}>
         <p className="ink-kicker">THE LITTLE PRINT SHOP WITH BIG IDEAS</p>
         <h2>A little different.<br />A lot more you.</h2>
-        <p>Playful prints. Useful little things. Made by two brothers with a soft spot for objects with personality.</p>
+        <p>Playful prints. Useful little things. Thoughtfully made objects with a personality all of their own.</p>
         <div className="ink-hero-actions"><LocalizedClientLink href="/store" className="ink-button">Find your happy <span aria-hidden="true">↗</span></LocalizedClientLink><a href="#latest" className="ink-underlined">Explore the collection</a></div>
         <span className="joy-makers-note">Made layer by layer. Loved every day.</span>
       </Reveal>

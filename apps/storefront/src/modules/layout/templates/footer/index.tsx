@@ -36,7 +36,7 @@ export default async function Footer() {
         <div className="mukky-footer-bottom">
           <p>© {new Date().getFullYear()} Mukky&apos;s 3D Shop.</p>
           <div><LocalizedClientLink href="/privacy">Privacy</LocalizedClientLink><LocalizedClientLink href="/terms">Terms</LocalizedClientLink></div>
-          <span>Two brothers. One printer. Plenty of personality.</span>
+          <span>Playful prints. Plenty of personality.</span>
         </div>
       </div>
     </footer>

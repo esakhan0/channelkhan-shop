@@ -1,4 +1,5 @@
 import styles from "./headline.module.css"
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Reveal from "@modules/common/components/reveal"
 
@@ -10,10 +11,9 @@ export default function Hero({ countryCode: _countryCode }: { countryCode: strin
     </nav>
     <section className="joy-editorial-hero content-container">
       <Reveal className="joy-artwork">
-        <h1 className={styles.headline}>
-          <span className={styles.top}>Hands up</span>{" "}
-          <span className={styles.middle}>if you love to</span>{" "}
-          <span className={styles.bottom}>fidget.</span>
+        <h1>
+          <Image src="/brand/hands-up-fidget.webp" alt="Hands up if you love to fidget."
+            width={1536} height={1024} sizes="(max-width: 750px) 95vw, 600px" priority />
         </h1>
       </Reveal>
       <Reveal className="joy-editorial-copy" delay={100}>

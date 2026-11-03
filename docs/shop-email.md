@@ -17,7 +17,7 @@ SMTP_FROM_NAME=Mukky's 3D Shop
 
 The address and password above are placeholders. Enable Google 2-Step Verification and create a dedicated app password. Use the app password, not the Google login password. Do not post it in chat. `SMTP_FROM` and `SMTP_REPLY_TO` default to `SMTP_USER` when blank. Gmail requires an authorised sender mailbox or verified alias. Changing the display name does not change the address. Port 587 requires STARTTLS; port 465 uses TLS immediately. Certificates are verified in both cases.
 
-`STOREFRONT_URL` defaults to `https://shop.channelkhan.com` in Compose and must be HTTPS. Set it if the shop domain changes. Redeploy after adding runtime variables. Missing credentials with email enabled cause startup to fail visibly rather than silently discarding emails. Leaving `SHOP_EMAIL_ENABLED=false` allows setup without sending email; events skipped while disabled are not replayed later.
+`STOREFRONT_URL` defaults to `https://mukkys3d.com` in Compose and must be HTTPS. Set it if the shop domain changes. Redeploy after adding runtime variables. Missing credentials with email enabled cause startup to fail visibly rather than silently discarding emails. Leaving `SHOP_EMAIL_ENABLED=false` allows setup without sending email; events skipped while disabled are not replayed later.
 
 ## Test before enabling customer emails
 

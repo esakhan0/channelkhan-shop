@@ -12,7 +12,7 @@ RUN --mount=type=cache,id=channelkhan-pnpm,target=/pnpm/store,sharing=locked \
 
 FROM dependencies AS build
 COPY apps/backend ./apps/backend
-ARG MEDUSA_BACKEND_URL=https://api.channelkhan.com
+ARG MEDUSA_BACKEND_URL=https://api.mukkys3d.com
 ENV MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL
 RUN pnpm --filter @dtc/backend build
 

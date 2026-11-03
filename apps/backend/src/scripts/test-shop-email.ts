@@ -9,7 +9,7 @@ export default async function testShopEmail({ container }: ExecArgs) {
   }
   await container.resolve(Modules.NOTIFICATION).createNotifications({
     to, channel: "email", template: "smtp-test",
-    data: { action_url: process.env.STOREFRONT_URL || "https://shop.channelkhan.com" },
+    data: { action_url: process.env.STOREFRONT_URL || "https://mukkys3d.com" },
   })
   container.resolve(ContainerRegistrationKeys.LOGGER).info("SMTP accepted the test message. Check the shop mailbox and spam folder to confirm receipt.")
 }

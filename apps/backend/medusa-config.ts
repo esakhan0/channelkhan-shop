@@ -28,7 +28,7 @@ module.exports = defineConfig({
               password: process.env.SMTP_PASSWORD, from: process.env.SMTP_FROM || process.env.SMTP_USER,
               from_name: process.env.SMTP_FROM_NAME || "Mukky's 3D Shop",
               reply_to: process.env.SMTP_REPLY_TO || process.env.SMTP_FROM || process.env.SMTP_USER,
-              storefront_url: process.env.STOREFRONT_URL || "https://shop.channelkhan.com",
+              storefront_url: process.env.STOREFRONT_URL || "https://mukkys3d.com",
             },
           },
         ],

@@ -25,6 +25,15 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    const aliases = ["www.mukkys3d.com", "mukkys3d.co.uk", "www.mukkys3d.co.uk"]
+    return aliases.map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host", value: host.replaceAll(".", "[.]") }],
+      destination: "https://mukkys3d.com/:path*",
+      permanent: true,
+    }))
+  },
   async rewrites() {
     return {
       beforeFiles: [

@@ -52,7 +52,7 @@ export async function prepareShopEmail(container: MedusaContainer, event: ShopEm
   const order = orders[0] as typeof orders[number] & Pick<OrderDTO, "discount_subtotal" | "credit_line_total">
   if (!order?.email) return
   const country = /^[a-z]{2}$/.test(order.shipping_address?.country_code ?? "") ? order.shipping_address!.country_code : "gb"
-  const base = (process.env.STOREFRONT_URL || "https://shop.channelkhan.com").replace(/\/$/, "")
+  const base = (process.env.STOREFRONT_URL || "https://mukkys3d.com").replace(/\/$/, "")
   let actionUrl = `${base}/${country}/account/${event.name.startsWith("shop.refund-") ? "refunds" : "orders"}`
 
   if (event.name === "order.transfer_requested") {

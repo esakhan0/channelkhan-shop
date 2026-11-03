@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: Dockerfile.backend
       args:
-        MEDUSA_BACKEND_URL: https://api.channelkhan.com
+        MEDUSA_BACKEND_URL: https://api.mukkys3d.com
     restart: unless-stopped
     depends_on:
       postgres:
@@ -55,12 +55,12 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
       SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Mukky's 3D Shop}
       SMTP_REPLY_TO: ${SMTP_REPLY_TO:-}
-      STOREFRONT_URL: https://shop.channelkhan.com
+      STOREFRONT_URL: https://mukkys3d.com
       ORDER_TRANSFER_EMAIL_ENABLED: ${ORDER_TRANSFER_EMAIL_ENABLED:-false}
-      STORE_CORS: https://shop.channelkhan.com
-      ADMIN_CORS: https://shopadmin.channelkhan.com,https://api.channelkhan.com
-      AUTH_CORS: https://shop.channelkhan.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
-      MEDUSA_BACKEND_URL: https://api.channelkhan.com
+      STORE_CORS: https://mukkys3d.com,https://www.mukkys3d.com,https://mukkys3d.co.uk,https://www.mukkys3d.co.uk,https://shop.channelkhan.com
+      ADMIN_CORS: https://admin.mukkys3d.com,https://api.mukkys3d.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
+      AUTH_CORS: https://mukkys3d.com,https://www.mukkys3d.com,https://mukkys3d.co.uk,https://www.mukkys3d.co.uk,https://shop.channelkhan.com,https://admin.mukkys3d.com,https://api.mukkys3d.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
+      MEDUSA_BACKEND_URL: https://api.mukkys3d.com
     volumes:
       - uploads:/server/apps/backend/.medusa/server/static
     healthcheck:
@@ -78,9 +78,9 @@ services:
       context: .
       dockerfile: Dockerfile.storefront
       args:
-        NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.channelkhan.com
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.mukkys3d.com
         NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:?Set MEDUSA_PUBLISHABLE_KEY}
-        NEXT_PUBLIC_BASE_URL: https://shop.channelkhan.com
+        NEXT_PUBLIC_BASE_URL: https://mukkys3d.com
         NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
     restart: unless-stopped
     depends_on:
@@ -90,9 +90,9 @@ services:
       - "8000"
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.channelkhan.com
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.mukkys3d.com
       NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:?Set MEDUSA_PUBLISHABLE_KEY}
-      NEXT_PUBLIC_BASE_URL: https://shop.channelkhan.com
+      NEXT_PUBLIC_BASE_URL: https://mukkys3d.com
       NEXT_PUBLIC_DEFAULT_REGION: gb
       NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
     healthcheck:

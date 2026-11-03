@@ -1,4 +1,6 @@
-CHANNELKHAN COOLIFY SETUP
+MUKKY'S COOLIFY SETUP
+
+Existing shop: keep the current Coolify application and volumes. For a domain change, use steps 4 and 7 below and redeploy the existing application.
 
 These files are a starting deployment, not a verified live store. Both Compose files pass Docker Compose validation. A full image build was not run because Docker Desktop is not running locally.
 
@@ -8,7 +10,7 @@ These files are a starting deployment, not a verified live store. Both Compose f
 
 3. Set POSTGRES_PASSWORD, JWT_SECRET and COOKIE_SECRET in Coolify. Use three different long random values. Use only hexadecimal characters for the database password to avoid URL escaping. This NEW application creates a NEW database volume and does not migrate existing data. Keep the previous service/volume until you have confirmed nothing needs preserving.
 
-4. Assign BOTH https://api.channelkhan.com and https://shopadmin.channelkhan.com to the medusa service on container port 9000 using Coolify's domain settings. DNS for these domains must point to your server. Deploy the backend. Check https://api.channelkhan.com/health returns OK. Admin is https://shopadmin.channelkhan.com/app, not the domain root.
+4. Add api.mukkys3d.com and admin.mukkys3d.com as separate HTTPS domains for medusa on internal port 9000, with no path restriction. Check https://api.mukkys3d.com/health and sign in at https://admin.mukkys3d.com/app. Keep the previous API route available for old uploaded image links and integrations during the switch.
 
 5. In Coolify's medusa container terminal the working directory should be /server/apps/backend/.medusa/server. Create your admin account using:
 pnpm exec medusa user -e YOUR_EMAIL -p YOUR_CHOSEN_PASSWORD
@@ -16,9 +18,9 @@ Use your own email/password privately. Never commit them to GitHub.
 
 6. Sign into Admin. This starter's initial migration creates demo store data and a default publishable API key. Under Settings > Publishable API Keys, copy the default key and ensure it is associated with your sales channel. Review demo products, currencies, inventory, shipping and regions before selling. It defaults to demo inventory and EUR/USD, not a configured UK business.
 
-7. Create a SECOND Coolify GitHub Application from the SAME repository, also Docker Compose, but use /docker-compose.storefront.yml. Set MEDUSA_PUBLISHABLE_KEY to the key from step 6. STRIPE_PUBLISHABLE_KEY is optional at this stage. Assign https://shop.channelkhan.com to storefront on port 8000. Deploy AFTER the backend is reachable. Changes to public keys/URLs require rebuilding the storefront.
+7. Add mukkys3d.com, www.mukkys3d.com, mukkys3d.co.uk and www.mukkys3d.co.uk as separate HTTPS domains for storefront on internal port 8000. The three aliases redirect to https://mukkys3d.com. docker-compose.yml already includes storefront; use the separate storefront resource only if your installation already runs it that way. Rebuild both services after changing public URLs. Turn maintenance mode off when ready to serve shoppers.
 
-8. Test browsing, sign-in, cart, ordering and persistence after redeploy. Stripe is NOT configured in the backend by these files. Do not accept real orders yet. Email delivery, Stripe/webhooks, backups, monitoring and production Redis-backed modules still need setup. This initial single-instance backend uses shared worker mode; do not scale it to multiple replicas without configuring the production modules. Uploaded files use a local persistent volume and need backups.
+8. Check products, images, login, cart and checkout on the new domain. For Stripe, update the existing webhook destination to https://api.mukkys3d.com/hooks/payment/stripe_stripe and register mukkys3d.com for wallet payments in the Stripe environment you use. Existing orders and inventory stay in the same database.
 
 If a deployment fails, share the build/startup error without secret values. Do not delete database volumes to troubleshoot.
 

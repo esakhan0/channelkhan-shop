@@ -3,7 +3,7 @@ import SmtpNotificationProviderService from "../service"
 import nodemailer from "nodemailer"
 
 jest.mock("nodemailer", () => ({ __esModule: true, default: { createTransport: jest.fn() } }))
-const options = { host: "smtp.gmail.com", port: 587, user: "shop@example.com", password: "test-password", from: "shop@example.com", reply_to: "shop@example.com", from_name: "Mukky's 3D Shop", storefront_url: "https://shop.channelkhan.com" }
+const options = { host: "smtp.gmail.com", port: 587, user: "shop@example.com", password: "test-password", from: "shop@example.com", reply_to: "shop@example.com", from_name: "Mukky's 3D Shop", storefront_url: "https://mukkys3d.com" }
 
 describe("Branded shop email", () => {
   const sendMail = jest.fn()
@@ -17,7 +17,7 @@ describe("Branded shop email", () => {
     expect(result.html).not.toContain("javascript:")
     expect(result.html).not.toContain("evil.example")
     expect(result.html).toContain("&lt;img")
-    expect(result.text).toContain("https://shop.channelkhan.com/gb/account/orders")
+    expect(result.text).toContain("https://mukkys3d.com/gb/account/orders")
     expect(result.text).not.toContain("javascript:")
   })
   it("has a readable text alternative and never calls a request a paid refund", () => {

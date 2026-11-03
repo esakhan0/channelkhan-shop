@@ -3,6 +3,9 @@ import { listRegions } from "@lib/data/regions"
 import { getSiteOrigin, listCountryCodes } from "@lib/util/site"
 import type { MetadataRoute } from "next"
 
+// Coolify builds both services before starting Medusa. Read its catalogue on request.
+export const dynamic = "force-dynamic"
+
 const STATIC_PATHS = [
   "",
   "/store",

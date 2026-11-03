@@ -19,7 +19,7 @@ const LoginTemplate = () => {
       <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop" width={250} height={125} sizes="(max-width: 600px) 160px, 250px"
         style={{ width: "clamp(150px, 22vw, 250px)", maxWidth: "100%", height: "auto", marginBottom: 12 }} />
       <h2>Your account</h2><p>Track your prints, check refunds and find your order updates here.</p>
-      <span className="ink-login-est">Making joy. Est. 2026</span></aside><div className="ink-login-form">
+      <span className="ink-login-est">Fidgets from the workshop · Est. 2026</span></aside><div className="ink-login-form">
       {currentView === "sign-in" ? (
         <Login setCurrentView={setCurrentView} />
       ) : (

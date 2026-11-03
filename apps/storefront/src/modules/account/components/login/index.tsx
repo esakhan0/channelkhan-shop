@@ -19,7 +19,7 @@ const Login = ({ setCurrentView }: Props) => {
     >
       <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Your orders, your details, your little joys. All in one place.
+        Track your orders, check refunds and manage your details.
       </p>
       {message?.state === "verification_required" && (
         <div

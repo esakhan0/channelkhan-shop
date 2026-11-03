@@ -16,18 +16,15 @@ export default async function Footer() {
           <div>
             <p className="mukky-eyebrow">A little print shop with big ideas</p>
             <LocalizedClientLink href="/" className="joy-footer-logo"><Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop — home" width={1792} height={896} sizes="280px" /></LocalizedClientLink>
-            <p>Making joy, one layer at a time.</p>
+            <p>3D printed fidget toys and more.</p>
             <span className="mukky-footer-est">Est. 2026</span>
           </div>
           <div>
-            <h2 className="joy-footer-art"><span className="sr-only">Find your joy</span><Image src="/brand/find-your-joy-v2.png" alt="" width={800} height={400} sizes="200px" /></h2>
+            <h2 className="joy-footer-art"><span className="sr-only">A helping hand</span><Image src="/brand/helping-hand-v2.png" alt="" width={800} height={400} sizes="220px" /></h2>
             <LocalizedClientLink href="/store">Shop everything</LocalizedClientLink>
             {collections?.slice(0, 4).map(c => (
               <LocalizedClientLink key={c.id} href={`/collections/${c.handle}`}>{c.title}</LocalizedClientLink>
             ))}
-          </div>
-          <div>
-            <h2 className="joy-footer-art"><span className="sr-only">A helping hand</span><Image src="/brand/helping-hand-v2.png" alt="" width={800} height={400} sizes="220px" /></h2>
             {serviceLinks.map(([label, href]) => (
               <LocalizedClientLink key={href} href={href}>{label}</LocalizedClientLink>
             ))}

@@ -35,9 +35,9 @@ export function safeHttpsUrl(value: unknown): string | undefined {
 }
 
 const messages: Record<string, { title: string; subject: string; intro: string; button: string }> = {
-  "order-placed": { title: "A little joy, on order.", subject: "We've received your order", intro: "Thanks for choosing Mukky's. Here's what you've ordered. We'll email you when your parcel is on its way.", button: "Your orders" },
-  "order-shipped": { title: "Joy is on its way.", subject: "Your parcel is on its way", intro: "We've marked this parcel as dispatched. If your order has more than one parcel, the others may arrive separately.", button: "Your orders" },
-  "order-delivered": { title: "A little joy has arrived.", subject: "Your parcel has been marked delivered", intro: "This parcel has been marked as delivered. If it hasn't arrived or something isn't right, reply to this email and we'll help.", button: "Your orders" },
+  "order-placed": { title: "We've received your order.", subject: "We've received your order", intro: "Thanks for choosing Mukky's. Here's what you've ordered. We'll email you when your parcel is on its way.", button: "Your orders" },
+  "order-shipped": { title: "Your parcel is on its way.", subject: "Your parcel is on its way", intro: "We've marked this parcel as dispatched. If your order has more than one parcel, the others may arrive separately.", button: "Your orders" },
+  "order-delivered": { title: "Your parcel was marked delivered.", subject: "Your parcel has been marked delivered", intro: "This parcel has been marked as delivered. If it hasn't arrived or something isn't right, reply to this email and we'll help.", button: "Your orders" },
   "order-canceled": { title: "Your order is cancelled.", subject: "Your order has been cancelled", intro: "Your order has been cancelled. This message confirms the cancellation; it isn't a payment refund receipt. Reply if you need help with your payment.", button: "Your orders" },
   "refund-requested": { title: "We're here to help.", subject: "We've received your request", intro: "Your refund or cancellation request is with us for review. Submitting a request doesn't automatically refund a payment or stop a parcel that's already on its way.", button: "View your request" },
   "refund-updated": { title: "A helping hand.", subject: "An update on your request", intro: "There's an update on your refund or cancellation request. A request status alone doesn't confirm a payment refund.", button: "View your request" },
@@ -50,7 +50,7 @@ export function renderShopEmail(template: string, data: ShopEmailData, brand: Em
   if (!message) throw new MedusaError(MedusaError.Types.INVALID_DATA, "Unknown shop email template")
   const base = safeHttpsUrl(brand.storefront_url)
   if (!base) throw new MedusaError(MedusaError.Types.INVALID_DATA, "Email storefront URL must use HTTPS")
-  const orderLabel = data.order_number ? `Order #${data.order_number}` : "MAKING JOY / EST. 2026"
+  const orderLabel = data.order_number ? `Order #${data.order_number}` : "MUKKY’S WORKSHOP / EST. 2026"
   const subject = `${message.subject}${data.order_number ? ` · #${data.order_number}` : ""} | ${brand.from_name}`
   // Account/approval links can only lead to this shop. Carrier links are separate below.
   const candidate = safeHttpsUrl(data.action_url)
@@ -94,7 +94,7 @@ ${details}${tracking}
 <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:28px"><tr><td bgcolor="#f9d84b" style="border:2px solid #292421;border-radius:10px"><a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#292421;text-decoration:none;font-weight:bold;font-size:15px">${escapeHtml(message.button)} &rarr;</a></td></tr></table>
 <p style="font-size:13px;line-height:1.6;color:#69645d;margin-top:24px">${template === "order-transfer" ? "Opening the link won't approve the request. You'll choose on the next page. Keep this link private." : "Checked out as a guest? Your updates will still arrive by email. You can reply here for help."}</p>
 </td></tr><tr><td align="center" style="background:#f9d84b;padding:16px;font-size:12px;font-weight:bold;letter-spacing:1.5px;border-top:2px solid #292421">SMALL OBJECTS. BIG PERSONALITY.</td></tr></table></td></tr>
-<tr><td align="center" style="padding:26px 16px;font-size:13px;line-height:1.8;color:#69645d">${escapeHtml(brand.from_name)} &middot; Making joy, one layer at a time.<br>Need a helping hand? Reply to this email.<br><a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/returns")}" style="color:#69645d">Returns &amp; refunds</a> &nbsp; / &nbsp; <a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/privacy")}" style="color:#69645d">Privacy</a></td></tr>
+<tr><td align="center" style="padding:26px 16px;font-size:13px;line-height:1.8;color:#69645d">${escapeHtml(brand.from_name)} &middot; 3D printed fidget toys and more.<br>Need a helping hand? Reply to this email.<br><a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/returns")}" style="color:#69645d">Returns &amp; refunds</a> &nbsp; / &nbsp; <a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/privacy")}" style="color:#69645d">Privacy</a></td></tr>
 </table></td></tr></table></body></html>`
   const text = [brand.from_name, orderLabel, message.title, message.intro,
     ...(data.items ?? []).map((item) => `${item.quantity} × ${item.title}${item.variant ? ` (${item.variant})` : ""}${item.total ? ` — ${item.total}` : ""}`),

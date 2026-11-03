@@ -38,7 +38,7 @@ export default function SideMenu({ regions, locales, currentLocale }: SideMenuPr
             <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop" width={1792} height={896} className="joy-menu-logo" sizes="190px" />
             <button type="button" className="joy-menu-close" onClick={() => setOpen(false)} aria-label="Close menu" data-testid="close-menu-button">×</button>
           </div>
-          <p className="ink-kicker">COME ON IN. FIND YOUR LITTLE HAPPY.</p>
+          <p className="ink-kicker">EXPLORE THE FIDGET SHOP</p>
           <nav aria-label="Main menu"><ul className="joy-menu-links">
             {links.map(([label, href], i) => <li key={href}><LocalizedClientLink href={href} onClick={() => setOpen(false)} aria-current={pathname === href ? "page" : undefined}><span className="joy-menu-number">0{i + 1}</span>{label}<span className="joy-menu-arrow" aria-hidden="true">↗</span></LocalizedClientLink></li>)}
           </ul></nav>
@@ -46,7 +46,7 @@ export default function SideMenu({ regions, locales, currentLocale }: SideMenuPr
           <div className="joy-menu-bottom">
             {!!locales?.length && <div onMouseEnter={languageToggle.open} onMouseLeave={languageToggle.close}><LanguageSelect toggleState={languageToggle} locales={locales} currentLocale={currentLocale} /></div>}
             {regions && <CountrySelect toggleState={countryToggle} regions={regions} />}
-            <p>Making joy, one layer at a time. <span>Est. 2026</span></p>
+            <p>Mukky’s 3D workshop. <span>Est. 2026</span></p>
           </div>
         </DialogPanel>
       </div>

@@ -29,7 +29,7 @@ const SortProducts = ({ currencyCode }: { currencyCode: string }) => {
 const StoreRefinements = ({ currencyCode }: { currencyCode: string }) => {
   return (
     <aside className="joy-store-filters" aria-label="Product filters">
-      <h2>Make it your kind of joy.</h2>
+      <h2>Filter the shop</h2>
       <SortProducts currencyCode={currencyCode} />
       <CurrentRefinements currencyCode={currencyCode} />
       <OptionRefinements />

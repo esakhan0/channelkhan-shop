@@ -15,7 +15,7 @@ export default function TrackingDetails({ order }: { order: HttpTypes.StoreOrder
   }
   const fulfillments = (order.fulfillments as TrackedFulfillment[] | undefined)?.filter((f) => !f.canceled_at) || []
   return <section className="joy-tracking" aria-label="Parcel tracking">
-    <h3>Follow your little joy</h3>
+    <h3>Track your parcel</h3>
     {!fulfillments.length && <p>Your order is waiting to be prepared. Tracking will appear here if your delivery service includes it.</p>}
     {fulfillments.map((fulfillment, i) => <div key={fulfillment.id} className="joy-tracking-parcel">
       <strong>Parcel {i + 1} · {fulfillment.delivered_at ? "Delivered" : fulfillment.shipped_at ? "Dispatched" : "Prepared for dispatch"}</strong>

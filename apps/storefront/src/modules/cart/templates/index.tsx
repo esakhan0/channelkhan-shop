@@ -16,7 +16,7 @@ const CartTemplate = ({
   return (
     <div className="py-12 ink-cart">
       <div className="content-container" data-testid="cart-container">
-        <div className="ink-page-heading"><p className="ink-kicker">GOOD CHOICES, BY THE WAY.</p><h1>Your bag of joy.</h1><LocalizedClientLink href="/store" className="ink-underlined">← Keep exploring</LocalizedClientLink></div>
+        <div className="ink-page-heading"><p className="ink-kicker">GOOD CHOICES, BY THE WAY.</p><h1>Your bag of fidgets.</h1><LocalizedClientLink href="/store" className="ink-underlined">← Keep exploring</LocalizedClientLink></div>
         {cart?.items?.length ? (
           <div className="joy-cart-grid">
             <div className="ink-cart-items flex flex-col p-6 gap-y-6">

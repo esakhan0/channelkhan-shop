@@ -1,7 +1,7 @@
 "use client"
 
 import type { SearchClient } from "instantsearch.js"
-import Image from "next/image"
+
 import { Configure, InstantSearch } from "react-instantsearch"
 
 import { PRODUCT_INDEX_NAME, searchClient } from "@lib/search-client"
@@ -16,8 +16,8 @@ const StoreTemplate = ({ currencyCode }: { currencyCode: string }) => {
     <div className="py-6 content-container mukky-store" data-testid="category-container">
       <div className="mukky-store-heading">
         <p className="mukky-eyebrow">A little something to make you smile</p>
-        <h1 data-testid="store-page-title"><span className="sr-only">Find your joy — shop all prints</span><Image src="/brand/find-your-joy-v2.png" alt="" width={800} height={400} priority sizes="280px" /></h1>
-        <p>Find your next favourite little thing.</p>
+        <h1 data-testid="store-page-title">Fidgets &amp; prints</h1>
+        <p>Explore the latest toys and prints from our workshop.</p>
       </div>
 
       <div className="joy-store-layout">

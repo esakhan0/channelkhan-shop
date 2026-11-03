@@ -11,6 +11,7 @@ const RefundRequest = model.define("refund_request", {
   customer_note: model.text(),
   response: model.text().default(""),
   reviewed_by: model.text().nullable(),
+  resolution: model.json().nullable(),
 })
 
 export default RefundRequest

@@ -18,3 +18,10 @@ export const reviewRefundSchema = z.object({
   status: z.enum(["reviewing", "closed", "declined"]),
   response: z.string().trim().min(3).max(2000),
 }).strict()
+
+export const resolveRefundSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("cancel_order"), response: z.string().trim().min(3).max(2000) }).strict(),
+  z.object({ action: z.literal("refund_payment"), response: z.string().trim().min(3).max(2000),
+    payment_id: z.string().min(1).max(100), amount: z.number().finite().positive().max(1000000) }).strict(),
+])
+export type ResolveRefundInput = z.infer<typeof resolveRefundSchema>

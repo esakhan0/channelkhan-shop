@@ -1,9 +1,29 @@
 import { allowFields, authenticate, configureStoreSearch, defineMiddlewares } from '@medusajs/framework/http'
+import { PolicyOperation } from "@medusajs/framework/utils"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/admin/refund-requests*", method: ["GET"],
+      policies: [{ resource: "order", operation: PolicyOperation.read }],
+    },
+    {
+      matcher: "/admin/refund-requests/:id", method: ["POST"],
+      policies: [{ resource: "order", operation: PolicyOperation.update }],
+    },
+    {
+      matcher: "/admin/refund-requests/:id/resolve", method: ["POST"],
+      policies: [{ resource: "order", operation: PolicyOperation.update }, { resource: "refund", operation: PolicyOperation.create }],
+    },
+    {
+      matcher: "/store/orders*",
+      middlewares: [allowFields(
+        "payment_collections.payments.id", "payment_collections.payments.refunds.id",
+        "payment_collections.payments.refunds.amount", "payment_collections.payments.refunds.created_at"
+      )],
+    },
     {
       matcher: "/store/orders/:id/transfer/request", method: ["POST"],
       middlewares: [authenticate("customer", ["session", "bearer"]), (_req, res, next) => {

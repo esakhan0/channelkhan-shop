@@ -37,9 +37,10 @@ const OrderDetails = ({ order, showStatus = true }: OrderDetailsProps) => {
       <div className="joy-order-statuses flex flex-wrap items-center text-compact-small gap-2 mt-3">
         {showStatus && (
           <>
+            <Text className="joy-status-pill">Order: <span data-testid="order-status">{order.status === "canceled" ? "Cancelled" : formatStatus(order.status)}</span></Text>
             <Text className="joy-status-pill">
               Fulfillment:{" "}
-              <span className="text-ui-fg-subtle " data-testid="order-status">
+              <span className="text-ui-fg-subtle " data-testid="order-fulfillment-status">
                 {formatStatus(order.fulfillment_status)}
               </span>
             </Text>
@@ -55,6 +56,7 @@ const OrderDetails = ({ order, showStatus = true }: OrderDetailsProps) => {
           </>
         )}
       </div>
+      {order.status === "canceled" && <Text className="mt-3">This order has been cancelled. See the payment section below for any refunds.</Text>}
     </div>
   )
 }

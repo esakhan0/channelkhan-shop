@@ -5,6 +5,8 @@ import medusaError from "@lib/util/medusa-error"
 import { getAuthHeaders } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
+const refundFields = "+payment_collections.payments.id,+payment_collections.payments.refunds.id,+payment_collections.payments.refunds.amount,+payment_collections.payments.refunds.created_at"
+
 export const retrieveOrder = async (id: string) => {
   const headers = {
     ...(await getAuthHeaders()),
@@ -15,7 +17,7 @@ export const retrieveOrder = async (id: string) => {
       method: "GET",
       query: {
         fields:
-          "+customer_id,+payment_status,+fulfillment_status,*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,+fulfillments.id,+fulfillments.created_at,+fulfillments.shipped_at,+fulfillments.delivered_at,+fulfillments.canceled_at,+fulfillments.labels.tracking_number,+fulfillments.labels.tracking_url",
+          `+customer_id,+payment_status,+fulfillment_status,*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,+fulfillments.id,+fulfillments.created_at,+fulfillments.shipped_at,+fulfillments.delivered_at,+fulfillments.canceled_at,+fulfillments.labels.tracking_number,+fulfillments.labels.tracking_url,${refundFields}`,
       },
       headers,
       cache: "no-store",
@@ -40,7 +42,7 @@ export const listOrders = async (
         limit,
         offset,
         order: "-created_at",
-        fields: "*items,+items.metadata,*items.variant,*items.product,+payment_status,+fulfillment_status",
+        fields: `*items,+items.metadata,*items.variant,*items.product,+payment_status,+fulfillment_status,${refundFields}`,
         ...filters,
       },
       headers,

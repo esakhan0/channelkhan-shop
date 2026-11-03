@@ -2,10 +2,12 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import { refundedTotal } from "@lib/util/order-refunds"
 
 export default function OrderCard({ order }: { order: HttpTypes.StoreOrder }) {
   const items = order.items || []
   const quantity = items.reduce((total, item) => total + item.quantity, 0)
+  const refunded = refundedTotal(order)
 
   return (
     <article className="joy-order-card joy-order-list-card" data-testid="order-card">
@@ -36,10 +38,12 @@ export default function OrderCard({ order }: { order: HttpTypes.StoreOrder }) {
           {!items.length && <span>View order for item details.</span>}
         </div>
         <div className="joy-order-list-status">
-          <LocalizedClientLink href={`/account/orders/details/${order.id}/refund`}>Request a refund ↗</LocalizedClientLink>
+          {order.status !== "canceled" && order.payment_status !== "refunded" && <LocalizedClientLink href={`/account/orders/details/${order.id}/refund`}>Request a refund ↗</LocalizedClientLink>}
           <span>{quantity} {quantity === 1 ? "item" : "items"}</span>
+          <span className="joy-status-pill" data-testid="order-status">Order: {order.status === "canceled" ? "Cancelled" : (order.status || "pending").replaceAll("_", " ")}</span>
           <span className="joy-status-pill">Payment: {(order.payment_status || "pending").replaceAll("_", " ")}</span>
-          <span className="joy-status-pill">Delivery: {(order.fulfillment_status || "not_fulfilled").replaceAll("_", " ")}</span>
+          {refunded > 0 && <strong data-testid="order-refunded-total">Refunded: {convertToLocale({ amount: refunded, currency_code: order.currency_code })}</strong>}
+          {order.status !== "canceled" && <span className="joy-status-pill">Delivery: {(order.fulfillment_status || "not_fulfilled").replaceAll("_", " ")}</span>}
         </div>
       </div>
     </article>

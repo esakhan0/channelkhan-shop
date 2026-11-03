@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState, useTransition } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { orderRefunds } from "@lib/util/order-refunds"
 
 type TrackedParcel = NonNullable<HttpTypes.StoreOrder["fulfillments"]>[number] & {
   labels?: { tracking_number?: string; tracking_url?: string }[]
@@ -23,6 +24,7 @@ export default function RefreshOrder({ orders }: { orders: HttpTypes.StoreOrder[
       const snapshot = JSON.stringify({
         status: order.status,
         payment: order.payment_status,
+        refunds: orderRefunds(order),
         delivery: order.fulfillment_status,
         parcels: (order.fulfillments as TrackedParcel[] | undefined)?.map((parcel) => ({
           id: parcel.id,

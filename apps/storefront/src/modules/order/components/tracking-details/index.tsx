@@ -7,6 +7,9 @@ export function safeTrackingUrl(value?: string | null) {
   } catch { return null }
 }
 export default function TrackingDetails({ order }: { order: HttpTypes.StoreOrder }) {
+  if (order.status === "canceled") return <section className="joy-tracking" aria-label="Parcel tracking">
+    <h3>Order cancelled</h3><p>This order is no longer awaiting dispatch.</p>
+  </section>
   type TrackedFulfillment = NonNullable<HttpTypes.StoreOrder["fulfillments"]>[number] & {
     labels?: { tracking_number?: string; tracking_url?: string }[]
   }

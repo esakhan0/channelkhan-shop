@@ -4,6 +4,7 @@ import { getPaymentInfo, isStripeLike } from "@lib/constants"
 import Divider from "@modules/common/components/divider"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import { orderRefunds, refundedTotal } from "@lib/util/order-refunds"
 
 type PaymentDetailsProps = {
   order: HttpTypes.StoreOrder
@@ -11,6 +12,7 @@ type PaymentDetailsProps = {
 
 const PaymentDetails = ({ order }: PaymentDetailsProps) => {
   const payment = order.payment_collections?.[0]?.payments?.[0]
+  const refunds = orderRefunds(order)
 
   return (
     <section className="joy-order-payment" aria-label="Payment details">
@@ -55,7 +57,14 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
           </div>
         )}
       </div>
-
+      {refunds.length > 0 && <div className="mt-4 rounded border border-ui-border-base p-3" data-testid="order-refunds">
+        <Text className="font-semibold">Refunded: {convertToLocale({ amount: refundedTotal(order), currency_code: order.currency_code })}</Text>
+        <ul className="mt-2 space-y-2">{refunds.map((refund) => <li key={refund.id}>
+          <Text>{convertToLocale({ amount: refund.amount, currency_code: order.currency_code })}
+            {refund.created_at ? ` · ${new Date(refund.created_at).toLocaleDateString("en-GB")}` : ""}</Text>
+        </li>)}</ul>
+        <Text className="mt-2">Refunded to the original payment method. Your bank may take time to show it.</Text>
+      </div>}
       <Divider className="mt-8" />
     </section>
   )

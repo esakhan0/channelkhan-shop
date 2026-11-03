@@ -10,9 +10,13 @@ export async function GET(req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid offset")
   }
   const service = req.scope.resolve<RefundRequestModuleService>(REFUND_REQUEST_MODULE)
-  const [requests, count] = await service.listAndCountRefundRequests({}, {
+  const status = req.query.status
+  if (status !== undefined && (typeof status !== "string" || !["pending", "reviewing", "closed", "declined"].includes(status))) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid request status")
+  }
+  const [requests, count] = await service.listAndCountRefundRequests(status ? { status: String(status) } : {}, {
     skip: offset, take: 20, order: { created_at: "DESC" },
   })
   res.setHeader("Cache-Control", "no-store")
-  res.json({ requests: requests.map(customerRequestView), count, offset, limit: 20 })
+  res.json({ requests: requests.map((request) => ({ ...customerRequestView(request), resolution: request.resolution })), count, offset, limit: 20 })
 }

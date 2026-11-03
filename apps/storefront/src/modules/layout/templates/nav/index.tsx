@@ -8,7 +8,6 @@ import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
-import OpeningSale from "@modules/layout/components/opening-sale"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -19,7 +18,6 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <OpeningSale />
       <header className="mukky-nav relative h-24 mx-auto border-b duration-200 border-ui-border-base">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
           <div className="flex-1 basis-0 h-full flex items-center">

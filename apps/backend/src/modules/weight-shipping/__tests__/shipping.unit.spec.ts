@@ -71,8 +71,10 @@ describe("weight shipping provider", () => {
     await expect(provider().calculatePrice({ id: "standard" }, {}, cart)).rejects.toThrow(/No physical/)
   })
 
-  it("requires explicit valid configuration and offers nothing by default", async () => {
-    await expect(new WeightShippingProvider({}).getFulfillmentOptions()).resolves.toEqual([])
+  it("offers an admin-configurable option but requires valid rates to quote", async () => {
+    const empty = new WeightShippingProvider({})
+    await expect(empty.getFulfillmentOptions()).resolves.toEqual([{ id: "weight-bands", name: "Weight bands (manage in Settings)" }])
+    await expect(empty.calculatePrice({ id: "weight-bands" }, {}, context())).rejects.toThrow(/unavailable/)
     for (const services of ["invalid-json", [service, service], [{ ...service, bands: [...service.bands].reverse() }],
       [{ ...service, bands: [{ max_weight_g: 250, price_pence: -1 }] }]]) {
       expect(() => new WeightShippingProvider({}, {
@@ -95,5 +97,36 @@ describe("weight shipping provider", () => {
       ...service, bands: [{ max_weight_g: 250, price_pence: 0 }],
     }]) })
     await expect(p.calculatePrice({ id: "standard" }, {}, context())).resolves.toMatchObject({ calculated_amount: 0 })
+  })
+
+  it("uses persisted Admin bands immediately without rebuilding the provider", async () => {
+    const p = new WeightShippingProvider({})
+    const option = { id: "weight-bands", weight_config: { ...service, id: "weight-bands" } }
+    await expect(p.calculatePrice(option, {}, context())).resolves.toMatchObject({ calculated_amount: 2 })
+    const updated = { ...option, weight_config: { ...option.weight_config, bands: [{ max_weight_g: 1000, price_pence: 375 }] } }
+    await expect(p.calculatePrice(updated, {}, context())).resolves.toMatchObject({ calculated_amount: 3.75 })
+    await expect(p.validateFulfillmentData(updated)).resolves.toEqual({ id: "weight-bands" })
+    await expect(p.createFulfillment({ id: "weight-bands" })).resolves.toEqual({ data: { id: "weight-bands" }, labels: [] })
+  })
+
+  it("never uses customer-supplied bands and never falls back after invalid stored bands", async () => {
+    const p = provider()
+    const free = { ...service, bands: [{ max_weight_g: 9999, price_pence: 0 }] }
+    await expect(p.calculatePrice({ id: "standard" }, { weight_config: free }, context()))
+      .resolves.toMatchObject({ calculated_amount: 2 })
+    for (const weight_config of [null, {}, { ...service, bands: [] }, { ...service, id: "different" },
+      { ...service, bands: [{ max_weight_g: 1000, price_pence: -50 }] }]) {
+      await expect(p.calculatePrice({ id: "standard", weight_config }, {}, context())).rejects.toThrow(/configuration/)
+      await expect(p.validateOption({ id: "standard", weight_config })).resolves.toBe(false)
+    }
+  })
+
+  it("allows setup before rates and lets persisted rates override legacy environment rates", async () => {
+    const p = provider()
+    await expect(p.validateOption({ id: "weight-bands" })).resolves.toBe(true)
+    await expect(p.validateOption({ id: "unknown" })).resolves.toBe(false)
+    await expect(p.calculatePrice({ id: "standard", weight_config: {
+      ...service, bands: [{ max_weight_g: 1000, price_pence: 550 }],
+    } }, {}, context())).resolves.toMatchObject({ calculated_amount: 5.5 })
   })
 })

@@ -12,20 +12,37 @@ normal fulfillment process.
 1. In Medusa Admin, open each product variant and edit Attributes → Weight.
    Use **grams** consistently. Set every size/colour variant, including both dragon
    sizes. Product-level weight alone is not used by this provider.
-2. In Coolify's backend environment, set `WEIGHT_SHIPPING_SERVICES` to a JSON array
-   of services, using the shape below. The Compose file passes it to Medusa at runtime.
-   Enter raw JSON in Coolify, without wrapping it in extra quotes. Redeploy to load changes.
+2. Deploy the updated backend/Admin once. No environment JSON is needed for new
+   services; `WEIGHT_SHIPPING_SERVICES` can remain `[]`.
 3. Under Settings → Locations & Shipping → your warehouse, enable the provider
    `weight-shipping` in Fulfillment Providers. Its stored provider ID is
    `weight-shipping_weight-shipping`.
 4. In the appropriate service zone, create a shipping option. Select **Calculated**,
-   the weight-shipping provider, your configured fulfillment option, and the same
+   the weight-shipping provider, **Weight bands (manage in Settings)**, and the same
    shipping profile used by your products. Choose a clear customer-facing name.
-5. Test a cart on both sides of each boundary. After confirming the new option
+5. Open **Settings → Weight-based delivery**. Press **Refresh services** if needed.
+   Set the service name, packaging weight in grams, destination country codes
+   (`gb` for the UK), tax treatment, and weight bands. Enter prices in **pounds**
+   here (for example `3.75` means £3.75). Add/remove bands and press **Save weight bands**.
+   Each service has its own independent bands. Unconfigured services cannot quote.
+6. Test a cart on both sides of each boundary. After confirming the new option
    works, disable the old fixed-rate option if you want customers to use only
    weight-based prices. Existing orders and their shipping prices stay unchanged.
 
-Example schema with **illustrative test prices, not Royal Mail prices**:
+Settings are stored in Medusa's database on the native shipping option. Saving
+changes affects subsequent shipping calculations without a restart or redeploy.
+Existing orders keep their original charges; an already open checkout must refresh
+or reselect delivery to request a new calculation. This does not retroactively
+change existing orders or promise to update every open cart immediately.
+
+## Legacy environment configuration (optional)
+
+Existing `WEIGHT_SHIPPING_SERVICES` configurations still work. Saving an option
+through Settings takes precedence over its environment configuration. Only edits
+to the legacy environment JSON require a redeploy. The Admin editor does not
+pre-fill legacy environment bands: enter all bands before saving the first time.
+
+Example JSON schema with **illustrative test prices, not Royal Mail prices**:
 
 ```json
 [
@@ -49,12 +66,18 @@ The maximum is inclusive. Each band starts immediately after the preceding maxim
 `tax_inclusive` controls whether Medusa treats the configured amount as including tax;
 Medusa's configured tax rules still apply. It does not enable tax registration.
 Add another service object for another delivery speed. Keep service IDs stable once
-they are in use. The default `[]` offers no weight-based services.
+they are in use. The default `[]` still offers the Admin-configurable fulfillment
+option, but no rates until you configure them.
 
 ## Scope and safeguards
 
-- Rates and packaging come from server configuration. Customer-supplied prices,
+- Rates and packaging come from persisted shipping-option settings, falling back
+  to legacy server configuration when no Admin bands are stored. Customer-supplied prices,
   service overrides and weights in shipping method data are ignored.
+- Settings use the native authenticated Admin shipping-option API and its access
+  controls. Additional validation rejects malformed bands on creation/update;
+  the provider also validates stored bands before quoting. There is no public
+  settings-write endpoint or separate shipping settings database.
 - Variant weights and quantities come from the cart context supplied by Medusa's
   workflows. Missing/zero/invalid weights, unsupported countries/currencies and
   overweight parcels produce a controlled error, never a free or guessed quote.

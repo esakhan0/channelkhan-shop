@@ -1,37 +1,23 @@
 import { AbstractFulfillmentProviderService, MedusaError } from "@medusajs/framework/utils"
 import { z } from "@medusajs/framework/zod"
+import { WEIGHT_OPTION_ID, weightServiceSchema, type WeightService } from "./config"
 import type {
   CalculateShippingOptionPriceDTO,
   CalculatedShippingOptionPrice,
   CreateFulfillmentResult,
 } from "@medusajs/framework/types"
 
-const serviceSchema = z.object({
-  id: z.string().regex(/^[a-z0-9][a-z0-9_-]*$/),
-  name: z.string().trim().min(1),
-  country_codes: z.array(z.string().regex(/^[a-z]{2}$/)).min(1),
-  packaging_weight_g: z.number().int().nonnegative(),
-  tax_inclusive: z.boolean(),
-  bands: z.array(z.object({
-    max_weight_g: z.number().int().positive(),
-    price_pence: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
-  }).strict()).min(1),
-}).strict().refine(service => service.bands.every((band, i, bands) =>
-  i === 0 || band.max_weight_g > bands[i - 1].max_weight_g
-), "Weight bands must be in strictly increasing order")
-
-const servicesSchema = z.array(serviceSchema).refine(services =>
+const servicesSchema = z.array(weightServiceSchema).refine(services =>
   new Set(services.map(service => service.id)).size === services.length,
   "Shipping service IDs must be unique"
 )
 
 type Options = { services_json?: string }
-type Service = z.infer<typeof serviceSchema>
 
 /** GBP weight bands for one outbound parcel. Labels are purchased manually. */
 export default class WeightShippingProvider extends AbstractFulfillmentProviderService {
   static identifier = "weight-shipping"
-  private services: Service[]
+  private services: WeightService[]
 
   constructor(container: Record<string, unknown>, options: Options = {}) {
     super()
@@ -44,11 +30,18 @@ export default class WeightShippingProvider extends AbstractFulfillmentProviderS
   }
 
   async getFulfillmentOptions() {
-    return this.services.map(({ id, name }) => ({ id, name }))
+    return [
+      { id: WEIGHT_OPTION_ID, name: "Weight bands (manage in Settings)" },
+      ...this.services.filter(service => service.id !== WEIGHT_OPTION_ID).map(({ id, name }) => ({ id, name })),
+    ]
   }
 
   async validateOption(data: Record<string, unknown>) {
-    return this.services.some(service => service.id === data.id)
+    if (Object.prototype.hasOwnProperty.call(data, "weight_config")) {
+      const result = weightServiceSchema.safeParse(data.weight_config)
+      return result.success && result.data.id === data.id
+    }
+    return data.id === WEIGHT_OPTION_ID || this.services.some(service => service.id === data.id)
   }
 
   async canCalculate() {
@@ -56,6 +49,14 @@ export default class WeightShippingProvider extends AbstractFulfillmentProviderS
   }
 
   private getService(optionData: Record<string, unknown>) {
+    // This is persisted ShippingOption.data, NOT customer-supplied shipping method data.
+    if (Object.prototype.hasOwnProperty.call(optionData, "weight_config")) {
+      const result = weightServiceSchema.safeParse(optionData.weight_config)
+      if (!result.success || result.data.id !== optionData.id) {
+        throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid shipping weight-band configuration. Please contact the shop.")
+      }
+      return result.data
+    }
     const service = this.services.find(service => service.id === optionData.id)
     if (!service) {
       throw new MedusaError(MedusaError.Types.INVALID_DATA, "This shipping service is unavailable.")
@@ -113,7 +114,10 @@ export default class WeightShippingProvider extends AbstractFulfillmentProviderS
   }
 
   async createFulfillment(data: Record<string, unknown>): Promise<CreateFulfillmentResult> {
-    return { data: { id: this.getService(data).id }, labels: [] }
+    if (data.id !== WEIGHT_OPTION_ID && !this.services.some(service => service.id === data.id)) {
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, "This shipping service is unavailable.")
+    }
+    return { data: { id: data.id }, labels: [] }
   }
 
   async cancelFulfillment() {

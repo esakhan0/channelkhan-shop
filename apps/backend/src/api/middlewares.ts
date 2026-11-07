@@ -1,10 +1,13 @@
 import { allowFields, authenticate, configureStoreSearch, defineMiddlewares } from '@medusajs/framework/http'
 import { PolicyOperation } from "@medusajs/framework/utils"
+import { validateWeightShippingConfig } from "./admin/weight-shipping-validation"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
 export default defineMiddlewares({
   routes: [
+    { matcher: "/admin/shipping-options", method: ["POST"], middlewares: [validateWeightShippingConfig] },
+    { matcher: "/admin/shipping-options/:id", method: ["POST"], middlewares: [validateWeightShippingConfig] },
     {
       matcher: "/admin/refund-requests*", method: ["GET"],
       policies: [{ resource: "order", operation: PolicyOperation.read }],

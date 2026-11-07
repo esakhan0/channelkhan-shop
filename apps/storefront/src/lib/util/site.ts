@@ -2,6 +2,14 @@ import "server-only"
 import { headers } from "next/headers"
 
 export const STORE_NAME = "Mukky's 3D Shop"
+export const STORE_DESCRIPTION =
+  "Discover 3D printed fidget toys, articulated dragons and gear shifters at Mukky's 3D Shop. Find your next favourite fidget."
+export const STORE_SHARE_IMAGE = {
+  url: "/brand/mukkys-logo.png?v=store-share-1",
+  width: 1774,
+  height: 887,
+  alt: "Mukky's 3D Shop — 3D printed fidget toys",
+}
 
 export const DEFAULT_COUNTRY_CODE = (
   process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"

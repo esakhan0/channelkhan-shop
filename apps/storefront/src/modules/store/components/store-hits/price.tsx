@@ -2,7 +2,7 @@
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
 import { convertToLocale } from "@lib/util/money"
-import { Text, clx } from "@modules/common/components/ui"
+import { Text } from "@modules/common/components/ui"
 
 /** The per-currency price fields a hit may carry, e.g. `min_price_eur`. */
 export type HitPricing = Record<string, unknown>
@@ -34,7 +34,7 @@ const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
   const isRange = max > min_price
 
   return (
-    <div className="flex items-center gap-x-2" data-testid="product-price">
+    <div className="mukky-card-price" data-testid="product-price">
       {!isRange && on_sale && original_price !== null && (
         <Text
           className="line-through text-ui-fg-muted"
@@ -44,12 +44,10 @@ const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
         </Text>
       )}
       <Text
-        className={clx("text-ui-fg-muted", {
-          "text-ui-tag-red-text": on_sale,
-        })}
+        className="mukky-card-amount"
         data-testid="price"
       >
-        {isRange ? `${format(min_price)} - ${format(max)}` : format(min_price)}
+        {isRange ? `${format(min_price)}–${format(max)}` : format(min_price)}
       </Text>
     </div>
   )

@@ -1,7 +1,7 @@
-import { Text, clx } from "@modules/common/components/ui"
+import { Text } from "@modules/common/components/ui"
 import { VariantPrice } from "types/global"
 
-export default async function PreviewPrice({ price }: { price: VariantPrice }) {
+export default async function PreviewPrice({ price, from }: { price: VariantPrice; from?: boolean }) {
   if (!price) {
     return null
   }
@@ -17,12 +17,10 @@ export default async function PreviewPrice({ price }: { price: VariantPrice }) {
         </Text>
       )}
       <Text
-        className={clx("text-ui-fg-muted", {
-          "text-ui-fg-interactive": price.price_type === "sale",
-        })}
+        className="mukky-card-amount"
         data-testid="price"
       >
-        {price.calculated_price}
+        {from ? "From " : ""}{price.calculated_price}
       </Text>
     </>
   )

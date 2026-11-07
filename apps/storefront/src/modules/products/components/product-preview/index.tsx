@@ -7,7 +7,6 @@ import PreviewPrice from "./price"
 
 export default async function ProductPreview({
   product,
-  isFeatured,
   region: _region,
 }: {
   product: HttpTypes.StoreProduct
@@ -26,23 +25,25 @@ export default async function ProductPreview({
   const { cheapestPrice } = getProductPrice({
     product,
   })
+  const hasPriceRange = !!cheapestPrice && product.variants?.some(variant =>
+    (variant.calculated_price?.calculated_amount ?? 0) > cheapestPrice.calculated_price_number)
 
   return (
     <LocalizedClientLink href={`/products/${product.handle}`} className="group mukky-product-card">
-      <div data-testid="product-wrapper">
+      <div className="mukky-card-content" data-testid="product-wrapper">
         <Thumbnail
           thumbnail={product.thumbnail}
           images={product.images}
           alt={product.title}
-          size="full"
-          isFeatured={isFeatured}
+          size="square"
+          className="mukky-card-photo"
         />
-        <div className="flex txt-compact-medium mt-4 justify-between">
+        <div className="mukky-card-details">
           <Text className="text-ui-fg-subtle" data-testid="product-title">
             {product.title}
           </Text>
-          <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+          <div className="mukky-card-price">
+            {cheapestPrice && <PreviewPrice price={cheapestPrice} from={hasPriceRange} />}
           </div>
         </div>
       </div>

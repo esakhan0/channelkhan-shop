@@ -173,7 +173,7 @@ a:focus-visible,button:focus-visible{outline:3px solid #7852af;outline-offset:5p
 .ink-product-reveal{min-width:0;display:flex}.ink-product-reveal>.mukky-product-card{width:100%}
 .ink-product-reveal:nth-child(2n) .mukky-product-card{background:#fff1bc}.ink-product-reveal:nth-child(3n) .mukky-product-card{background:#e1ead9}
 .mukky-product-card{transition:transform .25s,box-shadow .25s;box-shadow:0 0 0 var(--ink)}
-.mukky-product-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:5px 7px 0 var(--ink)}
+.mukky-product-card:hover{transform:translateY(-2px);box-shadow:5px 7px 0 var(--ink)}
 .ink-account-link,[data-testid='nav-cart-link']{transition:transform .2s,box-shadow .2s}
 .ink-account-link:hover,[data-testid='nav-cart-link']:hover{transform:translateY(-2px);box-shadow:2px 3px 0 var(--ink)}
 .ink-login-layout,.ink-empty-bag{animation:ink-arrive .65s ease-out}
@@ -183,3 +183,12 @@ a:focus-visible,button:focus-visible{outline:3px solid #7852af;outline-offset:5p
 @keyframes ink-stamp-in{from{transform:rotate(12deg) scale(.7);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
 @media(max-width:750px){.ink-type-headline{font-size:clamp(78px,17vw,116px);margin-top:25px}.ink-hero-copy>p.ink-handnote{font-size:16px}.ink-workshop-stage{margin-top:10px}}
 @media(prefers-reduced-motion:reduce){.ink-type-headline svg,.ink-doodle-one,.ink-sticker,.ink-login-layout,.ink-empty-bag{animation:none}.ink-workshop,.ink-account-link,[data-testid='nav-cart-link'],.ink-button span{transition:none}.ink-wiggle-button{display:none}.ink-product-reveal .mukky-product-card:hover,.ink-account-link:hover,[data-testid='nav-cart-link']:hover,.ink-button:hover span{transform:none}}
+
+/* Keep every catalogue photo visible and give prices their own line. */
+.mukky-product-card, .mukky-card-content { height: 100%; }
+.mukky-card-content, .mukky-card-details { display: flex; flex-direction: column; min-width: 0; }
+.mukky-card-photo { flex: none; background: #f8f6f1; }
+.mukky-card-photo img { object-fit: contain; }
+.mukky-card-details { flex: 1; gap: 6px; padding-top: 12px; }
+.mukky-card-price { margin-top: auto; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.mukky-card-price .mukky-card-amount { color: #241e1c; font-size: 1rem; font-weight: 700; line-height: 1.35; }

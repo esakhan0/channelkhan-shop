@@ -84,9 +84,9 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
                   href={`/products/${hit.handle}`}
                   className="group mukky-product-card"
                 >
-                  <div data-testid="product-wrapper">
-                    <Thumbnail thumbnail={hit.thumbnail} size="full" />
-                    <div className="flex txt-compact-medium mt-4 justify-between">
+                  <div className="mukky-card-content" data-testid="product-wrapper">
+                    <Thumbnail thumbnail={hit.thumbnail} size="square" className="mukky-card-photo" alt={hit.title ?? ""} />
+                    <div className="mukky-card-details">
                       <Text
                         className="text-ui-fg-subtle"
                         data-testid="product-title"

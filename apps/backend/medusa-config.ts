@@ -8,6 +8,18 @@ module.exports = defineConfig({
   },
   modules: [
     { resolve: "./src/modules/refund-request" },
+    {
+      resolve: "@medusajs/medusa/fulfillment",
+      options: {
+        providers: [
+          { resolve: "@medusajs/medusa/fulfillment-manual", id: "manual" },
+          {
+            resolve: "./src/modules/weight-shipping", id: "weight-shipping",
+            options: { services_json: process.env.WEIGHT_SHIPPING_SERVICES || "[]" },
+          },
+        ],
+      },
+    },
     ...(process.env.REDIS_URL ? [{
       resolve: "@medusajs/medusa/event-bus-redis",
       options: {

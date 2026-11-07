@@ -57,6 +57,7 @@ services:
       SMTP_REPLY_TO: ${SMTP_REPLY_TO:-}
       STOREFRONT_URL: https://mukkys3d.com
       ORDER_TRANSFER_EMAIL_ENABLED: ${ORDER_TRANSFER_EMAIL_ENABLED:-false}
+      WEIGHT_SHIPPING_SERVICES: ${WEIGHT_SHIPPING_SERVICES:-[]}
       STORE_CORS: https://mukkys3d.com,https://www.mukkys3d.com,https://mukkys3d.co.uk,https://www.mukkys3d.co.uk,https://shop.channelkhan.com
       ADMIN_CORS: https://admin.mukkys3d.com,https://api.mukkys3d.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com
       AUTH_CORS: https://mukkys3d.com,https://www.mukkys3d.com,https://mukkys3d.co.uk,https://www.mukkys3d.co.uk,https://shop.channelkhan.com,https://admin.mukkys3d.com,https://api.mukkys3d.com,https://shopadmin.channelkhan.com,https://api.channelkhan.com

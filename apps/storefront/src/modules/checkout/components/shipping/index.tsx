@@ -246,8 +246,8 @@ const Shipping: React.FC<ShippingProps> = ({
                   {_shippingMethods?.map((option) => {
                     const isDisabled =
                       option.price_type === "calculated" &&
-                      !isLoadingPrices &&
-                      typeof calculatedPricesMap[option.id] !== "number"
+                      (isLoadingPrices ||
+                        typeof calculatedPricesMap[option.id] !== "number")
 
                     return (
                       <Radio
@@ -279,7 +279,7 @@ const Shipping: React.FC<ShippingProps> = ({
                               amount: option.amount!,
                               currency_code: cart?.currency_code,
                             })
-                          ) : calculatedPricesMap[option.id] ? (
+                          ) : typeof calculatedPricesMap[option.id] === "number" ? (
                             convertToLocale({
                               amount: calculatedPricesMap[option.id],
                               currency_code: cart?.currency_code,

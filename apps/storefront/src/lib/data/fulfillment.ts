@@ -2,15 +2,13 @@
 
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
+import { unstable_rethrow } from "next/navigation"
+import { SHIPPING_QUOTE_ERROR, shippingErrorMessage } from "@lib/util/shipping-error"
 
 export const listCartShippingMethods = async (cartId: string) => {
   const headers = {
     ...(await getAuthHeaders()),
-  }
-
-  const next = {
-    ...(await getCacheOptions("fulfillment")),
   }
 
   return sdk.client
@@ -22,8 +20,7 @@ export const listCartShippingMethods = async (cartId: string) => {
           cart_id: cartId,
         },
         headers,
-        next,
-        cache: "force-cache",
+        cache: "no-store",
       }
     )
     .then(({ shipping_options }) => shipping_options)
@@ -41,10 +38,6 @@ export const calculatePriceForShippingOption = async (
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("fulfillment")),
-  }
-
   const body = { cart_id: cartId, data }
 
   if (data) {
@@ -58,11 +51,17 @@ export const calculatePriceForShippingOption = async (
         method: "POST",
         body,
         headers,
-        next,
+        cache: "no-store",
       }
     )
-    .then(({ shipping_option }) => shipping_option)
-    .catch((_e) => {
-      return null
+    .then(({ shipping_option }) => {
+      if (typeof shipping_option?.amount !== "number" || !Number.isFinite(shipping_option.amount) || shipping_option.amount < 0) {
+        return { shipping_option: null, error: SHIPPING_QUOTE_ERROR }
+      }
+      return { shipping_option, error: null }
+    })
+    .catch((error: unknown) => {
+      unstable_rethrow(error)
+      return { shipping_option: null, error: shippingErrorMessage(error) }
     })
 }

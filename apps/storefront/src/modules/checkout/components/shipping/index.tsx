@@ -3,6 +3,7 @@ import { Radio, RadioGroup } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
+import { SHIPPING_QUOTE_ERROR } from "@lib/util/shipping-error"
 import { CheckCircleSolid, Loader } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -58,6 +59,8 @@ const Shipping: React.FC<ShippingProps> = ({
   const [calculatedPricesMap, setCalculatedPricesMap] = useState<
     Record<string, number>
   >({})
+  const [quoteErrors, setQuoteErrors] = useState<Record<string, string>>({})
+  const [quoteAttempt, setQuoteAttempt] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [shippingMethodId, setShippingMethodId] = useState<string | null>(
     cart.shipping_methods?.at(-1)?.shipping_option_id || null
@@ -80,34 +83,33 @@ const Shipping: React.FC<ShippingProps> = ({
   const hasPickupOptions = !!_pickupMethods?.length
 
   useEffect(() => {
-    setIsLoadingPrices(true)
-
-    if (_shippingMethods?.length) {
-      const promises = _shippingMethods
-        .filter((sm) => sm.price_type === "calculated")
-        .map((sm) => calculatePriceForShippingOption(sm.id, cart.id))
-
-      if (promises.length) {
-        Promise.allSettled(promises).then((res) => {
-          const pricesMap: Record<string, number> = {}
-          res
-            .filter((r) => r.status === "fulfilled")
-            .forEach((p) => {
-              if (p.value?.id) {
-                pricesMap[p.value.id] = p.value.amount ?? 0
-              }
-            })
-
-          setCalculatedPricesMap(pricesMap)
-          setIsLoadingPrices(false)
-        })
-      }
-    }
+    let active = true
+    const methods = _shippingMethods?.filter(sm => sm.price_type === "calculated") || []
+    setIsLoadingPrices(methods.length > 0)
+    setCalculatedPricesMap({})
+    setQuoteErrors({})
+    Promise.allSettled(methods.map(sm => calculatePriceForShippingOption(sm.id, cart.id))).then(results => {
+      if (!active) return
+      const prices: Record<string, number> = {}
+      const errors: Record<string, string> = {}
+      results.forEach((result, index) => {
+        const id = methods[index].id
+        if (result.status === "fulfilled" && result.value.shipping_option) {
+          prices[id] = result.value.shipping_option.amount!
+        } else {
+          errors[id] = result.status === "fulfilled" ? result.value.error || SHIPPING_QUOTE_ERROR : SHIPPING_QUOTE_ERROR
+        }
+      })
+      setCalculatedPricesMap(prices)
+      setQuoteErrors(errors)
+      setIsLoadingPrices(false)
+    })
 
     if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
       setShowPickupOptions(PICKUP_OPTION_ON)
     }
-  }, [availableShippingMethods])
+    return () => { active = false }
+  }, [availableShippingMethods, cart.id, cart.updated_at, quoteAttempt])
 
   const handleEdit = () => {
     router.push(pathname + "?step=delivery", { scroll: false })
@@ -192,7 +194,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 Shipping method
               </span>
               <span className="mb-4 text-ui-fg-muted txt-medium">
-                How would you like you order delivered
+                How would you like your order delivered?
               </span>
             </div>
             <div data-testid="delivery-options-container">
@@ -287,13 +289,21 @@ const Shipping: React.FC<ShippingProps> = ({
                           ) : isLoadingPrices ? (
                             <Loader />
                           ) : (
-                            "-"
+                            "Unavailable"
                           )}
                         </span>
                       </Radio>
                     )
                   })}
                 </RadioGroup>
+                {Object.entries(quoteErrors).map(([id, message]) => (
+                  <div key={id} role="alert" className="mt-2 text-sm text-rose-700">
+                    {_shippingMethods?.find(option => option.id === id)?.name}: {message}
+                  </div>
+                ))}
+                {Object.keys(quoteErrors).length > 0 && <button type="button"
+                  className="mt-3 underline text-sm" disabled={isLoadingPrices}
+                  onClick={() => setQuoteAttempt(attempt => attempt + 1)}>Retry delivery prices</button>}
               </div>
             </div>
           </div>
@@ -376,7 +386,9 @@ const Shipping: React.FC<ShippingProps> = ({
               className="mt"
               onClick={handleSubmit}
               isLoading={isLoading}
-              disabled={!cart.shipping_methods?.[0]}
+              disabled={isLoading || !cart.shipping_methods?.[0] ||
+                (!!shippingMethodId && !!_shippingMethods?.some(option => option.id === shippingMethodId &&
+                  option.price_type === "calculated" && (isLoadingPrices || typeof calculatedPricesMap[option.id] !== "number")))}
               data-testid="submit-delivery-option-button"
             >
               Continue to payment

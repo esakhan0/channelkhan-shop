@@ -1,6 +1,7 @@
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { WEIGHT_OPTION_ID, WEIGHT_PROVIDER_ID } from "../../src/modules/weight-shipping/config"
+import { calculateShippingOptionsPricesWorkflow } from "@medusajs/medusa/core-flows"
 
 jest.setTimeout(120000)
 
@@ -61,6 +62,26 @@ medusaIntegrationTestRunner({
         weight_config: { ...config, bands: [{ max_weight_g: 1000, price_pence: 375 }] },
       } }, { headers })
       expect((await quote())[0].calculated_amount).toBe(3.75)
+      const product = await container.resolve(Modules.PRODUCT).createProducts({
+        title: "Weighted print", variants: [{ title: "Medium", weight: 100, manage_inventory: false }],
+      })
+      await link.create({ [Modules.PRODUCT]: { product_id: product.id },
+        [Modules.FULFILLMENT]: { shipping_profile_id: profile.id } })
+      const cart = await container.resolve(Modules.CART).createCarts({ currency_code: "gbp",
+        shipping_address: { country_code: "gb" }, items: [{ title: "Weighted print", quantity: 3, unit_price: 9,
+          variant_id: product.variants![0].id, product_id: product.id, requires_shipping: true }],
+      })
+      const actual = await calculateShippingOptionsPricesWorkflow(container).run({
+        input: { cart_id: cart.id, shipping_options: [{ id }] },
+      })
+      expect(actual.result[0].calculated_amount).toBe(3.75)
+      await api.post(`/admin/shipping-options/${id}`, body, { headers })
+      const calculateCart = () => calculateShippingOptionsPricesWorkflow(container).run({
+        input: { cart_id: cart.id, shipping_options: [{ id }] },
+      })
+      expect((await calculateCart()).result[0].calculated_amount).toBe(4)
+      await container.resolve(Modules.PRODUCT).updateProductVariants(product.variants![0].id, { weight: 40 })
+      expect((await calculateCart()).result[0].calculated_amount).toBe(2)
     })
   },
 })

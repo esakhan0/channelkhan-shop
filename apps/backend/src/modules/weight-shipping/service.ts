@@ -5,6 +5,7 @@ import type {
   CalculateShippingOptionPriceDTO,
   CalculatedShippingOptionPrice,
   CreateFulfillmentResult,
+  Logger,
 } from "@medusajs/framework/types"
 
 const servicesSchema = z.array(weightServiceSchema).refine(services =>
@@ -18,9 +19,11 @@ type Options = { services_json?: string }
 export default class WeightShippingProvider extends AbstractFulfillmentProviderService {
   static identifier = "weight-shipping"
   private services: WeightService[]
+  private logger: Pick<Logger, "warn">
 
   constructor(container: Record<string, unknown>, options: Options = {}) {
     super()
+    this.logger = (container.logger as Logger | undefined) || console
     try {
       this.services = servicesSchema.parse(JSON.parse(options.services_json || "[]"))
     } catch {
@@ -96,6 +99,11 @@ export default class WeightShippingProvider extends AbstractFulfillmentProviderS
       const weight = Number(item.variant?.weight)
       const quantity = Number(item.quantity)
       if (!Number.isFinite(weight) || weight <= 0 || !Number.isSafeInteger(quantity) || quantity <= 0) {
+        this.logger.warn(`Weight shipping: invalid cart item ${JSON.stringify({
+          variant_id: item.variant?.id ?? item.variant_id,
+          variant_weight: item.variant?.weight ?? null,
+          quantity: item.quantity,
+        })}`)
         throw new MedusaError(MedusaError.Types.INVALID_DATA,
           "A cart item has missing or invalid shipping weight. Please contact the shop.")
       }

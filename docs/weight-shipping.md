@@ -1,7 +1,7 @@
 # Weight-based delivery
 
 This provider uses Medusa 2.22.2's native calculated shipping API. The backend totals
-each physical item's variant weight × quantity, adds packaging once per parcel,
+each physical item's weight × quantity, adds packaging once per parcel,
 rounds up to a whole gram and selects the first band that covers the total.
 Prices are configured by the shop and returned in GBP. This is not a live Royal Mail
 quote or a label-purchasing integration. Buy labels and add tracking through your
@@ -9,9 +9,11 @@ normal fulfillment process.
 
 ## Configure
 
-1. In Medusa Admin, open each product variant and edit Attributes → Weight.
-   Use **grams** consistently. Set every size/colour variant, including both dragon
-   sizes. Product-level weight alone is not used by this provider.
+1. In Medusa Admin, set **Inventory → item → Attributes → Weight** in **grams**.
+   The inventory item must be linked to the purchased variant. Set each size/colour
+   separately where its weight differs. An explicit variant weight takes priority;
+   when it is blank, the provider uses linked inventory weights, including each
+   component's required quantity for kits. Product-level weight alone is not used.
 2. Deploy the updated backend/Admin once. No environment JSON is needed for new
    services; `WEIGHT_SHIPPING_SERVICES` can remain `[]`.
 3. Under Settings → Locations & Shipping → your warehouse, enable the provider
@@ -79,7 +81,9 @@ option, but no rates until you configure them.
   the provider also validates stored bands before quoting. There is no public
   settings-write endpoint or separate shipping settings database.
 - Variant weights and quantities come from the cart context supplied by Medusa's
-  workflows. Missing/zero/invalid weights, unsupported countries/currencies and
+  workflows. Native calculated-shipping context hooks load linked inventory weights
+  for both quoting and selecting/repricing delivery. Browser-supplied weights are
+  ignored. Missing/zero/invalid weights, unsupported countries/currencies and
   overweight parcels produce a controlled error, never a free or guessed quote.
 - Medusa recalculates shipping when cart changes trigger its refresh workflows.
 - This first version assumes one outbound parcel and one shipping profile for the

@@ -1,5 +1,6 @@
 import type { CalculateShippingOptionPriceDTO } from "@medusajs/framework/types"
 import WeightShippingProvider from "../service"
+import { inventoryWeight } from "../inventory-weight"
 
 // Test prices only, not Royal Mail tariffs.
 const service = {
@@ -17,6 +18,28 @@ const context = (weight: unknown = 100, quantity = 1) => ({
 } as unknown as CalculateShippingOptionPriceDTO["context"])
 
 describe("weight shipping provider", () => {
+  it("totals inventory components and rejects incomplete kits", () => {
+    expect(inventoryWeight([{ required_quantity: 2, inventory: { weight: 9 } },
+      { required_quantity: 1, inventory: { weight: 20 } }])).toBe(38)
+    for (const links of [[], [null], [{ required_quantity: 1, inventory: { weight: null } }],
+      [{ required_quantity: 0, inventory: { weight: 9 } }],
+      [{ required_quantity: 1, inventory: { weight: 9 } }, { required_quantity: 1, inventory: null }]]) {
+      expect(inventoryWeight(links)).toBeNull()
+    }
+  })
+
+  it("uses server inventory weight only for a missing variant weight", async () => {
+    const cart = context(null, 3)
+    cart.items[0].variant.id = "variant_test"
+    cart.inventory_shipping_weights = { variant_test: 100 }
+    await expect(provider().calculatePrice({ id: "standard" }, {
+      inventory_shipping_weights: { variant_test: 1 },
+    }, cart)).resolves.toMatchObject({ calculated_amount: 4 })
+    cart.items[0].variant.weight = 40
+    await expect(provider().calculatePrice({ id: "standard" }, {}, cart)).resolves.toMatchObject({ calculated_amount: 2 })
+    cart.items[0].variant.weight = 0
+    await expect(provider().calculatePrice({ id: "standard" }, {}, cart)).rejects.toThrow(/weight/)
+  })
   it.each([[100, 1, 2], [100, 2, 2], [100, 3, 4], [950, 1, 4], [200.01, 1, 4]])(
     "quotes weight %s × %s with packaging and inclusive band boundaries",
     async (weight, quantity, expected) => {

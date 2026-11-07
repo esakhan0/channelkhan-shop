@@ -1,7 +1,7 @@
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { WEIGHT_OPTION_ID, WEIGHT_PROVIDER_ID } from "../../src/modules/weight-shipping/config"
-import { calculateShippingOptionsPricesWorkflow } from "@medusajs/medusa/core-flows"
+import { calculateShippingOptionsPricesWorkflow, listShippingOptionsForCartWithPricingWorkflow } from "@medusajs/medusa/core-flows"
 
 jest.setTimeout(120000)
 
@@ -17,10 +17,14 @@ medusaIntegrationTestRunner({
       const login = await api.post("/auth/user/emailpass", { email: user.email, password: "local-test-password" })
       const headers = { authorization: `Bearer ${login.data.token}` }
       const location = await container.resolve(Modules.STOCK_LOCATION).createStockLocations({ name: "Weight test warehouse" })
+      const region = await container.resolve(Modules.REGION).createRegions({ name: "Weight test UK", currency_code: "gbp" })
+      const channel = await container.resolve(Modules.SALES_CHANNEL).createSalesChannels({ name: "Weight test shop" })
       const set = await fulfillment.createFulfillmentSets({ name: "Weight test set", type: "shipping", service_zones: [
         { name: "UK", geo_zones: [{ type: "country", country_code: "gb" }] },
       ] })
       const link = container.resolve(ContainerRegistrationKeys.LINK)
+      await link.create({ [Modules.SALES_CHANNEL]: { sales_channel_id: channel.id },
+        [Modules.STOCK_LOCATION]: { stock_location_id: location.id } })
       await link.create({ [Modules.STOCK_LOCATION]: { stock_location_id: location.id },
         [Modules.FULFILLMENT]: { fulfillment_provider_id: WEIGHT_PROVIDER_ID } })
       await link.create({ [Modules.STOCK_LOCATION]: { stock_location_id: location.id },
@@ -68,6 +72,7 @@ medusaIntegrationTestRunner({
       await link.create({ [Modules.PRODUCT]: { product_id: product.id },
         [Modules.FULFILLMENT]: { shipping_profile_id: profile.id } })
       const cart = await container.resolve(Modules.CART).createCarts({ currency_code: "gbp",
+        region_id: region.id, sales_channel_id: channel.id,
         shipping_address: { country_code: "gb" }, items: [{ title: "Weighted print", quantity: 3, unit_price: 9,
           variant_id: product.variants![0].id, product_id: product.id, requires_shipping: true }],
       })
@@ -82,6 +87,28 @@ medusaIntegrationTestRunner({
       expect((await calculateCart()).result[0].calculated_amount).toBe(4)
       await container.resolve(Modules.PRODUCT).updateProductVariants(product.variants![0].id, { weight: 40 })
       expect((await calculateCart()).result[0].calculated_amount).toBe(2)
+      // Reproduce the shop's setup: weight is saved in Inventory > Attributes,
+      // while the associated variant's physical attribute is null.
+      const inventory = await container.resolve(Modules.INVENTORY).createInventoryItems({ title: "Black print", weight: 9 })
+      await link.create({ [Modules.PRODUCT]: { variant_id: product.variants![0].id },
+        [Modules.INVENTORY]: { inventory_item_id: inventory.id }, data: { required_quantity: 2 } })
+      await container.resolve(Modules.PRODUCT).updateProductVariants(product.variants![0].id, { weight: null })
+      expect((await calculateCart()).result[0].calculated_amount).toBe(2)
+      await container.resolve(Modules.INVENTORY).updateInventoryItems({ id: inventory.id, weight: 100 })
+      expect((await calculateCart()).result[0].calculated_amount).toBe(4)
+      const listedWithPricing = await listShippingOptionsForCartWithPricingWorkflow(container).run({
+        input: { cart_id: cart.id, options: [{ id, data: { inventory_shipping_weights: { [product.variants![0].id]: 1 } } }] },
+      })
+      expect(listedWithPricing.result.find(option => option.id === id)?.calculated_price?.calculated_amount).toBe(4)
+      await container.resolve(Modules.PRODUCT).updateProductVariants(product.variants![0].id, { weight: 40 })
+      expect((await calculateCart()).result[0].calculated_amount).toBe(2)
+      await container.resolve(Modules.PRODUCT).updateProductVariants(product.variants![0].id, { weight: null })
+      await container.resolve(Modules.INVENTORY).updateInventoryItems({ id: inventory.id, weight: null })
+      const failed = await calculateShippingOptionsPricesWorkflow(container).run({
+        input: { cart_id: cart.id, shipping_options: [{ id }] }, throwOnError: false,
+      })
+      expect(failed.errors).toHaveLength(1)
+      expect(failed.errors[0].error.message).toMatch(/missing or invalid shipping weight/)
     })
   },
 })

@@ -95,13 +95,18 @@ export default class WeightShippingProvider extends AbstractFulfillmentProviderS
     }
     let grams = service.packaging_weight_g
     for (const item of items) {
-      // Medusa supplies persisted variants and quantities in this context.
-      const weight = Number(item.variant?.weight)
+      // An explicit variant weight takes priority. Native workflow hooks supply
+      // linked inventory weights when the variant attribute has not been set.
+      const variantId = item.variant?.id ?? item.variant_id
+      const inventoryWeights = context.inventory_shipping_weights as Record<string, number | null> | undefined
+      const inventoryWeight = variantId ? inventoryWeights?.[variantId] : undefined
+      const weight = Number(item.variant?.weight ?? inventoryWeight)
       const quantity = Number(item.quantity)
       if (!Number.isFinite(weight) || weight <= 0 || !Number.isSafeInteger(quantity) || quantity <= 0) {
         this.logger.warn(`Weight shipping: invalid cart item ${JSON.stringify({
           variant_id: item.variant?.id ?? item.variant_id,
           variant_weight: item.variant?.weight ?? null,
+          inventory_weight: inventoryWeight ?? null,
           quantity: item.quantity,
         })}`)
         throw new MedusaError(MedusaError.Types.INVALID_DATA,

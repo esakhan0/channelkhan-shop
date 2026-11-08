@@ -9,6 +9,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import Search from "@modules/layout/components/search"
+import User from "@modules/common/icons/user"
+import NavCartLabel from "@modules/layout/components/nav-cart-label"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -44,8 +46,10 @@ export default async function Nav() {
                 className="ink-account-link"
                 href="/account"
                 data-testid="nav-account-link"
+                aria-label="Your account"
               >
-                Account
+                <span className="mukky-nav-text">Account</span>
+                <span className="mukky-nav-icon" aria-hidden="true"><User size="22" focusable="false" /></span>
               </LocalizedClientLink>
             </div>
             <Suspense
@@ -54,8 +58,9 @@ export default async function Nav() {
                   className="hover:text-ui-fg-base flex gap-2"
                   href="/cart"
                   data-testid="nav-cart-link"
+                  aria-label="Cart, 0 items"
                 >
-                  Cart (0)
+                  <NavCartLabel count={0} />
                 </LocalizedClientLink>
               }
             >

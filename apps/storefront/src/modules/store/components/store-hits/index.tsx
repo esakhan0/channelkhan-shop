@@ -141,7 +141,7 @@ const StoreHits = ({ hitsPerPage }: StoreHitsProps) => {
             const label = variant.options?.map((option) => option.value).join(" / ") || variant.title
             const variantLabel = label && label !== "Default variant" ? label : ""
             const price = getPricesForVariant(variant)
-            const thumbnail = variant.images?.[0]?.url || product.thumbnail || product.images?.[0]?.url
+            const thumbnail = variant.thumbnail || variant.images?.[0]?.url || product.thumbnail || product.images?.[0]?.url
             return (
               <li key={variant.id} data-variant-id={variant.id}>
                 <LocalizedClientLink

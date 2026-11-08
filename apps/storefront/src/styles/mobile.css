@@ -1,4 +1,11 @@
 /* Mobile layout fixes. Desktop layouts and checkout behaviour remain shared. */
+.mukky-nav-icon { display: none; }
+@media (max-width: 750px) {
+  .mukky-nav .mukky-nav-text { display: none; }
+  .mukky-nav .mukky-nav-icon { display: inline-flex; position: relative; align-items: center; justify-content: center; }
+  .mukky-nav .ink-account-link, .mukky-nav [data-testid="nav-cart-link"] { width: 44px; height: 44px; padding: 0; flex-shrink: 0; }
+  .mukky-cart-count { position: absolute; top: -11px; right: -11px; min-width: 18px; height: 18px; padding: 0 3px; border-radius: 999px; background: var(--ink); color: white; font-size: 10px; font-weight: 700; line-height: 18px; text-align: center; }
+}
 .joy-gallery { min-width: 0; width: 100%; }
 .joy-gallery-controls { display: none; }
 

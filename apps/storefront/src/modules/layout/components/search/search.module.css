@@ -1,0 +1,40 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--ink, #282323);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink, #282323);
+}
+
+.trigger:hover {
+  background: #fff1bc;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--ink, #282323);
+  outline-offset: 3px;
+}
+
+.placeholder {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .trigger {
+    justify-content: flex-start;
+    width: clamp(150px, 18vw, 240px);
+    padding: 10px 16px;
+  }
+
+  .placeholder {
+    display: inline;
+    font-size: 13px;
+  }
+}

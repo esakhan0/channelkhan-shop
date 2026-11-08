@@ -2,7 +2,6 @@ import { Metadata } from "next"
 
 import ShopShowcase from "@modules/home/components/shop-showcase"
 import Hero from "@modules/home/components/hero"
-import { listCollections } from "@lib/data/collections"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { toJsonLd } from "@lib/util/product-structured-data"
 import { getSiteOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
@@ -45,11 +44,7 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode)
 
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
-
-  if (!collections || !region) {
+  if (!region) {
     return null
   }
 

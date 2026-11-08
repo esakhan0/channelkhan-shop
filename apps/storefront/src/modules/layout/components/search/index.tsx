@@ -19,6 +19,7 @@ import { PRODUCT_INDEX_NAME, searchClient } from "@lib/search-client"
 import { Text } from "@modules/common/components/ui"
 import SearchDrawer from "./drawer"
 import SearchHit, { ProductHit } from "./hit"
+import styles from "./search.module.css"
 
 const HITS_PER_PAGE = 12
 const DEBOUNCE_MS = 250
@@ -129,10 +130,13 @@ const Search = () => {
           open()
         }}
         aria-label="Search products"
-        className="flex items-center hover:text-ui-fg-base"
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        className={styles.trigger}
         data-testid="nav-search-button"
       >
-        <MagnifyingGlass />
+        <MagnifyingGlass aria-hidden="true" />
+        <span className={styles.placeholder}>Search fidgets...</span>
       </Link>
 
       <SearchDrawer isOpen={isOpen} close={close}>

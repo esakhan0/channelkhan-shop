@@ -16,6 +16,6 @@ export const getPaymentErrorMessage = (error?: Partial<StripeError> | null) => {
     return error.message
   }
 
-  console.error("Payment failed", error)
+  console.error("Payment failed", { type: error.type, code: error.code })
   return GENERIC_PAYMENT_ERROR
 }

@@ -55,7 +55,7 @@ export function renderShopEmail(template: string, data: ShopEmailData, brand: Em
   // Account/approval links can only lead to this shop. Carrier links are separate below.
   const candidate = safeHttpsUrl(data.action_url)
   const actionUrl = candidate && new URL(candidate).origin === new URL(base).origin ? candidate : `${base.replace(/\/$/, "")}/gb/account/orders`
-  const logoUrl = `${base.replace(/\/$/, "")}/brand/mukkys-logo.png`
+  const logoUrl = "cid:mukkys-logo@shop"
   const rows = (data.items ?? []).map((item) => `<tr><td style="padding:14px 12px 14px 0;border-bottom:1px solid #ddd7cb;overflow-wrap:anywhere">${escapeHtml(item.title)}<br><span style="color:#69645d;font-size:13px">${item.variant ? `Variant: ${escapeHtml(item.variant)}<br>` : ""}Quantity: ${escapeHtml(item.quantity)}</span></td><td align="right" style="padding:14px 0;border-bottom:1px solid #ddd7cb;white-space:nowrap">${escapeHtml(item.total)}</td></tr>`).join("")
   const totals = [
     { label: "Subtotal (excl. shipping and taxes)", value: data.subtotal },

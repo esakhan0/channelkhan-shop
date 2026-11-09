@@ -17,7 +17,12 @@ const nextConfig = {
     return [
       {
         source: "/:path*",
-        headers: [{ key: "Link", value: '</.well-known/ucp>; rel="ucp"' }],
+        headers: [
+          { key: "Link", value: '</.well-known/ucp>; rel="ucp"' },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
+        ],
       },
       {
         source: "/:countryCode/products/:handle",
@@ -51,11 +56,11 @@ const nextConfig = {
   },
   logging: {
     fetches: {
-      fullUrl: true,
+      fullUrl: process.env.NODE_ENV !== "production",
     },
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     unoptimized: true,

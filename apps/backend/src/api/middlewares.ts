@@ -1,13 +1,19 @@
 import { allowFields, authenticate, configureStoreSearch, defineMiddlewares } from '@medusajs/framework/http'
 import { PolicyOperation } from "@medusajs/framework/utils"
 import { validateWeightShippingConfig } from "./admin/weight-shipping-validation"
-import { monitoredErrorHandler } from "./monitored-error-handler"
+import { assertStorefrontPaymentProvider } from "../lib/checkout-payment"
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
 export default defineMiddlewares({
-  errorHandler: monitoredErrorHandler,
   routes: [
+    {
+      matcher: "/store/payment-collections/:id/payment-sessions", method: ["POST"],
+      middlewares: [(req, _res, next) => {
+        assertStorefrontPaymentProvider((req.body as { provider_id?: unknown })?.provider_id)
+        next()
+      }],
+    },
     { matcher: "/admin/shipping-options", method: ["POST"], middlewares: [validateWeightShippingConfig] },
     { matcher: "/admin/shipping-options/:id", method: ["POST"], middlewares: [validateWeightShippingConfig] },
     {

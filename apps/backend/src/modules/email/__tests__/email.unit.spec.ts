@@ -3,7 +3,7 @@ import SmtpNotificationProviderService from "../service"
 import nodemailer from "nodemailer"
 
 jest.mock("nodemailer", () => ({ __esModule: true, default: { createTransport: jest.fn() } }))
-const options = { host: "smtp.gmail.com", port: 587, user: "shop@example.com", password: "test-password", from: "shop@example.com", reply_to: "shop@example.com", from_name: "Mukky's 3D Shop", storefront_url: "https://mukkys3d.com" }
+const options = { host: "smtp-relay.brevo.com", port: 587, user: "shop@example.com", password: "test-password", from: "shop@example.com", reply_to: "shop@example.com", from_name: "Mukky's 3D Shop", storefront_url: "https://mukkys3d.com" }
 
 describe("Branded shop email", () => {
   const sendMail = jest.fn()
@@ -24,7 +24,7 @@ describe("Branded shop email", () => {
     for (const template of ["order-placed", "order-shipped", "order-delivered", "order-canceled", "refund-requested", "refund-updated", "order-transfer", "smtp-test"]) {
       const mail = renderShopEmail(template, { order_number: 42 }, options)
       expect(mail.html).toContain('name="viewport"')
-      expect(mail.html).toContain("mukkys-logo.png")
+      expect(mail.html).toContain("cid:mukkys-logo@shop")
       expect(mail.text).toContain("Order #42")
       expect(mail.subject).toContain("#42")
     }
@@ -33,7 +33,7 @@ describe("Branded shop email", () => {
   it("requires encrypted authenticated SMTP and keeps sender configuration private", async () => {
     sendMail.mockResolvedValue({ accepted: ["customer@example.com"], rejected: [], messageId: "smtp-1" })
     const provider = new SmtpNotificationProviderService({}, options)
-    const result = await provider.send({ to: "customer@example.com", channel: "email", template: "order-placed", from: "attacker@example.com", provider_data: { bcc: "attacker@example.com" }, content: { subject: "override", html: "override" } })
+    const result = await provider.send({ to: "customer@example.com", channel: "email", template: "order-placed", from: "attacker@example.com", provider_data: { bcc: "attacker@example.com", attachments: [{ path: "https://attacker.example/logo" }] }, content: { subject: "override", html: "override" } })
     expect(result).toEqual({ id: "smtp-1" })
     expect(nodemailer.createTransport).toHaveBeenCalledWith(expect.objectContaining({ secure: false, requireTLS: true, disableFileAccess: true, disableUrlAccess: true, tls: { minVersion: "TLSv1.2", rejectUnauthorized: true } }))
     expect(sendMail.mock.calls[0][0]).toMatchObject({ from: { address: options.from }, replyTo: options.reply_to })
@@ -56,20 +56,39 @@ describe("Branded shop email", () => {
     expect(mail.text).toContain("Shipping method: Royal Mail")
     expect(mail.text).toContain("Payment method: Debit / credit card or wallet")
   })
-  it("supports Resend SMTP credentials separately from the verified sender", async () => {
-    sendMail.mockResolvedValue({ accepted: ["customer@example.com"], rejected: [], messageId: "resend-test" })
+  it("supports Brevo SMTP credentials separately from the verified sender", async () => {
+    sendMail.mockResolvedValue({ accepted: ["customer@example.com"], rejected: [], messageId: "brevo-test" })
     const provider = new SmtpNotificationProviderService({}, {
-      ...options, host: "smtp.resend.com", user: "resend", password: "test-api-key",
+      ...options, host: "smtp-relay.brevo.com", user: "12345@smtp-brevo.com", password: "test-smtp-key",
       from: "orders@example.com", reply_to: "support@example.com",
     })
     await provider.send({ to: "customer@example.com", channel: "email", template: "order-placed" })
     expect(nodemailer.createTransport).toHaveBeenCalledWith(expect.objectContaining({
-      host: "smtp.resend.com", port: 587, requireTLS: true,
-      auth: { user: "resend", pass: "test-api-key" },
+      host: "smtp-relay.brevo.com", port: 587, requireTLS: true,
+      auth: { user: "12345@smtp-brevo.com", pass: "test-smtp-key" },
     }))
     expect(sendMail.mock.calls[0][0]).toMatchObject({
       from: { address: "orders@example.com" }, replyTo: "support@example.com",
     })
+  })
+  it("embeds a valid PNG in the MIME email without downloading the website logo", async () => {
+    sendMail.mockResolvedValue({ accepted: ["customer@example.com"], rejected: [], messageId: "logo-test" })
+    const provider = new SmtpNotificationProviderService({}, options)
+    await provider.send({ to: "customer@example.com", channel: "email", template: "smtp-test" })
+    const message = sendMail.mock.calls[0][0]
+    expect(message.attachments).toHaveLength(1)
+    const attachment = message.attachments[0]
+    expect(attachment).toMatchObject({ cid: "mukkys-logo@shop", contentType: "image/png", contentDisposition: "inline" })
+    expect(attachment.content.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a")
+    expect(attachment.content.length).toBeLessThan(100000)
+    expect(message.html).toContain('src="cid:mukkys-logo@shop"')
+    expect(message.html).not.toContain("/brand/mukkys-logo.png")
+    const transport = jest.requireActual("nodemailer").createTransport({ streamTransport: true, buffer: true, disableFileAccess: true, disableUrlAccess: true })
+    const result = await transport.sendMail(message)
+    const mime = result.message.toString()
+    expect(mime).toContain("multipart/related")
+    expect(mime).toContain("Content-ID: <mukkys-logo@shop>")
+    expect(mime).toContain("Content-Type: image/png")
   })
   it("rejects multiple recipients and hides SMTP errors containing secrets", async () => {
     const provider = new SmtpNotificationProviderService({}, options)

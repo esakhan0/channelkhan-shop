@@ -25,7 +25,7 @@ export const listCartPaymentMethods = async (regionId: string) => {
       }
     )
     .then(({ payment_providers }) =>
-      payment_providers.sort((a, b) => {
+      payment_providers.filter((provider) => provider.id === "pp_stripe_stripe").sort((a, b) => {
         return a.id > b.id ? 1 : -1
       })
     )

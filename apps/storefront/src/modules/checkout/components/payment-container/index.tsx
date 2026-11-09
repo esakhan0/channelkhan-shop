@@ -89,7 +89,7 @@ export const StripePaymentContainer = ({
               Enter your payment details:
             </Text>
             <PaymentElement
-              options={{ layout: "accordion" }}
+              options={{ layout: "accordion", wallets: { applePay: "auto", googlePay: "auto" } }}
               onChange={(e) => {
                 setError(null)
                 setPaymentComplete(e.complete)

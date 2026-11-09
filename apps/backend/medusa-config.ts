@@ -35,7 +35,7 @@ module.exports = defineConfig({
           {
             resolve: "./src/modules/email", id: "shop-smtp",
             options: {
-              channels: ["email"], host: process.env.SMTP_HOST || "smtp.gmail.com",
+              channels: ["email"], host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
               port: Number(process.env.SMTP_PORT || 587), user: process.env.SMTP_USER,
               password: process.env.SMTP_PASSWORD, from: process.env.SMTP_FROM || process.env.SMTP_USER,
               from_name: process.env.SMTP_FROM_NAME || "Mukky's 3D Shop",

@@ -46,10 +46,10 @@ const Payment = ({
   const setPaymentMethod = async (method: string) => {
     setError(null)
     setSelectedPaymentMethod(method)
+    setPaymentComplete(false)
     if (isStripeLike(method)) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
+      try { await initiatePaymentSession(cart, { provider_id: method }) }
+      catch { setError("We could not start payment. Refresh the page and try again.") }
     }
   }
 

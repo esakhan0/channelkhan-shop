@@ -2,6 +2,7 @@ import { AbstractNotificationProviderService, MedusaError } from "@medusajs/fram
 import type { NotificationTypes } from "@medusajs/framework/types"
 import nodemailer from "nodemailer"
 import { renderShopEmail, safeHttpsUrl } from "./templates"
+import logo from "./logo.json"
 
 type Options = { host: string; port: number; user: string; password: string; from: string; from_name: string; reply_to: string; storefront_url: string }
 const mailbox = /^[^\s<>(),;:\r\n]+@[^\s<>(),;:\r\n]+\.[^\s<>(),;:\r\n]+$/
@@ -14,7 +15,7 @@ export default class SmtpNotificationProviderService extends AbstractNotificatio
   static validateOptions(options: Options) {
     if (!options.host || ![465, 587].includes(Number(options.port)) || !options.user || !options.password ||
         !mailbox.test(options.from ?? "") || !mailbox.test(options.reply_to ?? "") || !safeHttpsUrl(options.storefront_url)) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, "Set SMTP host, port (465 or 587), username, app password, sender, reply address and HTTPS storefront URL")
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, "Set SMTP host, port (465 or 587), username, SMTP password/key, sender, reply address and HTTPS storefront URL")
     }
   }
 
@@ -41,6 +42,11 @@ export default class SmtpNotificationProviderService extends AbstractNotificatio
       const result = await this.transport.sendMail({
         from: { name: this.options.from_name, address: this.options.from },
         replyTo: this.options.reply_to, to: { address: notification.to, name: "" }, ...message,
+        // Fixed bundled logo: no remote download or customer-controlled file paths.
+        attachments: [{
+          filename: "mukkys-logo.png", content: Buffer.from(logo.base64, "base64"),
+          contentType: "image/png", contentDisposition: "inline", cid: "mukkys-logo@shop",
+        }],
       })
       if (!result.accepted?.length || result.rejected?.length) throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "Recipient rejected")
       return { id: result.messageId }

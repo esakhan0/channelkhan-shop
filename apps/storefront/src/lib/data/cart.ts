@@ -4,7 +4,7 @@ import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
-import { redirect } from "next/navigation"
+import { redirect, unstable_rethrow } from "next/navigation"
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -299,49 +299,6 @@ export async function applyPromotions(codes: string[]) {
     .catch(medusaError)
 }
 
-export async function applyGiftCard(code: string) {
-  //   const cartId = getCartId()
-  //   if (!cartId) return "No cartId cookie found"
-  //   try {
-  //     await updateCart(cartId, { gift_cards: [{ code }] }).then(() => {
-  //       revalidateTag("cart")
-  //     })
-  //   } catch (error: any) {
-  //     throw error
-  //   }
-}
-
-export async function removeDiscount(code: string) {
-  // const cartId = getCartId()
-  // if (!cartId) return "No cartId cookie found"
-  // try {
-  //   await deleteDiscount(cartId, code)
-  //   revalidateTag("cart")
-  // } catch (error: any) {
-  //   throw error
-  // }
-}
-
-export async function removeGiftCard(
-  codeToRemove: string,
-  giftCards: any[]
-  // giftCards: GiftCard[]
-) {
-  //   const cartId = getCartId()
-  //   if (!cartId) return "No cartId cookie found"
-  //   try {
-  //     await updateCart(cartId, {
-  //       gift_cards: [...giftCards]
-  //         .filter((gc) => gc.code !== codeToRemove)
-  //         .map((gc) => ({ code: gc.code })),
-  //     }).then(() => {
-  //       revalidateTag("cart")
-  //     })
-  //   } catch (error: any) {
-  //     throw error
-  //   }
-}
-
 export async function submitPromotionForm(
   currentState: unknown,
   formData: FormData
@@ -349,8 +306,8 @@ export async function submitPromotionForm(
   const code = formData.get("code") as string
   try {
     await applyPromotions([code])
-  } catch (e: any) {
-    return e.message
+  } catch (e: unknown) {
+    return e instanceof Error ? e.message : "Unable to update your cart. Please try again."
   }
 }
 
@@ -360,46 +317,50 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const data = {
+    const field = (name: string) => {
+      const value = formData.get(name)
+      return typeof value === "string" ? value : ""
+    }
+    const data: HttpTypes.StoreUpdateCart = {
       shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
+        first_name: field("shipping_address.first_name"),
+        last_name: field("shipping_address.last_name"),
+        address_1: field("shipping_address.address_1"),
         address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
+        company: field("shipping_address.company"),
+        postal_code: field("shipping_address.postal_code"),
+        city: field("shipping_address.city"),
+        country_code: field("shipping_address.country_code"),
+        province: field("shipping_address.province"),
+        phone: field("shipping_address.phone"),
       },
-      email: formData.get("email"),
-    } as any
+      email: field("email"),
+    }
 
-    const sameAsBilling = formData.get("same_as_billing")
+    const sameAsBilling = field("same_as_billing")
     if (sameAsBilling === "on") data.billing_address = data.shipping_address
 
     if (sameAsBilling !== "on")
       data.billing_address = {
-        first_name: formData.get("billing_address.first_name"),
-        last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
+        first_name: field("billing_address.first_name"),
+        last_name: field("billing_address.last_name"),
+        address_1: field("billing_address.address_1"),
         address_2: "",
-        company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
-        province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
+        company: field("billing_address.company"),
+        postal_code: field("billing_address.postal_code"),
+        city: field("billing_address.city"),
+        country_code: field("billing_address.country_code"),
+        province: field("billing_address.province"),
+        phone: field("billing_address.phone"),
       }
     await updateCart(data)
-  } catch (e: any) {
-    return e.message
+  } catch (e: unknown) {
+    return e instanceof Error ? e.message : "Unable to update your cart. Please try again."
   }
 
   redirect(
@@ -439,11 +400,27 @@ export async function placeOrder(cartId?: string) {
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag, { expire: 0 })
 
-    removeCartId()
+    await removeCartId()
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 
-  return cartRes.cart
+  if (cartRes.type === "cart") throw new Error(cartRes.error?.message || "The order could not be completed.")
+  return undefined
+}
+
+export async function placeOrderWithFeedback() {
+  try {
+    await placeOrder()
+    return { error: "Your order could not be completed. Please refresh checkout." }
+  } catch (error) {
+    unstable_rethrow(error)
+    const message = error instanceof Error ? error.message : ""
+    // Only expose known checkout guidance, never raw upstream headers or data.
+    if (message.includes("shipping profiles")) return { error: "The delivery method does not cover this product. Please choose delivery again or contact us." }
+    if (message.includes("basket changed")) return { error: "Your basket changed. Return to payment and refresh your payment details." }
+    if (message.includes("Stripe") || message.includes("successful payment")) return { error: "Please return to payment and complete your Stripe payment." }
+    return { error: "We could not complete your order. Check your orders before trying again, or contact us with your order details." }
+  }
 }
 
 /**

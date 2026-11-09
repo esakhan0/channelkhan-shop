@@ -8,14 +8,16 @@ Set these in the shop application's environment variables; Compose passes them t
 
 ```dotenv
 SHOP_EMAIL_ENABLED=true
-SMTP_HOST=smtp.gmail.com
+SMTP_HOST=smtp-relay.brevo.com
 SMTP_PORT=587
-SMTP_USER=your-shop-address@gmail.com
-SMTP_PASSWORD=your-google-app-password
+SMTP_USER=your-brevo-smtp-login
+SMTP_PASSWORD=your-brevo-smtp-key
+SMTP_FROM=orders@mukkys3d.com
+SMTP_REPLY_TO=your-support-mailbox@example.com
 SMTP_FROM_NAME=Mukky's 3D Shop
 ```
 
-The address and password above are placeholders. Enable Google 2-Step Verification and create a dedicated app password. Use the app password, not the Google login password. Do not post it in chat. `SMTP_FROM` and `SMTP_REPLY_TO` default to `SMTP_USER` when blank. Gmail requires an authorised sender mailbox or verified alias. Changing the display name does not change the address. Port 587 requires STARTTLS; port 465 uses TLS immediately. Certificates are verified in both cases.
+The values above are placeholders. In Brevo, verify your sending domain and sender, then copy the Login and SMTP key from Settings → SMTP & API → SMTP. Use the SMTP key, not an API key or your account password. Enter secrets directly in Coolify, never in chat or GitHub. Set `SMTP_FROM` explicitly to your verified sender; the SMTP login may be a generated `@smtp-brevo.com` address and is not your public sender. Set `SMTP_REPLY_TO` to a real monitored mailbox. Port 587 requires STARTTLS; port 465 uses TLS immediately. Certificates are verified in both cases. See [Brevo’s SMTP setup](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP).
 
 `STOREFRONT_URL` defaults to `https://mukkys3d.com` in Compose and must be HTTPS. Set it if the shop domain changes. Redeploy after adding runtime variables. Missing credentials with email enabled cause startup to fail visibly rather than silently discarding emails. Leaving `SHOP_EMAIL_ENABLED=false` allows setup without sending email; events skipped while disabled are not replayed later.
 
@@ -27,7 +29,7 @@ In Coolify's **medusa** container terminal, from `/server/apps/backend/.medusa/s
 pnpm exec medusa exec ./src/scripts/test-shop-email.js
 ```
 
-This sends one branded test to `SMTP_REPLY_TO`, falling back to the configured sender. Confirm it arrives in the inbox or spam folder. SMTP acceptance alone does not prove inbox delivery. Gmail has sending limits and is intended here for a small initial volume. For Resend, follow [the service setup guide](./shop-services.md); the same branded templates and Medusa events are reused.
+This sends one branded test to `SMTP_REPLY_TO`, falling back to the configured sender. Confirm it arrives in the inbox or spam folder. SMTP acceptance alone does not prove inbox delivery. Check Brevo’s transactional email logs if delivery fails. The existing branded templates and Medusa events are reused; no additional email plugin is required.
 
 ## Events and templates
 
@@ -43,7 +45,7 @@ This sends one branded test to `SMTP_REPLY_TO`, falling back to the configured s
 
 Partial shipments list only the items in that parcel. `no_notification` is respected. Delivery emails depend on Medusa marking the fulfillment delivered; this does not add automatic Royal Mail tracking updates. These emails neither capture payments nor issue refunds. Stripe payment receipts remain a separate Stripe feature. No marketing list is created.
 
-Templates live in `apps/backend/src/modules/email/templates.ts`: cream, yellow and lavender branding, shop logo, mobile-friendly tables, escaped customer content, allowlisted HTTPS links and a text alternative. Emails have no scripts, attachments or tracking pixels. Logos are remotely loaded and may be blocked by an email client's image settings; text and links still work.
+Templates live in `apps/backend/src/modules/email/templates.ts`: cream, yellow and lavender branding, shop logo, mobile-friendly tables, escaped customer content, allowlisted HTTPS links and a text alternative. Emails have no scripts or tracking pixels. The original printer logo is bundled as a small PNG in `src/modules/email/logo.json` and attached inline using Content-ID; it does not depend on the storefront domain or an external image download. This JSON asset is imported so the TypeScript build includes it in the deployed backend. Only this fixed attachment is allowed; caller-supplied attachments are ignored. Email clients may still hide images according to their settings; the logo has alt text and the message has a text alternative.
 
 ## Retries and operational limits
 

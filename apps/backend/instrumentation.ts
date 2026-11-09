@@ -1,24 +1,41 @@
-// Uncomment this file to enable instrumentation and observability using OpenTelemetry
-// Refer to the docs for installation instructions: https://docs.medusajs.com/learn/debugging-and-testing/instrumentation
+import { loadEnv } from "@medusajs/framework/utils"
+import * as Sentry from "@sentry/node"
+import { privateErrorEvent } from "./src/lib/observability"
 
-// import { registerOtel } from "@medusajs/medusa"
-// // If using an exporter other than Zipkin, require it here.
-// import { ZipkinExporter } from "@opentelemetry/exporter-zipkin"
+export function register() {
+  loadEnv(process.env.NODE_ENV || "development", process.cwd())
+  if (!process.env.SENTRY_DSN || Sentry.isInitialized()) return
 
-// // If using an exporter other than Zipkin, initialize it here.
-// const exporter = new ZipkinExporter({
-//   serviceName: 'my-medusa-project',
-// })
-
-// export function register() {
-//   registerOtel({
-//     serviceName: 'medusajs',
-//     // pass exporter
-//     exporter,
-//     instrument: {
-//       http: true,
-//       workflows: true,
-//       query: true
-//     },
-//   })
-// }
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || "development",
+    release: process.env.SENTRY_RELEASE || undefined,
+    includeServerName: false,
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      databaseQueryData: false,
+      queues: false,
+      stackFrameVariables: false,
+      frameContextLines: 0,
+      graphQL: { document: false, variables: false },
+      genAI: { inputs: false, outputs: false },
+      mcp: { inputs: false, outputs: false },
+    },
+    defaultIntegrations: false,
+    integrations: [
+      Sentry.onUncaughtExceptionIntegration(),
+      Sentry.onUnhandledRejectionIntegration({ mode: "strict" }),
+    ],
+    enableOpenTelemetrySetup: false,
+    enableRuntimeChannelInjection: false,
+    tracesSampleRate: undefined,
+    beforeSendLog: () => null,
+    beforeSendMetric: () => null,
+    maxBreadcrumbs: 0,
+    beforeSend: privateErrorEvent,
+  })
+}

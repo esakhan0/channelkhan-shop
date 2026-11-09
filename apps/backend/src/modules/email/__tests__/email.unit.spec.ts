@@ -56,6 +56,21 @@ describe("Branded shop email", () => {
     expect(mail.text).toContain("Shipping method: Royal Mail")
     expect(mail.text).toContain("Payment method: Debit / credit card or wallet")
   })
+  it("supports Resend SMTP credentials separately from the verified sender", async () => {
+    sendMail.mockResolvedValue({ accepted: ["customer@example.com"], rejected: [], messageId: "resend-test" })
+    const provider = new SmtpNotificationProviderService({}, {
+      ...options, host: "smtp.resend.com", user: "resend", password: "test-api-key",
+      from: "orders@example.com", reply_to: "support@example.com",
+    })
+    await provider.send({ to: "customer@example.com", channel: "email", template: "order-placed" })
+    expect(nodemailer.createTransport).toHaveBeenCalledWith(expect.objectContaining({
+      host: "smtp.resend.com", port: 587, requireTLS: true,
+      auth: { user: "resend", pass: "test-api-key" },
+    }))
+    expect(sendMail.mock.calls[0][0]).toMatchObject({
+      from: { address: "orders@example.com" }, replyTo: "support@example.com",
+    })
+  })
   it("rejects multiple recipients and hides SMTP errors containing secrets", async () => {
     const provider = new SmtpNotificationProviderService({}, options)
     await expect(provider.send({ to: "a@example.com,b@example.com", channel: "email", template: "smtp-test" })).rejects.toThrow("single valid email")

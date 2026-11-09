@@ -27,7 +27,7 @@ In Coolify's **medusa** container terminal, from `/server/apps/backend/.medusa/s
 pnpm exec medusa exec ./src/scripts/test-shop-email.js
 ```
 
-This sends one branded test only to the configured sender. Confirm it arrives in the inbox or spam folder. SMTP acceptance alone does not prove inbox delivery. Gmail has sending limits and is intended here for a small initial volume. Larger volumes should use a transactional provider by changing SMTP settings.
+This sends one branded test to `SMTP_REPLY_TO`, falling back to the configured sender. Confirm it arrives in the inbox or spam folder. SMTP acceptance alone does not prove inbox delivery. Gmail has sending limits and is intended here for a small initial volume. For Resend, follow [the service setup guide](./shop-services.md); the same branded templates and Medusa events are reused.
 
 ## Events and templates
 

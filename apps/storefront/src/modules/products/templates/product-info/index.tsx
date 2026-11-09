@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import GradientPaletteGuide from "@modules/products/components/gradient-palette-guide"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
@@ -32,6 +33,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         >
           {product.description}
         </Text>
+        <GradientPaletteGuide product={product} />
       </div>
     </div>
   )

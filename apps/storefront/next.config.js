@@ -28,6 +28,13 @@ const nextConfig = {
         source: "/:countryCode/products/:handle",
         headers: [{ key: "Vary", value: "Accept" }],
       },
+      {
+        source: "/:countryCode/reset-password",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "Cache-Control", value: "private, no-store" },
+        ],
+      },
     ]
   },
   async redirects() {

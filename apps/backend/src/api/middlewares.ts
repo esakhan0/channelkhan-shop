@@ -2,6 +2,7 @@ import { allowFields, authenticate, configureStoreSearch, defineMiddlewares } fr
 import { MedusaError, PolicyOperation } from "@medusajs/framework/utils"
 import { validateWeightShippingConfig } from "./admin/weight-shipping-validation"
 import { assertStorefrontPaymentProvider } from "../lib/checkout-payment"
+import { validateResetPassword } from "./password-reset-validation"
 import { attachAccessToken, protectCart, protectCartBody, protectOrder, protectPaymentCollection, protectShippingList } from "./shop-access"
 
 const optionalCustomer = () => authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true, requireMfa: true })
@@ -10,6 +11,7 @@ const optionalCustomer = () => authenticate("customer", ["session", "bearer"], {
 // the route narrows it to published products in the key's sales channels.
 export default defineMiddlewares({
   routes: [
+    { matcher: "/auth/customer/emailpass/update", method: ["POST"], middlewares: [validateResetPassword] },
     { matcher: "/store/carts", method: ["POST"], middlewares: [attachAccessToken("cart")] },
     ...["/store/carts/:id", "/store/carts/:id/*"].map((matcher) => ({ matcher, middlewares: [optionalCustomer(), protectCart] })),
     { matcher: "/store/carts/:id/complete", method: ["POST"], middlewares: [attachAccessToken("order")] },

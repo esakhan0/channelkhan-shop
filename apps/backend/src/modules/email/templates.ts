@@ -35,6 +35,7 @@ export function safeHttpsUrl(value: unknown): string | undefined {
 }
 
 const messages: Record<string, { title: string; subject: string; intro: string; button: string }> = {
+  "password-reset": { title: "Let's get you signed in.", subject: "Reset your password", intro: "We received a request to reset your Mukky's account password. This link can be used once and expires 15 minutes after it was requested. Only the newest reset link will work. If you didn't request this, ignore this email; your password hasn't changed.", button: "Reset your password" },
   "order-placed": { title: "We've received your order.", subject: "We've received your order", intro: "Thanks for choosing Mukky's. Here's what you've ordered. We'll email you when your parcel is on its way.", button: "Your orders" },
   "order-shipped": { title: "Your parcel is on its way.", subject: "Your parcel is on its way", intro: "We've marked this parcel as dispatched. If your order has more than one parcel, the others may arrive separately.", button: "Your orders" },
   "order-delivered": { title: "Your parcel was marked delivered.", subject: "Your parcel has been marked delivered", intro: "This parcel has been marked as delivered. If it hasn't arrived or something isn't right, reply to this email and we'll help.", button: "Your orders" },
@@ -54,6 +55,9 @@ export function renderShopEmail(template: string, data: ShopEmailData, brand: Em
   const subject = `${message.subject}${data.order_number ? ` · #${data.order_number}` : ""} | ${brand.from_name}`
   // Account/approval links can only lead to this shop. Carrier links are separate below.
   const candidate = safeHttpsUrl(data.action_url)
+  if (template === "password-reset" && (!candidate || new URL(candidate).origin !== new URL(base).origin || new URL(candidate).pathname !== "/gb/reset-password")) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, "Invalid password reset destination")
+  }
   const actionUrl = candidate && new URL(candidate).origin === new URL(base).origin ? candidate : `${base.replace(/\/$/, "")}/gb/account/orders`
   const logoUrl = "cid:mukkys-logo@shop"
   const rows = (data.items ?? []).map((item) => `<tr><td style="padding:14px 12px 14px 0;border-bottom:1px solid #ddd7cb;overflow-wrap:anywhere">${escapeHtml(item.title)}<br><span style="color:#69645d;font-size:13px">${item.variant ? `Variant: ${escapeHtml(item.variant)}<br>` : ""}Quantity: ${escapeHtml(item.quantity)}</span></td><td align="right" style="padding:14px 0;border-bottom:1px solid #ddd7cb;white-space:nowrap">${escapeHtml(item.total)}</td></tr>`).join("")
@@ -92,7 +96,7 @@ ${rows ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0
 ${summary}${delivery}${payment}
 ${details}${tracking}
 <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:28px"><tr><td bgcolor="#f9d84b" style="border:2px solid #292421;border-radius:10px"><a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#292421;text-decoration:none;font-weight:bold;font-size:15px">${escapeHtml(message.button)} &rarr;</a></td></tr></table>
-<p style="font-size:13px;line-height:1.6;color:#69645d;margin-top:24px">${template === "order-transfer" ? "Opening the link won't approve the request. You'll choose on the next page. Keep this link private." : "Checked out as a guest? Your updates will still arrive by email. You can reply here for help."}</p>
+<p style="font-size:13px;line-height:1.6;color:#69645d;margin-top:24px">${template === "password-reset" ? "Keep this link private. We'll never ask you to send us your password or reset link." : template === "order-transfer" ? "Opening the link won't approve the request. You'll choose on the next page. Keep this link private." : "Checked out as a guest? Your updates will still arrive by email. You can reply here for help."}</p>
 </td></tr><tr><td align="center" style="background:#f9d84b;padding:16px;font-size:12px;font-weight:bold;letter-spacing:1.5px;border-top:2px solid #292421">SMALL OBJECTS. BIG PERSONALITY.</td></tr></table></td></tr>
 <tr><td align="center" style="padding:26px 16px;font-size:13px;line-height:1.8;color:#69645d">${escapeHtml(brand.from_name)} &middot; 3D printed fidget toys and more.<br>Need a helping hand? Reply to this email.<br><a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/returns")}" style="color:#69645d">Returns &amp; refunds</a> &nbsp; / &nbsp; <a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/privacy")}" style="color:#69645d">Privacy</a></td></tr>
 </table></td></tr></table></body></html>`

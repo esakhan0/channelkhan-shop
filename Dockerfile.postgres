@@ -1,0 +1,6 @@
+FROM postgres:15-alpine
+RUN apk add --no-cache openssl
+COPY docker/postgres/ /usr/local/share/mukky-postgres/
+RUN chmod 755 /usr/local/share/mukky-postgres/*.sh
+ENTRYPOINT ["/usr/local/share/mukky-postgres/entrypoint.sh"]
+CMD ["postgres"]

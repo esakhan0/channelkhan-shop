@@ -1,0 +1,14 @@
+**/node_modules
+**/.env
+**/.env.*
+**/.git
+**/.scratch
+**/.next
+**/.medusa
+**/.turbo
+**/dist
+**/coverage
+**/*.tsbuildinfo
+**/*.key
+**/*.pem
+**/static

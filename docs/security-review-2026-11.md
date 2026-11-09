@@ -13,7 +13,7 @@ This is a targeted code and dependency review, not a penetration test or a guara
 - All pinned Medusa packages upgraded to 2.22.6, including the 2.22.5 query-path security hardening. Backend runtime dependencies now use the audited workspace lockfile instead of a fresh unlocked installation.
 - Individual order retrieval requires the authenticated owner or a signed, expiring guest receipt capability. Cart access, shipping quotes and payment-session creation require cart ownership or a capability issued at cart creation. The storefront stores capabilities in HttpOnly cookies; cart/order reads are uncached.
 - Non-empty customer-supplied payment-session data is rejected, preventing Stripe parameter overrides. The unused Adyen return handler and unauthenticated starter UCP checkout routes are disabled.
-- Production startup requires distinct JWT and cookie secrets of at least 32 characters. PostgreSQL and Redis use an internal Compose network. Optional PostgreSQL TLS configuration verifies the certificate and supports a private CA.
+- Production startup requires distinct JWT and cookie secrets of at least 32 characters. PostgreSQL and Redis use an internal Compose network. Compose now requires PostgreSQL TLS with a private CA and verified hostname; Redis remains internal without TLS.
 - Contact/privacy pages use the supplied support email and describe Stripe, Brevo, hosting, delivery and support processing. Legal trader identity/address and provider-specific retention/transfer details still need confirmation; this is not a completed legal compliance review.
 
 ## Dependency audit
@@ -40,10 +40,17 @@ The storefront changes include security headers and disabled production full-URL
 
 ## Database encryption and deployment
 
-- The current Compose PostgreSQL connection has `DATABASE_SSL=false`: database traffic is not encrypted in transit. The internal Docker network limits exposure but does not encrypt traffic. Configure a TLS listener and trusted certificate before setting `DATABASE_SSL=true`; do not disable certificate verification.
-- PostgreSQL data uses a normal persistent Docker volume. Host disk and backup encryption cannot be established from this repository; verify both with the hosting provider. Database credentials currently use the PostgreSQL administrative role; create and test a restricted application role and separate migration credentials on the host.
+- The revised Compose configuration retains the PostgreSQL 15 data volume and adds a TLS-only TCP listener, SCRAM authentication, persistent private certificates and a separate read-only public CA mount for Medusa. It must still be deployed and verified on Coolify. See `database-tls.md` for backup, rollout, verification, certificate renewal and rollback instructions.
+- The owner reports encrypted Hetzner VPS drives; this was not independently verified. Backup encryption still needs confirmation. Database credentials currently use the PostgreSQL administrative role; create and test a restricted application role and separate migration credentials on the host.
 - Rebuild and deploy backend and storefront together. Confirm distinct, strong `JWT_SECRET` and `COOKIE_SECRET` values before rollout; rotating them invalidates existing sessions/capabilities. Back up the database and uploads before migrations.
 - Existing guest carts and old ID-only order links do not have the new capability. Customers can start a new cart or sign in for their own orders; guests without the receipt cookie should contact support. Guest order linking remains disabled pending a verified email handoff.
 - Both application production builds pass locally. Docker image build and the live Coolify deployment remain unverified because no Docker daemon or production access was available.
+
+### TLS and policy follow-up verification
+
+- 14 focused backend cases pass, including mounted-CA failures and rejected connection-string TLS overrides. Backend TypeScript and Compose syntax validation pass; the updated storefront production build passes.
+- An isolated PostgreSQL 18.6 test using the generated certificates and production TCP authentication rules negotiated TLS 1.3, rejected plaintext, wrong hostname, untrusted CA and wrong password, preserved CA trust across certificate setup runs and retained a sentinel record after restart. This checks transport behaviour; it is not a PostgreSQL 15 Alpine container or live-volume migration test.
+- Build context exclusions now keep local environment files, keys, dependencies, uploads and generated output out of Docker source copies.
+- Terms, returns and shipping pages now describe Royal Mail as the default, customer agreement for a carrier change, statutory cancellation rights for standard products and the personalised-product exception. No additional voluntary returns period is offered. Legal trader identity and business address remain outstanding.
 
 References: [Medusa security hardening release](https://github.com/medusajs/medusa/releases/tag/v2.22.5), [2.22.6 release](https://github.com/medusajs/medusa/releases/tag/v2.22.6), [Medusa secure order retrieval guidance](https://docs.medusajs.com/resources/commerce-modules/order/secure-order-retrieval).

@@ -11,8 +11,8 @@ export const PolicyPage = ({
   title: string
   children: React.ReactNode
 }) => (
-  <div className="content-container py-12 max-w-3xl" data-testid="policy-page">
-    <h1 className="text-2xl-semi mb-8">{title}</h1>
+  <div className="joy-policy content-container py-12 max-w-3xl" data-testid="policy-page">
+    <h1 className="joy-policy-title">{title}</h1>
     <div className="flex flex-col gap-6 text-base-regular text-ui-fg-base">
       {children}
     </div>

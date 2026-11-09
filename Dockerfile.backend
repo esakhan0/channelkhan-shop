@@ -16,16 +16,21 @@ ARG MEDUSA_BACKEND_URL=https://api.mukkys3d.com
 ENV MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL
 RUN pnpm --filter @dtc/backend build
 
+FROM base AS production-dependencies
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/backend/package.json ./apps/backend/package.json
+COPY apps/storefront/package.json ./apps/storefront/package.json
+RUN --mount=type=cache,id=channelkhan-pnpm,target=/pnpm/store,sharing=locked \
+    pnpm --filter @dtc/backend... install --prod --frozen-lockfile --store-dir /pnpm/store --package-import-method copy
+
 FROM base AS runtime
 WORKDIR /server/apps/backend/.medusa/server
-# Copy the generated manifest separately so source edits do not reinstall
-# production dependencies when this manifest is unchanged.
-COPY --from=build /server/apps/backend/.medusa/server/package.json ./package.json
-RUN --mount=type=cache,id=channelkhan-pnpm,target=/pnpm/store,sharing=locked \
-    pnpm install --prod --ignore-workspace --no-frozen-lockfile --store-dir /pnpm/store --package-import-method copy
+# Preserve pnpm's relative links and the audited lockfile/overrides at runtime.
+COPY --from=production-dependencies /server/node_modules /server/node_modules
+COPY --from=production-dependencies /server/apps/backend/node_modules /server/apps/backend/node_modules
 COPY --from=build /server/apps/backend/.medusa/server/ ./
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=9000
 EXPOSE 9000
-CMD ["sh", "-c", "pnpm exec medusa db:migrate && exec pnpm start"]
+CMD ["sh", "-c", "../../node_modules/.bin/medusa db:migrate && exec ../../node_modules/.bin/medusa start"]

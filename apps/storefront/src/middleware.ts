@@ -88,6 +88,11 @@ async function getCountryCode(
  * Middleware to handle region selection and onboarding status.
  */
 export async function middleware(request: NextRequest) {
+  // The starter's agent checkout API used cart IDs alone as credentials.
+  // Keep it closed until it supports the same authenticated cart handoff.
+  if (request.nextUrl.pathname === "/ucp" || request.nextUrl.pathname.startsWith("/ucp/") || request.nextUrl.pathname === "/.well-known/ucp") {
+    return new NextResponse(null, { status: 404, headers: { "Cache-Control": "no-store" } })
+  }
   if (request.nextUrl.pathname.includes(".")) {
     return NextResponse.next()
   }
@@ -128,6 +133,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/ucp/:path*",
+    "/.well-known/ucp",
     "/((?!api|ucp|buy|_next/static|_next/image|favicon.ico|images|assets|png|svg|jpg|jpeg|gif|webp).*)",
   ],
 }

@@ -1,18 +1,16 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
 
-export const getAuthHeaders = async (): Promise<
-  { authorization: string } | Record<string, never>
-> => {
+export const getAuthHeaders = async (): Promise<Record<string, string>> => {
   try {
     const cookies = await nextCookies()
     const token = cookies.get("_medusa_jwt")?.value
 
-    if (!token) {
-      return {}
+    const cartAccess = cookies.get("_shop_cart_access")?.value
+    return {
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...(cartAccess ? { "x-cart-access-token": cartAccess } : {}),
     }
-
-    return { authorization: `Bearer ${token}` }
   } catch {
     return {}
   }
@@ -134,7 +132,26 @@ export const setCartId = async (cartId: string) => {
 
 export const removeCartId = async () => {
   const cookies = await nextCookies()
+  cookies.set("_shop_cart_access", "", { maxAge: -1, path: "/" })
   cookies.set("_medusa_cart_id", "", {
     maxAge: -1,
   })
+}
+
+export const setCartAccess = async (token: string) => {
+  if (!token) throw new Error("Checkout access could not be established. Please refresh and try again.")
+  const cookies = await nextCookies()
+  cookies.set("_shop_cart_access", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 604800 })
+}
+
+export const setOrderAccess = async (id: string, token: string) => {
+  if (!/^order_[a-zA-Z0-9]+$/.test(id) || !token) throw new Error("Order access could not be established")
+  const cookies = await nextCookies()
+  cookies.set(`_shop_${id}`, token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 604800 })
+}
+
+export const getOrderAccess = async (id: string): Promise<Record<string, string>> => {
+  const cookies = await nextCookies()
+  const token = cookies.get(`_shop_${id}`)?.value
+  return token ? { "x-order-access-token": token } : {}
 }

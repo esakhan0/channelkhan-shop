@@ -12,6 +12,8 @@ import {
   getCartId,
   removeCartId,
   setCartId,
+  setCartAccess,
+  setOrderAccess,
 } from "./cookies"
 import { getRegion } from "./regions"
 import { getLocale } from "./locale-actions"
@@ -46,7 +48,7 @@ export async function retrieveCart(cartId?: string, fields?: string) {
       },
       headers,
       next,
-      cache: "tags" in next && next.tags?.length ? "force-cache" : "no-store",
+      cache: "no-store",
     })
     .then(({ cart }: { cart: HttpTypes.StoreCart }) => cart)
     .catch(() => null)
@@ -73,6 +75,7 @@ export async function getOrSetCart(countryCode: string) {
       headers
     )
     cart = cartResp.cart
+    await setCartAccess((cartResp as typeof cartResp & { cart_access_token: string }).cart_access_token)
 
     await setCartId(cart.id)
 
@@ -81,7 +84,7 @@ export async function getOrSetCart(countryCode: string) {
   }
 
   if (cart && cart?.region_id !== region.id) {
-    await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
+    await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, await getAuthHeaders())
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag, { expire: 0 })
   }
@@ -394,6 +397,7 @@ export async function placeOrder(cartId?: string) {
     .catch(medusaError)
 
   if (cartRes?.type === "order") {
+    await setOrderAccess(cartRes.order.id, (cartRes as typeof cartRes & { order_access_token: string }).order_access_token)
     const countryCode =
       cartRes.order.shipping_address?.country_code?.toLowerCase()
 

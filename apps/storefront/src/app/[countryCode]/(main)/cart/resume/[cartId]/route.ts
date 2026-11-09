@@ -1,4 +1,5 @@
 import { sdk } from "@lib/config"
+import { getAuthHeaders } from "@lib/data/cookies"
 import { activateCart } from "@lib/util/server-cart"
 import { getRequestOrigin } from "@lib/util/site"
 import { NextResponse } from "next/server"
@@ -15,7 +16,7 @@ export async function GET(
   try {
     const { cart } = await sdk.store.cart.retrieve(cartId, {
       fields: "id,completed_at,metadata",
-    })
+    }, await getAuthHeaders())
     if (cart.completed_at || cart.metadata?.ucp_canceled === true) {
       throw new Error("Cart is no longer open")
     }

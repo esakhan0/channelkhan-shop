@@ -1,6 +1,6 @@
 import "server-only"
 import { sdk } from "@lib/config"
-import { getCacheTag, setCartId } from "@lib/data/cookies"
+import { getCacheTag, setCartId, setCartAccess, getAuthHeaders } from "@lib/data/cookies"
 import { listRegions } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -34,9 +34,11 @@ export const createCartWithItems = async (
   regionId: string,
   items: { variant_id: string; quantity: number }[]
 ) => {
-  const { cart } = await sdk.store.cart.create({ region_id: regionId })
+  const response = await sdk.store.cart.create({ region_id: regionId }, {}, await getAuthHeaders())
+  const { cart } = response
+  await setCartAccess((response as typeof response & { cart_access_token: string }).cart_access_token)
   for (const item of items) {
-    await sdk.store.cart.createLineItem(cart.id, item)
+    await sdk.store.cart.createLineItem(cart.id, item, {}, await getAuthHeaders())
   }
   return cart.id
 }

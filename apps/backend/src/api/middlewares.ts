@@ -1,16 +1,33 @@
 import { allowFields, authenticate, configureStoreSearch, defineMiddlewares } from '@medusajs/framework/http'
-import { PolicyOperation } from "@medusajs/framework/utils"
+import { MedusaError, PolicyOperation } from "@medusajs/framework/utils"
 import { validateWeightShippingConfig } from "./admin/weight-shipping-validation"
 import { assertStorefrontPaymentProvider } from "../lib/checkout-payment"
+import { attachAccessToken, protectCart, protectCartBody, protectOrder, protectPaymentCollection, protectShippingList } from "./shop-access"
+
+const optionalCustomer = () => authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true, requireMfa: true })
 
 // The product index declares filterable `status` and `sales_channel_ids`, so
 // the route narrows it to published products in the key's sales channels.
 export default defineMiddlewares({
   routes: [
+    { matcher: "/store/carts", method: ["POST"], middlewares: [attachAccessToken("cart")] },
+    ...["/store/carts/:id", "/store/carts/:id/*"].map((matcher) => ({ matcher, middlewares: [optionalCustomer(), protectCart] })),
+    { matcher: "/store/carts/:id/complete", method: ["POST"], middlewares: [attachAccessToken("order")] },
+    { matcher: "/store/orders/:id", method: ["GET"], middlewares: [optionalCustomer(), protectOrder] },
+    { matcher: "/store/payment-collections", method: ["POST"], middlewares: [optionalCustomer(), protectCartBody] },
+    ...["/store/payment-collections/:id", "/store/payment-collections/:id/*"].map((matcher) => ({ matcher, middlewares: [optionalCustomer(), protectPaymentCollection] })),
+    { matcher: "/store/shipping-options", method: ["GET"], middlewares: [optionalCustomer(), protectShippingList] },
+    { matcher: "/store/shipping-options/:id/calculate", method: ["POST"], middlewares: [optionalCustomer(), protectCartBody] },
     {
       matcher: "/store/payment-collections/:id/payment-sessions", method: ["POST"],
       middlewares: [(req, _res, next) => {
         assertStorefrontPaymentProvider((req.body as { provider_id?: unknown })?.provider_id)
+        // Stripe Elements confirms the intent client-side. Do not let customers
+        // override capture mode, confirmation, or Stripe account parameters.
+        const body = req.body as { data?: Record<string, unknown> }
+        if (body.data && Object.keys(body.data).length) {
+          throw new MedusaError(MedusaError.Types.INVALID_DATA, "Custom payment parameters are not supported")
+        }
         next()
       }],
     },

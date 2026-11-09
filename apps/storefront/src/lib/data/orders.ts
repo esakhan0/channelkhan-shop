@@ -2,7 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
-import { getAuthHeaders } from "./cookies"
+import { getAuthHeaders, getOrderAccess } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
 const refundFields = "+payment_collections.payments.id,+payment_collections.payments.refunds.id,+payment_collections.payments.refunds.amount,+payment_collections.payments.refunds.created_at"
@@ -10,6 +10,7 @@ const refundFields = "+payment_collections.payments.id,+payment_collections.paym
 export const retrieveOrder = async (id: string) => {
   const headers = {
     ...(await getAuthHeaders()),
+    ...(await getOrderAccess(id)),
   }
 
   return sdk.client

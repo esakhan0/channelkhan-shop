@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:15-alpine
+    networks: [data]
     restart: unless-stopped
     environment:
       POSTGRES_DB: medusa-store
@@ -15,6 +16,7 @@ services:
       retries: 15
   redis:
     image: redis:7-alpine
+    networks: [data]
     restart: unless-stopped
     command: [redis-server, --appendonly, "yes"]
     volumes:
@@ -25,6 +27,7 @@ services:
       timeout: 5s
       retries: 15
   medusa:
+    networks: [default, data]
     build:
       context: .
       dockerfile: Dockerfile.backend
@@ -41,6 +44,9 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/medusa-store
+      # Local postgres currently has no TLS listener. Enable only after configuring it.
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      DATABASE_SSL_CA: ${DATABASE_SSL_CA:-}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
       COOKIE_SECRET: ${COOKIE_SECRET:?Set COOKIE_SECRET}
@@ -110,3 +116,6 @@ volumes:
   postgres_data:
   uploads:
   redis_data:
+networks:
+  data:
+    internal: true

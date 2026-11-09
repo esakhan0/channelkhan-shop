@@ -1,8 +1,8 @@
 import { sdk } from "@lib/config"
-import { getCartId } from "@lib/data/cookies"
+import { getCartId, getAuthHeaders } from "@lib/data/cookies"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
-import { activateCart, MAX_LINE_ITEM_QUANTITY } from "@lib/util/server-cart"
+import { activateCart, createCartWithItems, MAX_LINE_ITEM_QUANTITY } from "@lib/util/server-cart"
 import { getRequestOrigin } from "@lib/util/site"
 import { isEqual } from "lodash"
 import { NextRequest, NextResponse } from "next/server"
@@ -42,10 +42,9 @@ const addLineItem = async (
   variantId: string,
   quantity: number
 ) => {
-  const id =
-    cartId ?? (await sdk.store.cart.create({ region_id: regionId })).cart.id
-  await sdk.store.cart.createLineItem(id, { variant_id: variantId, quantity })
-  return id
+  if (!cartId) return createCartWithItems(regionId, [{ variant_id: variantId, quantity }])
+  await sdk.store.cart.createLineItem(cartId, { variant_id: variantId, quantity }, {}, await getAuthHeaders())
+  return cartId
 }
 
 const errorMessage = (error: unknown) =>

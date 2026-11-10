@@ -42,7 +42,9 @@ export default function RefundForm({ details }: { details: RefundDetails }) {
         </select>
       </label>
       {kind === "refund" && details.order.items.some((item) => item.awaiting_delivery > 0) && <div className="joy-return-message">
-        <p>Some items are awaiting delivery. Please wait until delivery is recorded before reporting a fault with those items. You can still send a cancellation request for review.</p>
+        <p>Some items don’t have delivery recorded yet. If yours has arrived faulty, contact us so we can help. You can still send a cancellation request for review.</p>
+        <p><LocalizedClientLink href={`/contact?topic=faulty-item&order=${details.order.display_id}`}>Received it already? Report a fault by email ↗</LocalizedClientLink></p>
+        <p><LocalizedClientLink href={`/contact?topic=missing-delivery&order=${details.order.display_id}`}>Item hasn’t arrived? Get delivery help ↗</LocalizedClientLink></p>
       </div>}
       {kind === "cancellation" && details.order.items.some((item) => item.fulfillment_started) && <div className="joy-return-message">
         <p>Fulfilment has started, so we may not be able to stop dispatch. You can notify us of cancellation now; if the parcel is on its way, wait for delivery and our return instructions.</p>

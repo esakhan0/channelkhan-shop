@@ -46,7 +46,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
             <OrderSummary order={order} />
             <PaymentDetails order={order} />
             {order.status !== "canceled" && order.payment_status !== "refunded" && <LocalizedClientLink className="joy-return-order-link" href={`/account/orders/details/${order.id}/refund`}>Request a refund ↗</LocalizedClientLink>}
-            <Help orderNumber={order.display_id} />
+            <Help orderNumber={order.display_id} orderId={order.status !== "canceled" && order.payment_status !== "refunded" ? order.id : undefined} />
           </aside>
         </div>
       </div>

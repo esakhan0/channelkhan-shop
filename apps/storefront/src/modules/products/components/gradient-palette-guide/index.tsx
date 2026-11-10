@@ -7,8 +7,8 @@ export default function GradientPaletteGuide({ product }: { product: HttpTypes.S
     ...(product.variants ?? []).flatMap((variant) => [variant.title, ...(variant.options ?? []).map((option) => option.value)]),
   ]
   const palettes = [
-    { key: "coral", title: "Coral Palette", colours: "Pink, peach and orange tones" },
-    { key: "forest", title: "Forest Palette", colours: "Sage, olive, lime green and silvery grey tones" },
+    { key: "coral", title: "Coral Palette", colours: "Golden yellow, pink, violet, blue, turquoise and mint green tones" },
+    { key: "forest", title: "Forest Palette", colours: "Lime, leaf green, emerald, teal, blue and violet tones" },
   ].filter((palette) => colourNames.some((name) =>
     new RegExp(`\\b${palette.key}\\b`, "i").test(name ?? "") && /\b(palette|pallete|gradient)\b/i.test(name ?? "")
   ))

@@ -38,6 +38,7 @@ export default function OrderCard({ order }: { order: HttpTypes.StoreOrder }) {
           {!items.length && <span>View order for item details.</span>}
         </div>
         <div className="joy-order-list-status">
+          <LocalizedClientLink href={`/account/orders/details/${order.id}#order-help`}>Get help with this order ↗</LocalizedClientLink>
           {order.status !== "canceled" && order.payment_status !== "refunded" && <LocalizedClientLink href={`/account/orders/details/${order.id}/refund`}>Request a refund ↗</LocalizedClientLink>}
           <span>{quantity} {quantity === 1 ? "item" : "items"}</span>
           <span className="joy-status-pill" data-testid="order-status">Order: {order.status === "canceled" ? "Cancelled" : (order.status || "pending").replaceAll("_", " ")}</span>

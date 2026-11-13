@@ -168,9 +168,13 @@ export default function ProductActions({
             value={isValidVariant ? selectedVariant?.id ?? "" : ""}
           />
           <input type="hidden" name="quantity" value="1" />
+          {/* Price sits directly under the product name, ahead of the choices. */}
+          <ProductPrice product={product} variant={selectedVariant} />
+
           <div>
             {(product.variants?.length ?? 0) > 1 && (
               <div className="flex flex-col gap-y-4">
+                <Divider />
                 {(product.options || []).map((option) => {
                   return (
                     <div key={option.id}>
@@ -186,12 +190,9 @@ export default function ProductActions({
                     </div>
                   )
                 })}
-                <Divider />
               </div>
             )}
           </div>
-
-          <ProductPrice product={product} variant={selectedVariant} />
 
           {selectedVariant && isValidVariant && (
             <p
@@ -213,7 +214,7 @@ export default function ProductActions({
               !isValidVariant
             }
             variant="primary"
-            className="w-full h-10"
+            className="w-full h-12"
             isLoading={isAdding}
             data-testid="add-product-button"
           >

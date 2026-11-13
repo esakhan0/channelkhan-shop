@@ -1,58 +1,129 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { ChevronLeft, ChevronRight } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container } from "@modules/common/components/ui"
 import Image from "next/image"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
+  /** Product name, so each photo's alt text says what it shows. */
+  title?: string | null
 }
 
-const ImageGallery = ({ images }: ImageGalleryProps) => {
+/**
+ * One large photo with a strip of thumbnails beneath it. The photos sit in a
+ * horizontal scroll-snap track, so the same markup swipes on a touch screen and
+ * jumps to a photo when its thumbnail or an arrow is pressed.
+ */
+const ImageGallery = ({ images, title }: ImageGalleryProps) => {
   const track = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
-  const move = (index: number) => {
+
+  const photos = images.filter((image) => !!image.url)
+  const subject = title || "Product"
+
+  const show = (index: number) => {
     const target = track.current?.children[index] as HTMLElement | undefined
-    if (target && track.current) track.current.scrollTo({ left: target.offsetLeft, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
+
+    if (!target || !track.current) {
+      return
+    }
+
+    track.current.scrollTo({
+      left: target.offsetLeft,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    })
   }
+
+  // Follows swipes as well as button presses, so the thumbnails never disagree
+  // with the photo on screen.
+  const syncActive = () => {
+    const element = track.current
+
+    if (!element) {
+      return
+    }
+
+    const slides = Array.from(element.children) as HTMLElement[]
+    const closest = slides.reduce(
+      (best, slide, index) =>
+        Math.abs(slide.offsetLeft - element.scrollLeft) <
+        Math.abs(slides[best].offsetLeft - element.scrollLeft)
+          ? index
+          : best,
+      0
+    )
+
+    setActive(closest)
+  }
+
+  if (!photos.length) {
+    return null
+  }
+
   return (
-    <div className="joy-gallery" role="region" aria-label="Product photos">
-      <div ref={track} className="joy-gallery-track flex flex-col flex-1 small:mx-16 gap-y-4" onScroll={() => {
-        if (!track.current) return
-        const children = Array.from(track.current.children) as HTMLElement[]
-        const closest = children.reduce((best, child, index) => Math.abs(child.offsetLeft - track.current!.scrollLeft) < Math.abs(children[best].offsetLeft - track.current!.scrollLeft) ? index : best, 0)
-        setActive(closest)
-      }}>
-        {images.map((image, index) => {
-          return (
-            <Container
-              key={image.id}
-              className="joy-gallery-slide relative aspect-[29/34] w-full overflow-hidden bg-ui-bg-subtle"
-              id={image.id}
+    <div className="joy-gallery mk-gallery" role="region" aria-label="Product photos">
+      <div className="mk-gallery-stage">
+        <div ref={track} className="mk-gallery-track no-scrollbar" onScroll={syncActive}>
+          {photos.map((image, index) => (
+            <div key={image.id} id={image.id} className="mk-gallery-slide">
+              <Image
+                src={image.url}
+                alt={`${subject}, photo ${index + 1} of ${photos.length}`}
+                priority={index === 0}
+                fill
+                sizes="(max-width: 1023px) 100vw, 55vw"
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+          ))}
+        </div>
+        {photos.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="mk-gallery-arrow mk-gallery-arrow-previous"
+              onClick={() => show(active - 1)}
+              disabled={active === 0}
+              aria-label="Previous photo"
             >
-              {!!image.url && (
-                <Image
-                  src={image.url}
-                  priority={index === 0}
-                  className="absolute inset-0 rounded-rounded"
-                  alt={`Product image ${index + 1}`}
-                  fill
-                  sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-                  style={{
-                    objectFit: "cover",
-                  }}
-                />
-              )}
-            </Container>
-          )
-        })}
+              <ChevronLeft aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="mk-gallery-arrow mk-gallery-arrow-next"
+              onClick={() => show(active + 1)}
+              disabled={active === photos.length - 1}
+              aria-label="Next photo"
+            >
+              <ChevronRight aria-hidden="true" />
+            </button>
+            <span className="mk-gallery-count" aria-live="polite">
+              {active + 1} / {photos.length}
+            </span>
+          </>
+        )}
       </div>
-      {images.length > 1 && <div className="joy-gallery-controls">
-        <button type="button" onClick={() => move(Math.max(0, active - 1))} disabled={active === 0} aria-label="Previous product photo">←</button>
-        <span aria-live="polite">{active + 1} / {images.length} <span aria-hidden="true"> · Swipe to explore</span></span>
-        <button type="button" onClick={() => move(Math.min(images.length - 1, active + 1))} disabled={active === images.length - 1} aria-label="Next product photo">→</button>
-      </div>}
+      {photos.length > 1 && (
+        <div className="mk-gallery-thumbs" role="group" aria-label="Choose a photo">
+          {photos.map((image, index) => (
+            <button
+              key={image.id}
+              type="button"
+              className="mk-gallery-thumb"
+              aria-label={`Show photo ${index + 1} of ${photos.length}`}
+              aria-current={index === active ? "true" : undefined}
+              onClick={() => show(index)}
+              data-testid="gallery-thumbnail"
+            >
+              <Image src={image.url} alt="" fill sizes="96px" style={{ objectFit: "cover" }} />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

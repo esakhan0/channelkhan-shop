@@ -1,0 +1,1090 @@
+/*
+ * Minimal refresh.
+ *
+ * Loaded last, so it restyles the shared classes from globals.css,
+ * brand-refresh.css and mobile.css without rewriting them. It keeps the shop's
+ * own fonts and its ink, paper and yellow; what it removes is the heavy
+ * outlines, the offset "sticker" shadows and the tinted card frames, and it
+ * gives everything more room.
+ *
+ * Two shapes only: 8px corners for cards, buttons and fields, and full pills
+ * for chips, option choices and icon buttons.
+ */
+
+:root {
+  --mk-line: #28232324; /* hairlines */
+  --mk-line-strong: #28232359; /* field and control outlines */
+  --mk-surface: #f8f6f1; /* photo wells and quiet panels */
+  --mk-muted: #625959; /* secondary text */
+  --mk-ink-hover: #3d3737;
+  --mk-radius: 8px;
+  --mk-header-height: 72px;
+}
+
+/* Medusa UI's blue accents (selected borders, "clear all", focus rings) read as ink here. */
+html[data-mode="light"] {
+  --border-interactive: var(--ink);
+  --fg-interactive: var(--ink);
+  --fg-interactive-hover: var(--mk-ink-hover);
+  --bg-interactive: var(--ink);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- Type ---------- */
+
+.ink-kicker,
+.mukky-eyebrow {
+  margin-bottom: 12px;
+  color: var(--mk-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The display serif stays, without the wonky cut and the very tight tracking. */
+.ink-section-head h2,
+.mukky-story h2,
+.ink-page-heading h1,
+.ink-login-aside h2,
+.ink-empty-bag h2,
+.ink-coming h3,
+.joy-editorial-copy h2,
+.joy-store-empty h2,
+.joy-policy-title,
+.mukky-store-heading h1,
+.mk-product-title {
+  font-family: var(--mukky-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variation-settings: "SOFT" 0, "WONK" 0;
+}
+
+/* ---------- Header ---------- */
+
+.mk-header {
+  height: var(--mk-header-height);
+  background: var(--paper);
+  border-bottom: 1px solid var(--mk-line);
+}
+
+.mk-header-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: "logo links actions";
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+}
+
+.mk-header-menu {
+  grid-area: menu;
+  display: none;
+}
+
+.mk-header-logo {
+  grid-area: logo;
+  justify-self: start;
+}
+
+.mk-header .mukky-header-logo {
+  width: 128px;
+}
+
+.mk-header-links {
+  grid-area: links;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mk-header-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.mk-header-links a:hover {
+  background: #2823230f;
+}
+
+.mk-header-actions {
+  grid-area: actions;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mk-icon-button,
+.mk-header [data-testid="nav-cart-link"],
+.joy-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  transition: background-color 0.15s ease;
+}
+
+.mk-icon-button:hover,
+.mk-header [data-testid="nav-cart-link"]:hover,
+.joy-menu-trigger:hover {
+  background: #2823230f;
+  box-shadow: none;
+  transform: none;
+}
+
+.mk-icon-button svg,
+.mk-cart-label svg,
+.joy-menu-trigger svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mk-cart-label {
+  position: relative;
+  display: inline-flex;
+}
+
+.mk-cart-count {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--yellow);
+  box-shadow: 0 0 0 2px var(--paper);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.mk-header [data-testid="nav-cart-dropdown"] {
+  top: calc(100% + 14px);
+  overflow: hidden;
+  border: 1px solid var(--mk-line);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 0 16px 40px #2823231f;
+}
+
+@media (max-width: 1023px) {
+  .mk-header {
+    height: 64px;
+  }
+
+  .mk-header-row {
+    grid-template-areas: "menu logo actions";
+    gap: 8px;
+  }
+
+  .mk-header-menu {
+    display: flex;
+    justify-self: start;
+  }
+
+  .mk-header-logo {
+    justify-self: center;
+  }
+
+  .mk-header-links,
+  .mk-header-account {
+    display: none;
+  }
+
+  .mk-header .mukky-header-logo {
+    width: 108px;
+  }
+}
+
+/* ---------- Buttons and links ---------- */
+
+.ink-button {
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: var(--mk-radius);
+  background: var(--ink);
+  box-shadow: none;
+  color: var(--paper);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+
+.ink-button:hover {
+  background: var(--mk-ink-hover);
+  box-shadow: none;
+  transform: none;
+}
+
+.ink-button svg {
+  transition: transform 0.2s ease;
+}
+
+.ink-button:hover svg {
+  transform: translateX(3px);
+}
+
+.mukky-ui-button {
+  border: 1px solid transparent;
+  border-radius: var(--mk-radius);
+  box-shadow: none;
+}
+
+.mukky-ui-button.bg-black {
+  background-color: var(--ink);
+}
+
+.mukky-ui-button.bg-black:hover {
+  background-color: var(--mk-ink-hover);
+}
+
+.mukky-ui-button.bg-white {
+  border-color: var(--mk-line-strong);
+  background-color: transparent;
+  color: var(--ink);
+}
+
+.mk-arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mk-arrow-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* ---------- Home ---------- */
+
+.mk-hero {
+  grid-template-columns: 1.1fr 1fr;
+  gap: 64px;
+  max-width: 1240px;
+  padding-top: 72px;
+  padding-bottom: 88px;
+}
+
+.joy-editorial-copy h2 {
+  margin: 14px 0 18px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.1;
+}
+
+.joy-editorial-copy > p:not(.ink-kicker) {
+  color: var(--mk-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.ink-products {
+  padding-top: 24px;
+  padding-bottom: 104px;
+}
+
+.ink-section-head {
+  margin-bottom: 32px;
+}
+
+.ink-section-head h2 {
+  font-size: clamp(26px, 2.6vw, 34px);
+  line-height: 1.15;
+}
+
+.ink-section-head h2 + p {
+  margin-top: 6px;
+  color: var(--mk-muted);
+  font-size: 15px;
+}
+
+.joy-product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 40px 24px;
+}
+
+.ink-coming {
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+}
+
+@media (max-width: 750px) {
+  .mk-hero {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding-top: 24px;
+    padding-bottom: 56px;
+  }
+
+  .ink-products {
+    padding-top: 8px;
+    padding-bottom: 64px;
+  }
+
+  .joy-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 12px;
+  }
+}
+
+/* ---------- Product cards: the photo is the frame ---------- */
+
+.mukky-product-card,
+.mukky-product-card:nth-child(2n),
+.mukky-product-card:nth-child(3n),
+.ink-product-reveal:nth-child(2n) .mukky-product-card,
+.ink-product-reveal:nth-child(3n) .mukky-product-card {
+  background: transparent;
+}
+
+.mukky-product-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transition: none;
+}
+
+.mukky-product-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.mukky-card-photo {
+  padding: 0;
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+  box-shadow: none !important;
+}
+
+.mukky-card-photo img {
+  transition: transform 0.35s ease;
+}
+
+.mukky-product-card:hover .mukky-card-photo img {
+  transform: scale(1.03);
+}
+
+.mukky-card-details {
+  gap: 2px;
+  padding-top: 12px;
+}
+
+.mukky-product-card [data-testid="product-title"] {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.mukky-product-card:hover [data-testid="product-title"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.mukky-product-card [data-testid="variant-title"] {
+  margin-top: 2px;
+  color: var(--mk-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.mukky-card-price {
+  margin-top: 6px;
+}
+
+.mukky-card-price .mukky-card-amount {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------- Shop ---------- */
+
+.mukky-store {
+  padding-top: 48px;
+  padding-bottom: 104px;
+}
+
+.mukky-store-heading {
+  display: block;
+  margin-bottom: 32px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.mukky-store-heading .mukky-eyebrow {
+  max-width: none;
+  margin: 0 0 10px;
+  padding-bottom: 0;
+  font-size: 12px;
+}
+
+.mukky-store-heading h1 {
+  margin-bottom: 8px;
+  font-size: clamp(30px, 3.4vw, 40px);
+  line-height: 1.1;
+}
+
+.mukky-store-heading > p:last-child {
+  max-width: none;
+  color: var(--mk-muted);
+  font: 400 15px/1.6 var(--mukky-body);
+  letter-spacing: 0;
+}
+
+.joy-store-layout {
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 48px;
+}
+
+.joy-store-filters {
+  position: sticky;
+  top: calc(var(--mk-header-height) + 24px);
+  gap: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.joy-store-filters > h2 {
+  color: var(--mk-muted);
+  font: 600 12px/1.2 var(--mukky-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.joy-sort-label select {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--mk-line-strong);
+  border-radius: var(--mk-radius);
+  background: transparent;
+  font-size: 14px;
+}
+
+.joy-store-search {
+  min-height: 48px;
+  margin-bottom: 16px;
+  border: 1px solid var(--mk-line-strong);
+  border-radius: var(--mk-radius);
+  background: transparent;
+}
+
+.joy-store-search:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.joy-store-empty {
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+}
+
+.mukky-store [data-testid="products-list"] {
+  row-gap: 40px;
+}
+
+/* Colour chips, and the swatch dot they share with the product page's options. */
+.mk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.mk-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--mk-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mk-chip:hover {
+  border-color: var(--ink);
+}
+
+.mk-chip[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.mk-swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px #28232333;
+}
+
+.mk-chip[aria-pressed="true"] .mk-swatch {
+  box-shadow: 0 0 0 1.5px var(--paper);
+}
+
+@media (max-width: 1000px) {
+  .joy-store-layout {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+
+@media (max-width: 750px) {
+  .mukky-store {
+    padding-top: 28px;
+    padding-bottom: 64px;
+  }
+
+  .joy-store-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .joy-store-filters {
+    position: static;
+  }
+
+  /* The "Filters & sort" pill and the panel it opens. */
+  .joy-store-filters > button[aria-controls] {
+    border: 1px solid var(--mk-line-strong);
+    background: transparent;
+  }
+
+  .joy-store-filters > div[data-open] {
+    border-color: var(--mk-line);
+    border-radius: var(--mk-radius);
+    background: var(--paper);
+  }
+
+  /* One swipeable row instead of three wrapped ones. */
+  .mk-chips {
+    flex-wrap: nowrap;
+    margin-right: -22px;
+    margin-bottom: 20px;
+    padding-right: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .mk-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mk-chip {
+    min-height: 44px;
+  }
+
+  .mukky-store [data-testid="products-list"] {
+    column-gap: 12px;
+    row-gap: 28px;
+  }
+}
+
+/* ---------- Product page ---------- */
+
+.mk-product {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: start;
+  gap: 64px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.mk-product-media {
+  position: sticky;
+  top: calc(var(--mk-header-height) + 24px);
+  min-width: 0;
+}
+
+.mk-product-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+  max-width: 520px;
+}
+
+.mk-product-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mk-product-title {
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.12;
+}
+
+.mk-product-purchase {
+  padding: 0;
+}
+
+.mk-product-purchase form {
+  gap: 16px;
+}
+
+.mk-product-purchase .text-xl-semi {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mk-product-purchase .mukky-ui-button {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mk-option-legend {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mk-option-current {
+  margin-left: 8px;
+  color: var(--mk-muted);
+  font-weight: 400;
+}
+
+.mk-option-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* The extra selector weight beats the starter's floating-label rule
+   (`input:not(:placeholder-shown) ~ label`), which would otherwise shrink these
+   labels to 10px and nudge them upwards because each follows a radio input. */
+.mk-option-list label.mk-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px 0 12px;
+  border: 1px solid var(--mk-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transform: none;
+  transition: border-color 0.15s ease;
+}
+
+.mk-option-list label.mk-option:hover {
+  border-color: var(--ink);
+}
+
+.mk-option-list label.mk-option-selected {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.mk-product-description {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mk-product-description [data-testid="product-description"] {
+  color: var(--mk-muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.mk-product-description [aria-label="Gradient colour guide"] {
+  margin-top: 0;
+  border-color: var(--mk-line);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+}
+
+.mk-related {
+  margin-top: 72px;
+  margin-bottom: 104px;
+}
+
+/* Gallery: one photo on show, thumbnails underneath. */
+.mk-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mk-gallery-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+}
+
+.mk-gallery-track {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+}
+
+.mk-gallery-slide {
+  position: relative;
+  flex: 0 0 100%;
+  aspect-ratio: 1 / 1;
+  scroll-snap-align: start;
+}
+
+.mk-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 1px 4px #28232333;
+  color: var(--ink);
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 0.15s ease;
+}
+
+.mk-gallery-arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mk-gallery-arrow-previous {
+  left: 12px;
+}
+
+.mk-gallery-arrow-next {
+  right: 12px;
+}
+
+.mk-gallery-stage:hover .mk-gallery-arrow,
+.mk-gallery-arrow:focus-visible {
+  opacity: 1;
+}
+
+.mk-gallery-stage .mk-gallery-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mk-gallery-count {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fffdf5e6;
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.mk-gallery-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mk-gallery-thumb {
+  position: relative;
+  flex: none;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 6px;
+  background: var(--mk-surface);
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.mk-gallery-thumb:hover {
+  opacity: 1;
+}
+
+.mk-gallery-thumb[aria-current="true"] {
+  opacity: 1;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .mk-product {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .mk-product-media {
+    position: static;
+  }
+
+  .mk-product-summary {
+    max-width: none;
+    gap: 24px;
+  }
+
+  .mk-gallery-thumbs {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .mk-gallery-thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mk-gallery-thumb {
+    width: 64px;
+    height: 64px;
+  }
+
+  .mk-related {
+    margin-top: 40px;
+    margin-bottom: 56px;
+  }
+}
+
+/* ---------- Footer ---------- */
+
+.mk-footer {
+  padding-top: 64px;
+  border-top: 1px solid var(--mk-line);
+  background: var(--paper);
+}
+
+.mk-footer-top {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 56px;
+}
+
+.mk-footer .joy-footer-logo {
+  max-width: 150px;
+  margin: 0 0 18px;
+}
+
+.mk-footer-brand p {
+  max-width: 320px;
+  color: var(--mk-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.mk-footer .mukky-footer-est {
+  margin-top: 14px;
+  color: var(--mk-muted);
+  font-size: 12px;
+}
+
+.mk-footer-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mk-footer-column h2 {
+  margin-bottom: 12px;
+  color: var(--mk-muted);
+  font: 600 12px/1.2 var(--mukky-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mk-footer-column a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.mk-footer-column a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.mk-footer .mukky-footer-bottom {
+  border-top: 1px solid var(--mk-line);
+  color: var(--mk-muted);
+  font-size: 12px;
+}
+
+@media (max-width: 750px) {
+  .mk-footer {
+    padding-top: 40px;
+  }
+
+  .mk-footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 24px;
+    padding-bottom: 40px;
+  }
+
+  .mk-footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .mk-footer-column a {
+    min-height: 44px;
+  }
+}
+
+/* ---------- Menu drawer (small screens) ---------- */
+
+.joy-menu-panel {
+  border-right: 0;
+  box-shadow: 0 0 60px #0000001f;
+}
+
+.joy-menu-close {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: #2823230f;
+}
+
+.joy-menu-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.joy-menu-links a {
+  font: 500 22px/1.2 var(--mukky-body);
+  letter-spacing: -0.01em;
+}
+
+.joy-menu-links a:hover,
+.joy-menu-links a[aria-current="page"] {
+  background: #2823230a;
+}
+
+.joy-menu-arrow {
+  display: inline-flex;
+  color: var(--mk-muted);
+}
+
+/* ---------- Cart, checkout and account: same shapes, quieter frames ---------- */
+
+.ink-page-heading h1 {
+  font-size: clamp(30px, 3.4vw, 40px);
+  line-height: 1.1;
+}
+
+.ink-cart-items,
+.ink-cart-summary,
+.joy-checkout-summary {
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  box-shadow: none;
+}
+
+.ink-empty-bag {
+  border: 0;
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+}
+
+.ink-login-layout {
+  border: 1px solid var(--mk-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.ink-login-aside {
+  background: var(--mk-surface);
+}
+
+.ink-account-sidebar {
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  background: transparent;
+}
+
+.joy-checkout-header {
+  border-bottom: 1px solid var(--mk-line);
+  background: var(--paper);
+}
+
+.joy-policy .joy-button {
+  border: 0;
+  border-radius: var(--mk-radius);
+  background: var(--ink);
+  box-shadow: none;
+  color: var(--paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mukky-card-photo img,
+  .ink-button svg,
+  .mk-gallery-arrow {
+    transition: none;
+  }
+
+  .mukky-product-card:hover .mukky-card-photo img,
+  .ink-button:hover svg {
+    transform: none;
+  }
+}

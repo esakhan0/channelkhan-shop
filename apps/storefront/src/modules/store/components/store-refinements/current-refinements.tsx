@@ -1,14 +1,25 @@
 "use client"
 
 import { XMarkMini } from "@medusajs/icons"
-import { useClearRefinements, useCurrentRefinements } from "react-instantsearch"
+import {
+  useClearRefinements,
+  useCurrentRefinements,
+  useInstantSearch,
+  useRefinementList,
+} from "react-instantsearch"
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
 import { convertToLocale } from "@lib/util/money"
 import {
+  groupColourFamilies,
+  isColourValue,
+  sameValues,
+} from "@modules/store/components/colour-chips/families"
+import {
   CATEGORY_ATTRIBUTE,
   LABELS_ATTRIBUTE,
   OPTION_VALUES_ATTRIBUTE,
+  OPTION_VALUES_FACET,
 } from "./attributes"
 
 type Refinement = ReturnType<
@@ -68,11 +79,44 @@ function refinementLabel(refinement: Refinement, currencyCode: string) {
 const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
   const { items, refine } = useCurrentRefinements()
   const { canRefine: canClearAll, refine: clearAll } = useClearRefinements()
+  const { items: optionItems } = useRefinementList(OPTION_VALUES_FACET)
+  const { setIndexUiState } = useInstantSearch()
 
-  const refinements = items.flatMap((item) => item.refinements)
+  const allRefinements = items.flatMap((item) => item.refinements)
 
-  if (!refinements.length) {
+  if (!allRefinements.length) {
     return null
+  }
+
+  // A colour chip selects every value in its family. Show that as the one
+  // filter the shopper picked ("Colour: Black") instead of a chip per value.
+  const colourRefinements = allRefinements.filter(
+    (refinement) =>
+      refinement.attribute === OPTION_VALUES_ATTRIBUTE &&
+      isColourValue(String(refinement.value))
+  )
+  const colourValues = colourRefinements.map((refinement) => String(refinement.value))
+  const activeFamily =
+    colourValues.length > 1
+      ? groupColourFamilies(optionItems.map((item) => item.value)).find((family) =>
+          sameValues(colourValues, family.values)
+        )
+      : undefined
+  const refinements = activeFamily
+    ? allRefinements.filter((refinement) => !colourRefinements.includes(refinement))
+    : allRefinements
+
+  const clearColourFamily = () => {
+    setIndexUiState((previous) => ({
+      ...previous,
+      page: 1,
+      refinementList: {
+        ...previous.refinementList,
+        [OPTION_VALUES_ATTRIBUTE]: (
+          previous.refinementList?.[OPTION_VALUES_ATTRIBUTE] ?? []
+        ).filter((value) => !colourValues.includes(value)),
+      },
+    }))
   }
 
   return (
@@ -93,6 +137,19 @@ const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
       </div>
 
       <ul className="flex flex-wrap gap-2 pr-6">
+        {activeFamily && (
+          <li>
+            <button
+              onClick={clearColourFamily}
+              aria-label={`Remove filter Colour: ${activeFamily.label}`}
+              className="border-ui-border-interactive text-ui-fg-base border text-small-regular h-8 rounded-rounded px-3 flex items-center gap-x-1.5 transition-colors duration-150 hover:bg-ui-bg-base-hover"
+              data-testid="remove-refinement"
+            >
+              Colour: {activeFamily.label}
+              <XMarkMini className="text-ui-fg-muted" />
+            </button>
+          </li>
+        )}
         {refinements.map((refinement) => {
           const label = refinementLabel(refinement, currencyCode)
 

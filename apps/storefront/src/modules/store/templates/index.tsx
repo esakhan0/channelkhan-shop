@@ -5,6 +5,7 @@ import type { SearchClient } from "instantsearch.js"
 import { Configure, InstantSearch } from "react-instantsearch"
 
 import { PRODUCT_INDEX_NAME, searchClient } from "@lib/search-client"
+import ColourChips from "@modules/store/components/colour-chips"
 import StoreHits from "@modules/store/components/store-hits"
 import StoreRefinements from "@modules/store/components/store-refinements"
 import StoreSearchBox from "@modules/store/components/store-search-box"
@@ -31,6 +32,7 @@ const StoreTemplate = ({ currencyCode }: { currencyCode: string }) => {
           <StoreRefinements currencyCode={currencyCode} />
           <div className="w-full min-w-0">
             <StoreSearchBox />
+            <ColourChips />
             <StoreHits
               hitsPerPage={PRODUCT_LIMIT}
               currencyCode={currencyCode}

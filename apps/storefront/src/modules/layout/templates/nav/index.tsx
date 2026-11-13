@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { User } from "@medusajs/icons"
 import BrandLogo from "@modules/common/components/brand-logo"
 
 import { listLocales } from "@lib/data/locales"
@@ -9,8 +10,14 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import Search from "@modules/layout/components/search"
-import User from "@modules/common/icons/user"
 import NavCartLabel from "@modules/layout/components/nav-cart-label"
+
+const links = [
+  ["Shop", "/store"],
+  ["Shipping", "/shipping"],
+  ["Returns", "/returns"],
+  ["Contact", "/contact"],
+]
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -21,41 +28,43 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="mukky-nav relative h-24 mx-auto border-b duration-200 border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
-          <div className="flex-1 basis-0 h-full flex items-center gap-2 medium:gap-5 min-w-0">
-            <div className="h-full flex items-center">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
-            </div>
+      {/* Wide screens: logo, page links, then search, account and cart.
+          Small screens: menu, centred logo, then search and cart. */}
+      <header className="mk-header">
+        <nav className="content-container mk-header-row" aria-label="Main">
+          <div className="mk-header-menu">
+            <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
+          </div>
+
+          <LocalizedClientLink
+            href="/"
+            className="mukky-brand-link mk-header-logo"
+            data-testid="nav-store-link"
+          >
+            <BrandLogo />
+          </LocalizedClientLink>
+
+          <ul className="mk-header-links">
+            {links.map(([label, href]) => (
+              <li key={href}>
+                <LocalizedClientLink href={href}>{label}</LocalizedClientLink>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mk-header-actions">
             <Search />
-          </div>
-
-          <div className="flex items-center h-full">
             <LocalizedClientLink
-              href="/"
-              className="mukky-brand-link"
-              data-testid="nav-store-link"
+              className="mk-icon-button mk-header-account"
+              href="/account"
+              data-testid="nav-account-link"
+              aria-label="Your account"
             >
-              <BrandLogo />
+              <User aria-hidden="true" />
             </LocalizedClientLink>
-          </div>
-
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <div className="flex items-center gap-x-6 h-full">
-              <LocalizedClientLink
-                className="ink-account-link"
-                href="/account"
-                data-testid="nav-account-link"
-                aria-label="Your account"
-              >
-                <span className="mukky-nav-text">Account</span>
-                <span className="mukky-nav-icon" aria-hidden="true"><User size="22" focusable="false" /></span>
-              </LocalizedClientLink>
-            </div>
             <Suspense
               fallback={
                 <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex gap-2"
                   href="/cart"
                   data-testid="nav-cart-link"
                   aria-label="Cart, 0 items"

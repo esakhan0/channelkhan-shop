@@ -1,3 +1,4 @@
+import { isColourOption, swatchFill } from "@lib/util/colour-swatch"
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@modules/common/components/ui"
 import React from "react"
@@ -22,18 +23,19 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   disabled,
 }) => {
   const filteredOptions = (option.values ?? []).map((v) => v.value)
+  const showSwatches = isColourOption(title)
 
   return (
-    <fieldset className="flex flex-col gap-y-3" disabled={disabled}>
-      <legend className="text-sm mb-3">Select {title}</legend>
-      <div
-        className="flex flex-wrap justify-between gap-2"
-        data-testid={dataTestId}
-      >
+    <fieldset className="flex flex-col" disabled={disabled}>
+      <legend className="mk-option-legend">
+        {title}
+        {current && <span className="mk-option-current">{current}</span>}
+      </legend>
+      <div className="mk-option-list" data-testid={dataTestId}>
         {filteredOptions.map((v) => {
           const id = `${name}-${v}`.replace(/[^A-Za-z0-9_-]/g, "-")
           return (
-            <div key={v} className="flex-1">
+            <div key={v}>
               <input
                 type="radio"
                 id={id}
@@ -46,15 +48,18 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               <label
                 htmlFor={id}
                 className={clx(
-                  "flex items-center justify-center cursor-pointer border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 peer-focus-visible:ring-2 peer-focus-visible:ring-offset-1 peer-disabled:cursor-not-allowed",
-                  {
-                    "border-ui-border-interactive": v === current,
-                    "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                      v !== current,
-                  }
+                  "mk-option peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed",
+                  { "mk-option-selected": v === current }
                 )}
                 data-testid="option-button"
               >
+                {showSwatches && (
+                  <span
+                    className="mk-swatch"
+                    style={{ background: swatchFill(v) }}
+                    aria-hidden="true"
+                  />
+                )}
                 {v}
               </label>
             </div>

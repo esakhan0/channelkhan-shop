@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { ArrowRightMini } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { getRegion } from "@lib/data/regions"
 import ProductPreview from "@modules/products/components/product-preview"
@@ -27,7 +28,7 @@ export default async function ShopShowcase({ countryCode }: { countryCode: strin
   }
   const visible = Array.from(new Map(products.map((p) => [p.id, p])).values())
   return <section className="content-container ink-products" id="latest">
-    <div className="ink-section-head"><div><p className="ink-kicker">LATEST PRODUCTS</p><h2>Fresh from the workshop</h2><p>Discover our latest fidgets, with the newest arrivals first.</p></div><LocalizedClientLink href="/store?sortBy=created_at" className="ink-underlined">Explore the shop</LocalizedClientLink></div>
+    <div className="ink-section-head"><div><p className="ink-kicker">Latest products</p><h2>Fresh from the workshop</h2><p>Discover our latest fidgets, with the newest arrivals first.</p></div><LocalizedClientLink href="/store?sortBy=created_at" className="ink-underlined mk-arrow-link">Explore the shop <ArrowRightMini aria-hidden="true" /></LocalizedClientLink></div>
     {visible.length ? <div className="joy-product-grid">{visible.map((product, index) => <Reveal key={product.id} className="ink-product-reveal" delay={(index % 4) * 65}><ProductPreview product={product} region={region} /></Reveal>)}</div> : <Reveal className="ink-coming"><span aria-hidden="true">✳</span><h3>The next fidgets are on their way.</h3><p>We’re getting our first collection ready. Check back soon for the good stuff.</p><LocalizedClientLink href="/contact" className="ink-underlined">Say hello to the makers ↗</LocalizedClientLink></Reveal>}
   </section>
 }

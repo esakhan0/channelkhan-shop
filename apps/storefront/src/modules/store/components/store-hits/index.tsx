@@ -76,12 +76,19 @@ const StoreHits = ({ hitsPerPage }: StoreHitsProps) => {
     if (!hit.handle) return []
     const product = productsByHandle.get(hit.handle)
     if (!product?.handle) return []
+    // A selected option only narrows products that have that option. A colour
+    // chip can select values from both "Colour" and "Colour combination", and a
+    // product with just one of those must not be hidden by the other.
+    const optionTitles = new Set((product.options ?? []).map((option) => option.title))
+    const applicableGroups = Array.from(selectedGroups.entries())
+      .filter(([title]) => optionTitles.has(title))
+      .map(([, group]) => group)
     return (product.variants ?? []).filter((variant) => {
       const values = (variant.options ?? []).map((value) => {
         const title = product.options?.find((option) => option.id === value.option_id)?.title
         return `${title}:${value.value}`
       })
-      return Array.from(selectedGroups.values()).every((group) => group.some((value) => values.includes(value)))
+      return applicableGroups.every((group) => group.some((value) => values.includes(value)))
     }).map((variant) => ({ product, variant }))
   })
 

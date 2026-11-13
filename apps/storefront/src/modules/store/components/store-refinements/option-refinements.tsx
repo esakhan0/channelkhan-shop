@@ -6,9 +6,7 @@ import clsx from "clsx"
 import { useState } from "react"
 import { useRefinementList } from "react-instantsearch"
 
-import { OPTION_VALUES_ATTRIBUTE } from "./attributes"
-
-const FACET_LIMIT = 200
+import { OPTION_VALUES_FACET } from "./attributes"
 
 type OptionGroup = {
   title: string
@@ -51,14 +49,10 @@ function groupItems(
 }
 
 const OptionRefinements = () => {
-  const { items, refine } = useRefinementList({
-    attribute: OPTION_VALUES_ATTRIBUTE,
-    limit: FACET_LIMIT,
-    // Alphabetical keeps a size or colour list stable as counts move around.
-    sortBy: ["name:asc"],
-    operator: "and",
-  })
-  const [closedGroups, setClosedGroups] = useState<string[]>([])
+  const { items, refine } = useRefinementList(OPTION_VALUES_FACET)
+  // Groups start closed to keep the sidebar short; the count beside each title
+  // shows when something inside is selected, for example by a colour chip.
+  const [toggledGroups, setToggledGroups] = useState<Record<string, boolean>>({})
 
   const groups = groupItems(items)
 
@@ -66,23 +60,23 @@ const OptionRefinements = () => {
     return null
   }
 
+  const isGroupOpen = (group: OptionGroup) => toggledGroups[group.title] ?? false
+
   return (
     <Accordion.Root
       type="multiple"
-      value={groups
-        .map((group) => group.title)
-        .filter((title) => !closedGroups.includes(title))}
+      value={groups.filter(isGroupOpen).map((group) => group.title)}
       onValueChange={(openTitles) =>
-        setClosedGroups(
-          groups
-            .map((group) => group.title)
-            .filter((title) => !openTitles.includes(title))
+        setToggledGroups(
+          Object.fromEntries(
+            groups.map((group) => [group.title, openTitles.includes(group.title)])
+          )
         )
       }
       className="flex flex-col gap-y-3 pr-6"
     >
       {groups.map((group) => {
-        const isOpen = !closedGroups.includes(group.title)
+        const isOpen = isGroupOpen(group)
         const selectedCount = group.values.filter(
           (value) => value.isRefined
         ).length

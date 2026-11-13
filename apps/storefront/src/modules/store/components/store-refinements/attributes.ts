@@ -1,6 +1,22 @@
+import type { UseRefinementListProps } from "react-instantsearch"
+
 import { PRODUCT_INDEX_NAME, priceAttribute } from "@lib/search-client"
 
 export const OPTION_VALUES_ATTRIBUTE = "option_values"
+
+/**
+ * One facet setup for every widget that reads option values, because
+ * InstantSearch needs widgets on the same attribute to agree. "or" is what a
+ * colour filter means to a shopper: picking Black and Red shows prints in
+ * either colour, and the other colours stay on offer while one is picked.
+ */
+export const OPTION_VALUES_FACET: UseRefinementListProps = {
+  attribute: OPTION_VALUES_ATTRIBUTE,
+  limit: 200,
+  // Alphabetical keeps a size or colour list stable as counts move around.
+  sortBy: ["name:asc"],
+  operator: "or",
+}
 export const CATEGORY_ATTRIBUTE = "category"
 // The index calls the product's tags "labels".
 export const LABELS_ATTRIBUTE = "labels"

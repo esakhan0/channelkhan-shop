@@ -136,7 +136,6 @@ const Search = () => {
         data-testid="nav-search-button"
       >
         <MagnifyingGlass aria-hidden="true" />
-        <span className={styles.placeholder}>Search fidgets...</span>
       </Link>
 
       <SearchDrawer isOpen={isOpen} close={close}>

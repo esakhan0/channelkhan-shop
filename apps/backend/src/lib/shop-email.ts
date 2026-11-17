@@ -1,4 +1,5 @@
 import type { MedusaContainer, OrderDTO } from "@medusajs/framework/types"
+import { readLineCustomisation } from "./customisation"
 import { ChangeActionType, ContainerRegistrationKeys, MedusaError, Modules } from "@medusajs/framework/utils"
 import { REFUND_REQUEST_MODULE } from "../modules/refund-request"
 import type RefundRequestModuleService from "../modules/refund-request/service"
@@ -47,7 +48,7 @@ export async function prepareShopEmail(container: MedusaContainer, event: ShopEm
     fields: ["id", "display_id", "email", "total", "currency_code", "shipping_address.first_name", "shipping_address.country_code", "items.id", "items.title", "items.quantity", "items.total",
       ...(event.name === "order.placed" ? ["item_subtotal", "shipping_subtotal", "discount_subtotal", "tax_total", "credit_line_total",
         "shipping_address.last_name", "shipping_address.company", "shipping_address.address_1", "shipping_address.address_2", "shipping_address.city", "shipping_address.province", "shipping_address.postal_code",
-        "shipping_methods.name", "items.variant_title", "payment_collections.payments.provider_id"] : [])] })
+        "shipping_methods.name", "items.variant_title", "items.metadata", "payment_collections.payments.provider_id"] : [])] })
   // These computed totals are in OrderDTO but absent from the generated graph type.
   const order = orders[0] as typeof orders[number] & Pick<OrderDTO, "discount_subtotal" | "credit_line_total">
   if (!order?.email) return
@@ -84,7 +85,10 @@ export async function prepareShopEmail(container: MedusaContainer, event: ShopEm
       const quantity = shipmentItems.filter((entry) => entry.line_item_id === item.id).reduce((sum, entry) => sum + entry.quantity, 0)
       return quantity ? [{ title: item.title, quantity }] : []
     }
-    return [{ title: item.title, variant: item.variant_title || undefined, quantity: Number(item.quantity), total: money(item.total) }]
+    // The text a buyer typed for a personalised item, so the email confirms it back to them.
+    const custom = readLineCustomisation((item as { metadata?: Record<string, unknown> | null }).metadata)
+    return [{ title: item.title, variant: item.variant_title || undefined, custom: custom ? `${custom.label}: ${custom.text}` : undefined,
+      quantity: Number(item.quantity), total: money(item.total) }]
   })
   const address = order.shipping_address
   const addressLines = address ? [

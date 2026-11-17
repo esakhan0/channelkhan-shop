@@ -2,6 +2,7 @@ import { sdk } from "@lib/config"
 import { getCartId, getAuthHeaders } from "@lib/data/cookies"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
+import { customisationMetadata, getCustomisationSettings } from "@lib/util/customisation"
 import { activateCart, createCartWithItems, MAX_LINE_ITEM_QUANTITY } from "@lib/util/server-cart"
 import { getRequestOrigin } from "@lib/util/site"
 import { isEqual } from "lodash"
@@ -36,14 +37,32 @@ const resolveVariantId = async (form: FormData, regionId: string) => {
   )?.id
 }
 
+// The buyer's text for a personalised item, shaped the way the server expects.
+// The label comes from the product, never from the form. If the product takes
+// no text, the text is still sent, so the server can refuse it with a reason.
+const resolveCustomisation = async (form: FormData, regionId: string) => {
+  const text = form.get("customisation")?.toString().trim()
+  const productId = form.get("product_id")?.toString()
+  if (!text || !productId) return undefined
+
+  const { product } = await sdk.store.product.retrieve(productId, {
+    region_id: regionId,
+    fields: "id,metadata",
+  })
+  const settings = getCustomisationSettings(product)
+  return settings ? customisationMetadata(settings, text) : { customisation: text }
+}
+
 const addLineItem = async (
   cartId: string | undefined,
   regionId: string,
   variantId: string,
-  quantity: number
+  quantity: number,
+  metadata?: Record<string, unknown>
 ) => {
-  if (!cartId) return createCartWithItems(regionId, [{ variant_id: variantId, quantity }])
-  await sdk.store.cart.createLineItem(cartId, { variant_id: variantId, quantity }, {}, await getAuthHeaders())
+  const line = { variant_id: variantId, quantity, ...(metadata ? { metadata } : {}) }
+  if (!cartId) return createCartWithItems(regionId, [line])
+  await sdk.store.cart.createLineItem(cartId, line, {}, await getAuthHeaders())
   return cartId
 }
 
@@ -68,8 +87,10 @@ export async function POST(
   )
 
   let variantId: string | undefined
+  let metadata: Record<string, unknown> | undefined
   try {
     variantId = await resolveVariantId(form, region.id)
+    metadata = await resolveCustomisation(form, region.id)
   } catch {
     return new NextResponse("Product not found", { status: 404 })
   }
@@ -80,14 +101,14 @@ export async function POST(
   const existingCartId = await getCartId()
   let cartId: string
   try {
-    cartId = await addLineItem(existingCartId, region.id, variantId, quantity)
+    cartId = await addLineItem(existingCartId, region.id, variantId, quantity, metadata)
   } catch (error) {
     if (!existingCartId) {
       return new NextResponse(errorMessage(error), { status: 400 })
     }
     // The stored cart may be completed or belong to another region.
     try {
-      cartId = await addLineItem(undefined, region.id, variantId, quantity)
+      cartId = await addLineItem(undefined, region.id, variantId, quantity, metadata)
     } catch (retryError) {
       return new NextResponse(errorMessage(retryError), { status: 400 })
     }

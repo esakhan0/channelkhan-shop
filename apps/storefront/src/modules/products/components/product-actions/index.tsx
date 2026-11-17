@@ -3,11 +3,17 @@
 import { addToCartWithFeedback } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { notifyCartUpdated } from "@lib/util/cart-events"
+import {
+  countCharacters,
+  customisationMetadata,
+  getCustomisationSettings,
+} from "@lib/util/customisation"
 import { getVariantStockLabel, isVariantInStock } from "@lib/util/inventory"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import Divider from "@modules/common/components/divider"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
 import { useParams, usePathname } from "next/navigation"
@@ -50,6 +56,13 @@ export default function ProductActions({
   const [cartError, setCartError] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
   const countryCode = useParams().countryCode as string
+
+  // When the shop owner has switched it on for this product, the buyer types
+  // their own text here (a number plate, a name) and it goes with the item.
+  const customisation = useMemo(() => getCustomisationSettings(product), [product])
+  const [customText, setCustomText] = useState("")
+  const [customMissing, setCustomMissing] = useState(false)
+  const customField = useRef<HTMLInputElement>(null)
 
   const selectedVariant = useMemo(() => {
     if (!product.variants || product.variants.length === 0) {
@@ -125,13 +138,30 @@ export default function ProductActions({
     if (!selectedVariant?.id || !hasPrice || !inStock || isAdding || disabled) return
     setCartError(null)
     setAdded(false)
+
+    // A personalised item cannot go in the bag without its text. Say so and
+    // take the buyer to the box, wherever on the page they pressed the button.
+    if (customisation && !customText.trim()) {
+      setCustomMissing(true)
+      setCartError(`Please fill in "${customisation.label}" first.`)
+      customField.current?.focus()
+      return
+    }
+
     setIsAdding(true)
     try {
-      const result = await addToCartWithFeedback({ variantId: selectedVariant.id, quantity: 1, countryCode })
+      const result = await addToCartWithFeedback({
+        variantId: selectedVariant.id,
+        quantity: 1,
+        countryCode,
+        ...(customisation ? { metadata: customisationMetadata(customisation, customText) } : {}),
+      })
       if (!result.success) {
         setCartError(result.error)
         return
       }
+      // Cleared so the next one added can carry different text.
+      setCustomText("")
       setAdded(true)
       notifyCartUpdated()
       router.refresh()
@@ -154,6 +184,10 @@ export default function ProductActions({
           method="post"
           action={`/${countryCode}/cart/add`}
           onSubmit={handleSubmit}
+          // Once the page is interactive it explains a missing text box itself,
+          // in the same place as other errors. Before that, and without
+          // JavaScript, the browser's own check on the required box still applies.
+          noValidate={isUrlVariantApplied}
           className="flex flex-col gap-y-2"
           {...{
             toolname: "add_to_cart",
@@ -193,6 +227,48 @@ export default function ProductActions({
               </div>
             )}
           </div>
+
+          {customisation && (
+            <div className="mk-custom">
+              <div className="mk-custom-head">
+                <label htmlFor="product-customisation" className="mk-option-legend">
+                  {customisation.label}
+                </label>
+                <span className="mk-custom-count" aria-hidden="true">
+                  {countCharacters(customText)} / {customisation.maxLength}
+                </span>
+              </div>
+              <input
+                ref={customField}
+                id="product-customisation"
+                name="customisation"
+                type="text"
+                className="mk-custom-input"
+                value={customText}
+                maxLength={customisation.maxLength}
+                required
+                autoComplete="off"
+                spellCheck={false}
+                enterKeyHint="done"
+                placeholder="Type it here"
+                aria-describedby="product-customisation-hint"
+                aria-invalid={customMissing || undefined}
+                disabled={!!disabled || isAdding}
+                data-testid="product-customisation-input"
+                onChange={(event) => {
+                  setCustomText(event.target.value)
+                  setCustomMissing(false)
+                  setCartError(null)
+                  setAdded(false)
+                }}
+              />
+              <p id="product-customisation-hint" className="mk-custom-hint">
+                Up to {customisation.maxLength} characters, spaces included. Made with your text,
+                so it may not be returnable if you change your mind. See{" "}
+                <LocalizedClientLink href="/returns">Returns</LocalizedClientLink>.
+              </p>
+            </div>
+          )}
 
           {selectedVariant && isValidVariant && (
             <p

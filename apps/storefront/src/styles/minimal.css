@@ -1974,6 +1974,79 @@ button:focus-visible {
   box-shadow: inset 0 0 0 1px var(--ink);
 }
 
+/* The buyer's own text for a personalised item (see lib/util/customisation.ts). */
+.mk-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.mk-custom-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mk-custom-head .mk-option-legend {
+  margin-bottom: 0;
+}
+
+.mk-custom-count {
+  color: var(--mk-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 20px type keeps phones from zooming in when the box is tapped. */
+.mk-custom-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  border: 1px solid var(--mk-line-strong);
+  border-radius: var(--mk-radius-field);
+  background: var(--mk-card);
+  color: var(--ink);
+  font-family: var(--mk-display);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.mk-custom-input::placeholder {
+  color: var(--mk-muted);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.mk-custom-input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.mk-custom-input[aria-invalid="true"] {
+  border-color: #c9283a;
+  box-shadow: inset 0 0 0 1px #c9283a;
+}
+
+.mk-custom-hint {
+  color: var(--mk-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mk-custom-hint a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* The same text again, under the item in the bag and on the order. */
+.mk-custom-value {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .mk-product-description {
   display: flex;
   flex-direction: column;

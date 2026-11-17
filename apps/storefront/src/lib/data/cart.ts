@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { CUSTOMISATION_MESSAGE_PREFIX } from "@lib/util/customisation"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -121,10 +122,13 @@ export async function addToCart({
   variantId,
   quantity,
   countryCode,
+  metadata,
 }: {
   variantId: string
   quantity: number
   countryCode: string
+  /** Extra details for the line, such as the buyer's text for a personalised item. */
+  metadata?: Record<string, unknown>
 }) {
   if (!variantId) {
     throw new Error("Missing variant ID when adding to cart")
@@ -146,6 +150,7 @@ export async function addToCart({
       {
         variant_id: variantId,
         quantity,
+        ...(metadata ? { metadata } : {}),
       },
       {},
       headers
@@ -165,11 +170,16 @@ export async function addToCartWithFeedback(input: {
   variantId: string
   quantity: number
   countryCode: string
+  metadata?: Record<string, unknown>
 }): Promise<{ success: true } | { success: false; error: string }> {
   try {
     await addToCart(input)
     return { success: true }
   } catch (error) {
+    // The server explains exactly what is wrong with a buyer's text; show that as it is.
+    if (error instanceof Error && error.message.startsWith(CUSTOMISATION_MESSAGE_PREFIX)) {
+      return { success: false, error: error.message.slice(CUSTOMISATION_MESSAGE_PREFIX.length) }
+    }
     const message = error instanceof Error ? error.message.toLowerCase() : ""
     if (/price|currency/.test(message)) {
       return { success: false, error: "This option is currently unavailable in your currency. Please contact us for help." }

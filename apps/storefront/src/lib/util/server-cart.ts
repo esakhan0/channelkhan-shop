@@ -32,7 +32,7 @@ export const resolveRegion = async (
 
 export const createCartWithItems = async (
   regionId: string,
-  items: { variant_id: string; quantity: number }[]
+  items: { variant_id: string; quantity: number; metadata?: Record<string, unknown> }[]
 ) => {
   const response = await sdk.store.cart.create({ region_id: regionId }, {}, await getAuthHeaders())
   const { cart } = response

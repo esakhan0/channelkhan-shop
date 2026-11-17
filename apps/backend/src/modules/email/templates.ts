@@ -3,7 +3,7 @@ import { MedusaError } from "@medusajs/framework/utils"
 export type ShopEmailData = {
   order_number?: string | number
   first_name?: string
-  items?: { title: string; variant?: string; quantity: number; total?: string }[]
+  items?: { title: string; variant?: string; custom?: string; quantity: number; total?: string }[]
   total?: string
   subtotal?: string
   shipping?: string
@@ -60,7 +60,7 @@ export function renderShopEmail(template: string, data: ShopEmailData, brand: Em
   }
   const actionUrl = candidate && new URL(candidate).origin === new URL(base).origin ? candidate : `${base.replace(/\/$/, "")}/gb/account/orders`
   const logoUrl = "cid:mukkys-logo@shop"
-  const rows = (data.items ?? []).map((item) => `<tr><td style="padding:14px 12px 14px 0;border-bottom:1px solid #ddd7cb;overflow-wrap:anywhere">${escapeHtml(item.title)}<br><span style="color:#69645d;font-size:13px">${item.variant ? `Variant: ${escapeHtml(item.variant)}<br>` : ""}Quantity: ${escapeHtml(item.quantity)}</span></td><td align="right" style="padding:14px 0;border-bottom:1px solid #ddd7cb;white-space:nowrap">${escapeHtml(item.total)}</td></tr>`).join("")
+  const rows = (data.items ?? []).map((item) => `<tr><td style="padding:14px 12px 14px 0;border-bottom:1px solid #ddd7cb;overflow-wrap:anywhere">${escapeHtml(item.title)}<br><span style="color:#69645d;font-size:13px">${item.variant ? `Variant: ${escapeHtml(item.variant)}<br>` : ""}${item.custom ? `${escapeHtml(item.custom)}<br>` : ""}Quantity: ${escapeHtml(item.quantity)}</span></td><td align="right" style="padding:14px 0;border-bottom:1px solid #ddd7cb;white-space:nowrap">${escapeHtml(item.total)}</td></tr>`).join("")
   const totals = [
     { label: "Subtotal (excl. shipping and taxes)", value: data.subtotal },
     { label: "Shipping (excl. tax)", value: data.shipping },
@@ -101,7 +101,7 @@ ${details}${tracking}
 <tr><td align="center" style="padding:26px 16px;font-size:13px;line-height:1.8;color:#69645d">${escapeHtml(brand.from_name)} &middot; 3D printed fidget toys and more.<br>Need a helping hand? Reply to this email.<br><a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/returns")}" style="color:#69645d">Returns &amp; refunds</a> &nbsp; / &nbsp; <a href="${escapeHtml(base.replace(/\/$/, "") + "/gb/privacy")}" style="color:#69645d">Privacy</a></td></tr>
 </table></td></tr></table></body></html>`
   const text = [brand.from_name, orderLabel, message.title, message.intro,
-    ...(data.items ?? []).map((item) => `${item.quantity} × ${item.title}${item.variant ? ` (${item.variant})` : ""}${item.total ? ` — ${item.total}` : ""}`),
+    ...(data.items ?? []).map((item) => `${item.quantity} × ${item.title}${item.variant ? ` (${item.variant})` : ""}${item.custom ? ` [${item.custom}]` : ""}${item.total ? ` — ${item.total}` : ""}`),
     ...totals.map((row) => `${row.label}: ${row.value}`),
     data.address?.length && `Shipping address:\n${data.address.join("\n")}`,
     data.contact_email && `Contact: ${data.contact_email}`, data.shipping_method && `Shipping method: ${data.shipping_method}`,

@@ -1,5 +1,5 @@
 import type { MedusaContainer, OrderDTO } from "@medusajs/framework/types"
-import { readLineCustomisation } from "./customisation"
+import { readOrderLineCustomisation } from "./customisation"
 import { ChangeActionType, ContainerRegistrationKeys, MedusaError, Modules } from "@medusajs/framework/utils"
 import { REFUND_REQUEST_MODULE } from "../modules/refund-request"
 import type RefundRequestModuleService from "../modules/refund-request/service"
@@ -86,7 +86,7 @@ export async function prepareShopEmail(container: MedusaContainer, event: ShopEm
       return quantity ? [{ title: item.title, quantity }] : []
     }
     // The text a buyer typed for a personalised item, so the email confirms it back to them.
-    const custom = readLineCustomisation((item as { metadata?: Record<string, unknown> | null }).metadata)
+    const custom = readOrderLineCustomisation(item as Parameters<typeof readOrderLineCustomisation>[0])
     return [{ title: item.title, variant: item.variant_title || undefined, custom: custom ? `${custom.label}: ${custom.text}` : undefined,
       quantity: Number(item.quantity), total: money(item.total) }]
   })

@@ -2,7 +2,7 @@ import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import type { AdminOrder, DetailWidgetProps } from "@medusajs/framework/types"
 import { Container, Copy, Heading, Text } from "@medusajs/ui"
 import { useQuery } from "@tanstack/react-query"
-import { readLineCustomisation } from "../../lib/customisation"
+import { readOrderLineCustomisation } from "../../lib/customisation"
 import { adminApi } from "../lib/admin-api"
 
 type OrderLine = {
@@ -12,6 +12,7 @@ type OrderLine = {
   variant_title?: string | null
   quantity?: number | null
   metadata?: Record<string, unknown> | null
+  line_item_metadata?: Record<string, unknown> | null
 }
 
 /**
@@ -31,7 +32,7 @@ const OrderCustomisation = ({ data }: DetailWidgetProps<AdminOrder>) => {
 
   const items: OrderLine[] = loaded?.order.items ?? (data.items as OrderLine[] | undefined) ?? []
   const lines = items.flatMap((item) => {
-    const custom = readLineCustomisation(item.metadata)
+    const custom = readOrderLineCustomisation(item)
     return custom ? [{ item, ...custom }] : []
   })
 

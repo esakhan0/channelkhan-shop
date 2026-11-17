@@ -27,7 +27,12 @@ const Item = ({ item, currencyCode }: ItemProps) => {
         >
           {item.product_title}
         </Text>
-        <LineItemOptions variant={item.variant} metadata={item.metadata} data-testid="product-variant" />
+        <LineItemOptions
+          variant={item.variant}
+          // An order keeps the bag line's own metadata here; see lib/util/customisation.ts.
+          metadata={(item as { line_item_metadata?: Record<string, unknown> | null }).line_item_metadata ?? item.metadata}
+          data-testid="product-variant"
+        />
       </Table.Cell>
 
       <Table.Cell className="!pr-0">

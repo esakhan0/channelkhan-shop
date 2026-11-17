@@ -82,6 +82,18 @@ export function readLineCustomisation(metadata: Metadata): { label: string; text
 }
 
 /**
+ * Reads the buyer's text from an order line. On an order, Medusa keeps the
+ * cart line's own metadata in `line_item_metadata` and shows it as `metadata`
+ * only while the order row has none of its own, so look there first.
+ */
+export function readOrderLineCustomisation(line: {
+  metadata?: Metadata
+  line_item_metadata?: Metadata
+}): { label: string; text: string } | null {
+  return readLineCustomisation(line.line_item_metadata) ?? readLineCustomisation(line.metadata)
+}
+
+/**
  * Checks what a buyer sent for one cart line against the product's setting.
  * Returns a sentence to show the buyer when something is wrong, and null when
  * the line is fine. The server runs this on every way of putting an item in a

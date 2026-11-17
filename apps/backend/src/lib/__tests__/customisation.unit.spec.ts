@@ -6,6 +6,7 @@ import {
   MESSAGE_PREFIX,
   readCustomisationSettings,
   readLineCustomisation,
+  readOrderLineCustomisation,
 } from "../customisation"
 
 const plate = {
@@ -66,6 +67,25 @@ describe("readLineCustomisation", () => {
     expect(readLineCustomisation(null)).toBeNull()
     expect(readLineCustomisation({ customisation: "   " })).toBeNull()
     expect(readLineCustomisation({ customisation: 42 })).toBeNull()
+  })
+})
+
+describe("readOrderLineCustomisation", () => {
+  const typed = { customisation: "AB12 CDE", customisation_label: "Number plate" }
+  const expected = { label: "Number plate", text: "AB12 CDE" }
+
+  it("reads the cart line's own metadata, which an order keeps separately", () => {
+    expect(readOrderLineCustomisation({ metadata: {}, line_item_metadata: typed })).toEqual(expected)
+  })
+
+  it("falls back to the line's metadata", () => {
+    expect(readOrderLineCustomisation({ metadata: typed })).toEqual(expected)
+    expect(readOrderLineCustomisation({ metadata: typed, line_item_metadata: null })).toEqual(expected)
+  })
+
+  it("returns null when neither holds text", () => {
+    expect(readOrderLineCustomisation({})).toBeNull()
+    expect(readOrderLineCustomisation({ metadata: {}, line_item_metadata: {} })).toBeNull()
   })
 })
 

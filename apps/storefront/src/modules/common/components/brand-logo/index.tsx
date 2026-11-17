@@ -1,23 +1,21 @@
-"use client"
-
-import { useState } from "react"
 import Image from "next/image"
 
-export default function BrandLogo({ animated = false }: { animated?: boolean }) {
-  const [paused, setPaused] = useState(false)
+/**
+ * The shop's logo: the printer mascot on a pastel badge, next to the name set
+ * in the heading font. Being type and one small image, it stays sharp at any
+ * size and takes its colours from the theme.
+ *
+ * Sizes scale with the font size of `.mk-logo`; see styles/minimal.css.
+ */
+export default function BrandLogo({ className = "" }: { className?: string }) {
   return (
-    <div className={animated ? "mukky-logo-stage" : "mukky-header-logo"}>
-      <Image src="/brand/mukkys-logo.png" alt="Mukky's 3D Shop"
-        width={1792} height={896} priority sizes="170px"
-        className={animated ? "mukky-logo-drawing" : "mukky-logo-small"}
-        style={{ animationPlayState: paused ? "paused" : "running" }} />
-      {animated && (
-        <button type="button" className="mukky-motion-button"
-          aria-label={paused ? "Play logo animation" : "Pause logo animation"}
-          aria-pressed={paused} onClick={() => setPaused(!paused)}>
-          {paused ? "Play animation" : "Pause animation"}
-        </button>
-      )}
-    </div>
+    <span className={`mk-logo ${className}`.trim()}>
+      <span className="mk-logo-mark" aria-hidden="true">
+        <Image src="/brand/mukkys-icon.png" alt="" width={512} height={512} sizes="72px" priority />
+      </span>
+      <span className="mk-logo-word">
+        Mukky’s<span className="mk-logo-tag">3D</span>
+      </span>
+    </span>
   )
 }

@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { STORE_NAME } from "@lib/util/site"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { PolicyPage } from "@modules/policies/templates"
 
 export const metadata: Metadata = { title: "Privacy policy", description: "How Mukky's 3D Shop handles orders, payments and personal information." }
@@ -17,15 +18,19 @@ const sections = [
 
 export default function PrivacyPage() {
   return <PolicyPage title="Privacy policy">
-    <p>Last updated: 9 November 2026.</p>
+    <p>Last updated: 13 November 2026.</p>
     <p>{STORE_NAME} is responsible for the personal information used to run this shop. For support or privacy enquiries, email <a className="underline break-all" href="mailto:mukkys3dshop@gmail.com">mukkys3dshop@gmail.com</a>.</p>
     <section>
       <h2 className="text-xl font-semibold mb-3">Payments through Stripe</h2>
       <p>Stripe processes card and supported wallet payments. Your card number and security code are entered through Stripe&apos;s payment fields; our shop does not store full card numbers or security codes. We receive payment references, payment status and limited payment-method details needed for orders, refunds and disputes. Stripe may process transaction, device and identity information to provide payments, prevent fraud and meet its own legal obligations.</p>
       <p className="mt-3">See <a className="underline" href="https://stripe.com/gb/privacy">Stripe&apos;s privacy policy</a> for its practices and your rights. Wallets such as Apple Pay and Google Pay are available when supported by your device, browser and checkout configuration.</p>
     </section>
-    {sections.map(([title, text]) => <section key={title}><h2 className="text-xl font-semibold mb-3">{title}</h2><p>{text}</p></section>)}
-    <p>You can also complain to the UK Information Commissioner&apos;s Office at <a className="underline" href="https://ico.org.uk/make-a-complaint/">ico.org.uk/make-a-complaint</a>.</p>
+    {sections.map(([title, text]) => <section key={title}><h2 className="text-xl font-semibold mb-3">{title}</h2><p>{text}</p>{title === "Cookies" && <p className="mt-3">Our <LocalizedClientLink className="underline" href="/cookies">cookies page</LocalizedClientLink> lists each cookie and how long it lasts.</p>}</section>)}
+    <section>
+      <h2 className="text-xl font-semibold mb-3">Complaints</h2>
+      <p>If you are unhappy with how we have used your personal information, email <a className="underline break-all" href="mailto:mukkys3dshop@gmail.com">mukkys3dshop@gmail.com</a> and tell us what went wrong. We will confirm we have received your complaint within 30 days, look into it and tell you the outcome without undue delay.</p>
+      <p className="mt-3">You can also complain to the UK&apos;s data protection regulator, the ICO, at <a className="underline" href="https://ico.org.uk/make-a-complaint/">ico.org.uk/make-a-complaint</a>.</p>
+    </section>
     <p>We will update this page when our practices change and revise the date above. Where required, we will notify you of significant changes.</p>
   </PolicyPage>
 }

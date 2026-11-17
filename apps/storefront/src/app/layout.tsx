@@ -38,9 +38,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mode="light">
+    // data-palette picks the pastel set in styles/minimal.css:
+    // "sherbet" (default), "gelato", "playroom" or "cotton-candy".
+    <html lang="en" data-mode="light" data-palette="sherbet">
       <head>
         <link rel="ucp" href="/.well-known/ucp" />
+        {/* The heading font is fetched early, so headlines do not change face after they appear. */}
+        <link
+          rel="preload"
+          href="/fonts/fredoka-variable.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         <main className="relative">{props.children}</main>

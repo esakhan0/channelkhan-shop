@@ -1,24 +1,113 @@
 /*
- * Minimal refresh.
+ * Shop theme: pastel sticker cards on warm cream paper.
  *
  * Loaded last, so it restyles the shared classes from globals.css,
- * brand-refresh.css and mobile.css without rewriting them. It keeps the shop's
- * own fonts and its ink, paper and yellow; what it removes is the heavy
- * outlines, the offset "sticker" shadows and the tinted card frames, and it
- * gives everything more room.
+ * brand-refresh.css and mobile.css without rewriting them.
  *
- * Two shapes only: 8px corners for cards, buttons and fields, and full pills
- * for chips, option choices and icon buttons.
+ * The look follows the "Eddie" style from styles.refero.design:
+ *   - a cream page, white cards and near-black text
+ *   - flat pastel fills for the big cards, never gradients
+ *   - very round corners: 40px cards, 30px tags, 25px buttons, 15px photos
+ *   - one soft tinted shadow, kept for things that float or lift
+ *     (the menu bar, buttons, and a card under the pointer)
+ *   - a rounded display typeface (Fredoka) for headings and controls,
+ *     with the device's own font for longer reading text
  */
 
+/* Fredoka, SIL Open Font License 1.1 (see public/fonts/fredoka-LICENSE.txt). */
+@font-face {
+  font-family: "Mukky Fredoka";
+  src: url("/fonts/fredoka-variable.ttf") format("truetype");
+  font-weight: 300 700;
+  font-stretch: 75% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Palette ----------
+ * Pick a set with data-palette on <html> (see app/layout.tsx).
+ * pastel-1 leads (the feature card), 2 to 5 fill the product tiles,
+ * soft is for quiet panels and hover fills, badge sits behind the mascot.
+ */
 :root {
-  --mk-line: #28232324; /* hairlines */
-  --mk-line-strong: #28232359; /* field and control outlines */
-  --mk-surface: #f8f6f1; /* photo wells and quiet panels */
-  --mk-muted: #625959; /* secondary text */
-  --mk-ink-hover: #3d3737;
-  --mk-radius: 8px;
-  --mk-header-height: 72px;
+  /* Sherbet: warm candy pastels that sit with the yellow in the logo. */
+  --pastel-1: #ffe89a; /* butter */
+  --pastel-2: #ffd2b8; /* peach */
+  --pastel-3: #ffc4dc; /* bubblegum */
+  --pastel-4: #dcd0ff; /* lilac */
+  --pastel-5: #c3eed8; /* mint */
+  --pastel-soft: #fff6d6;
+  --pastel-badge: var(--pastel-4);
+  --accent: #ff5d73;
+  --ink: #201c2b;
+}
+
+html[data-palette="gelato"] {
+  --pastel-1: #c9f2df; /* mint */
+  --pastel-2: #c2e4ff; /* sky */
+  --pastel-3: #ddd6ff; /* lavender */
+  --pastel-4: #fff3a6; /* lemon */
+  --pastel-5: #ffd9e0; /* blush */
+  --pastel-soft: #ebfaf2;
+  --pastel-badge: var(--pastel-3);
+  --accent: #3f63f3;
+  --ink: #17203b;
+}
+
+html[data-palette="playroom"] {
+  --pastel-1: #ffb8ac; /* coral */
+  --pastel-2: #afd5ff; /* sky */
+  --pastel-3: #ffe48a; /* sun */
+  --pastel-4: #bde8b4; /* leaf */
+  --pastel-5: #ffd9c2; /* apricot */
+  --pastel-soft: #fff7e6;
+  --pastel-badge: var(--pastel-2);
+  --accent: #ff5a3c;
+  --ink: #222222;
+}
+
+html[data-palette="cotton-candy"] {
+  --pastel-1: #ffd3e4; /* pink */
+  --pastel-2: #cfe8ff; /* baby blue */
+  --pastel-3: #e6dbff; /* lilac */
+  --pastel-4: #d7f3ea; /* mint */
+  --pastel-5: #ffe6c9; /* cream */
+  --pastel-soft: #fff0f6;
+  --pastel-badge: var(--pastel-3);
+  --accent: #7a5cfa;
+  --ink: #1d1d1f;
+}
+
+:root {
+  --paper: #f7f4f2; /* the page itself: warm cream */
+  --mk-card: #ffffff; /* cards that sit on the page */
+  --mk-on-ink: #ffffff; /* text on the dark buttons */
+  /* The older stylesheets reach for these two names; keep them on-palette. */
+  --yellow: var(--pastel-1);
+  --lilac: var(--pastel-4);
+
+  --mk-line: #e9e4e0; /* hairlines */
+  --mk-line-control: #cfc8c2; /* chip and option outlines */
+  --mk-line-strong: #8f8780; /* text field outlines (3:1 against white and cream) */
+  --mk-surface: #f7f4f2; /* photo wells inside white cards */
+  --mk-muted: #5d5a66; /* secondary text */
+  --mk-ink-hover: #000000;
+  --mk-shadow: 5px 5px 20px rgba(198, 185, 237, 0.3);
+
+  --mk-radius-card: 40px;
+  --mk-radius: 28px; /* smaller cards and panels */
+  --mk-radius-tag: 30px;
+  --mk-radius-button: 25px;
+  --mk-radius-image: 15px;
+  --mk-radius-nav: 15px;
+  --mk-radius-field: 15px;
+  --mk-header-height: 78px; /* the floating bar plus the gap above it */
+
+  --mk-font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mk-display: "Mukky Fredoka", "Arial Rounded MT Bold", var(--mk-font);
+  --mukky-display: var(--mk-display);
+  --mukky-body: var(--mk-font);
 }
 
 /* Medusa UI's blue accents (selected borders, "clear all", focus rings) read as ink here. */
@@ -27,6 +116,27 @@ html[data-mode="light"] {
   --fg-interactive: var(--ink);
   --fg-interactive-hover: var(--mk-ink-hover);
   --bg-interactive: var(--ink);
+}
+
+html {
+  /* Keeps in-page jumps (such as "Meet the fidgets") clear of the floating bar. */
+  scroll-padding-top: calc(var(--mk-header-height) + 16px);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mk-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--pastel-1);
+  color: var(--ink);
+}
+
+.content-container {
+  max-width: 1296px; /* 1200px of content plus the side padding */
 }
 
 a:focus-visible,
@@ -41,36 +151,48 @@ button:focus-visible {
 .mukky-eyebrow {
   margin-bottom: 12px;
   color: var(--mk-muted);
-  font-size: 12px;
+  font-family: var(--mk-display);
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-/* The display serif stays, without the wonky cut and the very tight tracking. */
 .ink-section-head h2,
 .mukky-story h2,
 .ink-page-heading h1,
 .ink-login-aside h2,
 .ink-empty-bag h2,
 .ink-coming h3,
-.joy-editorial-copy h2,
 .joy-store-empty h2,
 .joy-policy-title,
 .mukky-store-heading h1,
-.mk-product-title {
-  font-family: var(--mukky-display);
+.mk-product-title,
+.mk-hero-title,
+.mk-made-copy h2,
+.mk-help h2,
+.mukky-heading {
+  font-family: var(--mk-display);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  font-variation-settings: "SOFT" 0, "WONK" 0;
+  letter-spacing: 0;
+  font-variation-settings: normal;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header: a white bar floating over the page ---------- */
+
+/* Only the bar itself takes clicks, so the gap around it never blocks the page. */
+.mk-header-shell,
+.mk-header {
+  pointer-events: none;
+}
 
 .mk-header {
-  height: var(--mk-header-height);
-  background: var(--paper);
-  border-bottom: 1px solid var(--mk-line);
+  height: auto;
+  padding-top: 14px;
+  border-bottom: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .mk-header-row {
@@ -79,7 +201,14 @@ button:focus-visible {
   grid-template-areas: "logo links actions";
   align-items: center;
   gap: 24px;
-  height: 100%;
+  width: calc(100% - 96px);
+  max-width: 1200px;
+  height: 64px;
+  padding: 0 12px 0 22px;
+  border-radius: var(--mk-radius-nav);
+  background: var(--mk-card);
+  box-shadow: var(--mk-shadow);
+  pointer-events: auto;
 }
 
 .mk-header-menu {
@@ -92,14 +221,10 @@ button:focus-visible {
   justify-self: start;
 }
 
-.mk-header .mukky-header-logo {
-  width: 128px;
-}
-
 .mk-header-links {
   grid-area: links;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -109,16 +234,17 @@ button:focus-visible {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
+  padding: 0 16px;
+  border-radius: var(--mk-radius-button);
   color: var(--ink);
-  font-size: 14px;
+  font-family: var(--mk-display);
+  font-size: 17px;
   font-weight: 500;
   transition: background-color 0.15s ease;
 }
 
 .mk-header-links a:hover {
-  background: #2823230f;
+  background: var(--pastel-soft);
 }
 
 .mk-header-actions {
@@ -126,7 +252,7 @@ button:focus-visible {
   justify-self: end;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .mk-icon-button,
@@ -140,7 +266,7 @@ button:focus-visible {
   min-height: 0;
   padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: 50%;
   background: transparent;
   box-shadow: none;
   color: var(--ink);
@@ -150,7 +276,7 @@ button:focus-visible {
 .mk-icon-button:hover,
 .mk-header [data-testid="nav-cart-link"]:hover,
 .joy-menu-trigger:hover {
-  background: #2823230f;
+  background: var(--pastel-soft);
   box-shadow: none;
   transform: none;
 }
@@ -158,8 +284,8 @@ button:focus-visible {
 .mk-icon-button svg,
 .mk-cart-label svg,
 .joy-menu-trigger svg {
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 21px;
 }
 
 .mk-cart-label {
@@ -175,9 +301,9 @@ button:focus-visible {
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  background: var(--yellow);
-  box-shadow: 0 0 0 2px var(--paper);
-  color: var(--ink);
+  background: var(--ink);
+  box-shadow: 0 0 0 2px var(--mk-card);
+  color: var(--mk-on-ink);
   font-size: 11px;
   font-weight: 700;
   line-height: 18px;
@@ -185,22 +311,19 @@ button:focus-visible {
 }
 
 .mk-header [data-testid="nav-cart-dropdown"] {
-  top: calc(100% + 14px);
+  top: calc(100% + 18px);
   overflow: hidden;
   border: 1px solid var(--mk-line);
-  border-radius: 12px;
-  background: var(--paper);
-  box-shadow: 0 16px 40px #2823231f;
+  border-radius: var(--mk-radius);
+  background: var(--mk-card);
+  box-shadow: var(--mk-shadow);
 }
 
 @media (max-width: 1023px) {
-  .mk-header {
-    height: 64px;
-  }
-
   .mk-header-row {
     grid-template-areas: "menu logo actions";
     gap: 8px;
+    padding: 0 10px;
   }
 
   .mk-header-menu {
@@ -217,31 +340,149 @@ button:focus-visible {
     display: none;
   }
 
-  .mk-header .mukky-header-logo {
-    width: 108px;
+}
+
+@media (max-width: 750px) {
+  :root {
+    --mk-header-height: 68px;
+    --mk-radius-card: 28px;
+    --mk-radius: 22px;
+  }
+
+  .mk-header {
+    padding-top: 10px;
+  }
+
+  .mk-header-row {
+    width: calc(100% - 24px);
+    height: 58px;
+    padding: 0 6px;
+  }
+}
+
+/* The logo: the mascot on a badge beside the shop's name. Every size inside it
+   is in em, so changing the font size scales the whole logo. */
+.mk-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36em;
+  color: var(--ink);
+  font-family: var(--mk-display);
+  font-size: 26px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mk-logo-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 0.46em;
+  background: var(--pastel-badge);
+  rotate: -6deg;
+}
+
+.mk-logo-mark img {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+}
+
+.mk-logo-word {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.14em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mk-logo-tag {
+  padding: 0.22em 0.44em;
+  border-radius: 0.5em;
+  background: var(--ink);
+  color: var(--mk-on-ink);
+  font-size: 0.42em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.mk-logo-lg {
+  font-size: 34px;
+}
+
+.mk-checkout-logo {
+  display: inline-flex;
+}
+
+/* Once the page has scrolled, the bar tightens up and casts a deeper shadow. */
+.mk-header-row {
+  transition: height 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mk-header-shell[data-scrolled] .mk-header-row {
+  height: 56px;
+  box-shadow: 0 12px 32px rgba(32, 28, 43, 0.14);
+}
+
+@media (max-width: 750px) {
+  .mk-header .mk-logo {
+    font-size: 21px;
+  }
+
+  .mk-header-shell[data-scrolled] .mk-header-row {
+    height: 52px;
   }
 }
 
 /* ---------- Buttons and links ---------- */
 
-.ink-button {
+.ink-button,
+.mk-ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 12px 24px;
+  min-height: 52px;
+  padding: 0 28px;
   border: 0;
-  border-radius: var(--mk-radius);
+  border-radius: var(--mk-radius-button);
+  box-shadow: var(--mk-shadow);
+  font-family: var(--mk-display);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.2s ease;
+}
+
+.ink-button {
   background: var(--ink);
-  box-shadow: none;
-  color: var(--paper);
-  font-size: 15px;
-  font-weight: 600;
-  transition: background-color 0.15s ease;
+  color: var(--mk-on-ink);
+}
+
+.mk-ghost-button {
+  background: var(--mk-card);
+  color: var(--ink);
 }
 
 .ink-button:hover {
   background: var(--mk-ink-hover);
-  box-shadow: none;
-  transform: none;
+  box-shadow: var(--mk-shadow);
+  transform: translateY(-2px);
+}
+
+.mk-ghost-button:hover {
+  background: var(--pastel-soft);
+  transform: translateY(-2px);
+}
+
+.ink-button:active,
+.mk-ghost-button:active,
+.mk-chip:active {
+  transform: scale(0.96);
 }
 
 .ink-button svg {
@@ -254,8 +495,10 @@ button:focus-visible {
 
 .mukky-ui-button {
   border: 1px solid transparent;
-  border-radius: var(--mk-radius);
+  border-radius: var(--mk-radius-button);
   box-shadow: none;
+  font-family: var(--mk-display);
+  font-weight: 500;
 }
 
 .mukky-ui-button.bg-black {
@@ -267,8 +510,8 @@ button:focus-visible {
 }
 
 .mukky-ui-button.bg-white {
-  border-color: var(--mk-line-strong);
-  background-color: transparent;
+  border-color: var(--mk-line-control);
+  background-color: var(--mk-card);
   color: var(--ink);
 }
 
@@ -276,10 +519,16 @@ button:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--ink);
+  font-family: var(--mk-display);
+  font-size: 18px;
+  font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.mk-arrow-link svg {
+  transition: transform 0.2s ease;
 }
 
 .mk-arrow-link:hover {
@@ -287,142 +536,1079 @@ button:focus-visible {
   text-underline-offset: 5px;
 }
 
+.mk-arrow-link:hover svg {
+  transform: translateX(3px);
+}
+
 /* ---------- Home ---------- */
 
+/* The hero: a full-width sheet of colour with round bottom corners. */
 .mk-hero {
-  grid-template-columns: 1.1fr 1fr;
-  gap: 64px;
-  max-width: 1240px;
-  padding-top: 72px;
-  padding-bottom: 88px;
+  position: relative;
+  overflow: hidden; /* a thrown card must not widen the page */
+  border-radius: 0 0 56px 56px;
+  background: var(--pastel-1);
 }
 
-.joy-editorial-copy h2 {
-  margin: 14px 0 18px;
-  font-size: clamp(30px, 3.2vw, 44px);
-  line-height: 1.1;
+/* It slides up behind the floating header, so its colour shows around the bar. */
+.mk-header-shell ~ .mk-page .mk-hero {
+  margin-top: calc(-1 * var(--mk-header-height));
+  padding-top: var(--mk-header-height);
 }
 
-.joy-editorial-copy > p:not(.ink-kicker) {
-  color: var(--mk-muted);
+/* Unless the orange cart notice sits between them: that must stay readable. */
+.bg-orange-300 ~ .mk-page .mk-hero {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.mk-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 72px);
+  padding-top: clamp(36px, 5.5vw, 80px);
+  padding-bottom: clamp(56px, 7vw, 104px);
+}
+
+.mk-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.mk-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 18px 9px 14px;
+  border-radius: var(--mk-radius-tag);
+  background: var(--mk-card);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.mk-hero-kicker::before {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.mk-hero-title {
+  margin: 22px 0;
+  font-size: clamp(44px, 6.1vw, 92px);
+  line-height: 1.02;
+}
+
+/* Each word is its own box so it can arrive on its own beat. */
+.mk-word {
+  display: inline-block;
+}
+
+.mk-underlined {
+  position: relative;
+  white-space: nowrap;
+}
+
+.mk-underlined svg {
+  position: absolute;
+  right: -2%;
+  bottom: -0.14em;
+  left: -2%;
+  width: 104%;
+  height: 0.22em;
+  overflow: visible;
+}
+
+.mk-underlined path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-width: 0.085em;
+  vector-effect: non-scaling-stroke;
+}
+
+.mk-hero-lede {
+  max-width: 28em;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.5;
+}
+
+.mk-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.mk-hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mk-display);
   font-size: 16px;
-  line-height: 1.7;
+  font-weight: 500;
 }
 
-.ink-products {
-  padding-top: 24px;
-  padding-bottom: 104px;
+.mk-hero-facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.ink-section-head {
-  margin-bottom: 32px;
+.mk-hero-facts svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
 }
 
-.ink-section-head h2 {
-  font-size: clamp(26px, 2.6vw, 34px);
+/* The stage: a stack of product cards with stickers around it. */
+.mk-hero-stage {
+  position: relative;
+  min-width: 0;
+  padding: 12px 0;
+}
+
+.mk-deck {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 430px);
+  margin: 0 auto;
+}
+
+/* The stack leans towards the pointer (see hero-deck/index.tsx). */
+.mk-deck-cards {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.18;
+  transform: perspective(1100px) rotateX(var(--lean-x, 0deg)) rotateY(var(--lean-y, 0deg));
+  transition: transform 0.3s ease-out;
+}
+
+.mk-deck-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 14px 18px;
+  border-radius: 36px;
+  background: var(--mk-card);
+  box-shadow: 0 18px 40px rgba(32, 28, 43, 0.16);
+  color: var(--ink);
+  pointer-events: none; /* only the top card can be pressed */
+  touch-action: pan-y; /* sideways drags belong to the card, scrolling stays vertical */
+  -webkit-user-select: none;
+  user-select: none;
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease;
+}
+
+/* The top card follows a drag: --drag is the distance in pixels, as a plain number. */
+.mk-deck-card[data-pos="0"] {
+  z-index: 4;
+  cursor: grab;
+  pointer-events: auto;
+  transform: translateX(calc(var(--drag, 0) * 1px)) rotate(calc(-3deg + var(--drag, 0) * 0.05deg));
+}
+
+.mk-deck-card[data-pos="1"] {
+  z-index: 3;
+  transform: translate(7%, 2.5%) rotate(5deg) scale(0.96);
+}
+
+.mk-deck-card[data-pos="2"],
+.mk-deck-card[data-pos="3"] {
+  z-index: 2;
+  transform: translate(-7%, 4.5%) rotate(-9deg) scale(0.92);
+}
+
+.mk-deck-card[data-pos="3"] {
+  z-index: 1;
+  opacity: 0;
+}
+
+.mk-deck-card[data-dragging] {
+  cursor: grabbing;
+  transition: none;
+}
+
+.mk-deck-photo {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--mk-surface);
+}
+
+.mk-deck-photo img {
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.mk-deck-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 8px;
+  font-family: var(--mk-display);
+  transition: opacity 0.25s ease;
+}
+
+/* Only the top card shows its name and price, so nothing peeks out twice. */
+.mk-deck-card:not([data-pos="0"]) .mk-deck-caption {
+  opacity: 0;
+}
+
+.mk-deck-title {
+  font-size: clamp(18px, 1.7vw, 22px);
+  font-weight: 600;
   line-height: 1.15;
 }
 
-.ink-section-head h2 + p {
-  margin-top: 6px;
-  color: var(--mk-muted);
-  font-size: 15px;
+.mk-deck-price {
+  flex: none;
+  font-size: 17px;
+  font-weight: 500;
 }
 
-.joy-product-grid {
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 40px 24px;
+.mk-deck-shuffle {
+  position: relative;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  margin-top: 30px;
+  padding: 0 20px 0 16px;
+  border: 0;
+  border-radius: var(--mk-radius-button);
+  background: var(--mk-card);
+  box-shadow: var(--mk-shadow);
+  color: var(--ink);
+  font-family: var(--mk-display);
+  font-size: 17px;
+  font-weight: 500;
+  transition: transform 0.2s ease;
+}
+
+.mk-deck-shuffle svg {
+  transition: rotate 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.mk-deck-shuffle:hover {
+  transform: translateY(-2px);
+}
+
+.mk-deck-shuffle:hover svg {
+  rotate: 180deg;
+}
+
+.mk-deck-shuffle:active {
+  transform: scale(0.96);
+}
+
+.mk-sticker {
+  position: absolute;
+  pointer-events: none;
+}
+
+.mk-sticker-sparkle {
+  top: -2%;
+  left: 1%;
+  width: 60px;
+  rotate: -10deg;
+  --pop-delay: 0.85s;
+  --bob-time: 4.4s;
+}
+
+.mk-sticker-cube {
+  top: -3%;
+  right: -5%;
+  width: 68px;
+  rotate: 12deg;
+  --pop-delay: 0.95s;
+  --bob-time: 5.2s;
+}
+
+.mk-sticker-squiggle {
+  bottom: 21%;
+  left: -8%;
+  width: 104px;
+  rotate: -8deg;
+  --pop-delay: 1.05s;
+  --bob-time: 4.8s;
+}
+
+.mk-sticker-smile {
+  right: -6%;
+  bottom: 30%;
+  z-index: 6;
+  width: 62px;
+  rotate: 8deg;
+  --pop-delay: 1.15s;
+  --bob-time: 5.6s;
+}
+
+.mk-spin-badge {
+  position: absolute;
+  top: 44%;
+  left: -6%;
+  z-index: 6;
+  width: 108px;
+  pointer-events: none;
+}
+
+.mk-spin-badge text {
+  font-family: var(--mk-display);
+}
+
+/* A slanted band of big words between the hero and the products. */
+.mk-marquee {
+  overflow: hidden;
+  padding: 40px 0 16px;
+}
+
+.mk-marquee-band {
+  width: 104vw;
+  margin-left: -2vw;
+  padding: 16px 0;
+  background: var(--ink);
+  color: var(--mk-on-ink);
+  rotate: -1.6deg;
+}
+
+.mk-marquee-track {
+  display: flex;
+  width: max-content;
+}
+
+.mk-marquee-run {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 40px;
+  margin: 0;
+  padding: 0 20px;
+  list-style: none;
+}
+
+.mk-marquee-run li {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  font-family: var(--mk-display);
+  font-size: clamp(28px, 4.2vw, 56px);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mk-marquee-run li:nth-child(5n + 1) span {
+  color: var(--pastel-1);
+}
+
+.mk-marquee-run li:nth-child(5n + 2) span {
+  color: var(--pastel-3);
+}
+
+.mk-marquee-run li:nth-child(5n + 3) span {
+  color: var(--pastel-5);
+}
+
+.mk-marquee-run li:nth-child(5n + 4) span {
+  color: var(--pastel-2);
+}
+
+.mk-marquee-run li:nth-child(5n + 5) span {
+  color: var(--pastel-4);
+}
+
+/* On the dark band the stickers' outlines turn white. */
+.mk-marquee-sticker {
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
+  --ink: var(--mk-on-ink);
+}
+
+.ink-products {
+  padding-top: 72px;
+  padding-bottom: 0;
+}
+
+.ink-section-head {
+  margin-bottom: 36px;
+}
+
+.ink-section-head h2 {
+  font-size: clamp(34px, 4.6vw, 64px);
+  line-height: 1.04;
+}
+
+.ink-section-head h2 + p {
+  margin-top: 12px;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+/* Colour tiles: three to a row. The widths come from the tile's own class
+   (see tileWidths in shop-showcase.tsx), so no row is left with a hole. */
+.mk-tiles {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.mk-tile-slot {
+  display: flex;
+  grid-column: span 2;
+  min-width: 0;
+}
+
+.mk-tile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 22px;
+  border-radius: var(--mk-radius-card);
+  background: var(--pastel-2);
+  color: var(--ink);
+  transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.mk-tile-slot:nth-child(5n + 2) .mk-tile {
+  background: var(--pastel-3);
+}
+
+.mk-tile-slot:nth-child(5n + 3) .mk-tile {
+  background: var(--pastel-4);
+}
+
+.mk-tile-slot:nth-child(5n + 4) .mk-tile {
+  background: var(--pastel-5);
+}
+
+.mk-tile-slot:nth-child(5n + 5) .mk-tile {
+  background: var(--pastel-1);
+}
+
+.mk-tile:hover {
+  box-shadow: var(--mk-shadow);
+  transform: translateY(-6px) rotate(-0.6deg);
+}
+
+.mk-tile-slot:nth-child(even) .mk-tile:hover {
+  transform: translateY(-6px) rotate(0.6deg);
+}
+
+.mk-tile-copy {
+  padding: 8px 8px 0;
+}
+
+.mk-tile-copy h3 {
+  font-family: var(--mk-display);
+  font-size: clamp(21px, 1.9vw, 26px);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.mk-tile-copy p {
+  margin-top: 6px;
+  font-family: var(--mk-display);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.mk-tile-photo {
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  background: #ffffff66;
+}
+
+.mk-tile-photo img {
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.mk-tile:hover .mk-tile-photo img {
+  transform: scale(1.05);
+}
+
+/* A round arrow button, shown only on the wide tiles, where there is room for it. */
+.mk-tile-go {
+  display: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--mk-card);
+  transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.mk-tile-go svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (min-width: 751px) {
+  .mk-tile-slot-half {
+    grid-column: span 3;
+  }
+
+  .mk-tile-slot-full {
+    grid-column: span 6;
+  }
+}
+
+/* Wide tiles put the name beside the photo, so the square photo is never cropped.
+   A tile that fills the row has room for that from tablet width up; a half-row
+   tile needs a laptop-width screen, and keeps the photo underneath until then. */
+@media (min-width: 751px) {
+  .mk-tile-slot-full .mk-tile {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  .mk-tile-slot-full .mk-tile-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 8px;
+  }
+
+  .mk-tile-slot-full .mk-tile-copy h3 {
+    font-size: clamp(24px, 2.5vw, 34px);
+  }
+
+  .mk-tile-slot-full .mk-tile-go {
+    display: grid;
+    margin-top: auto;
+  }
+
+  .mk-tile-slot-full .mk-tile-photo {
+    flex: 0 0 34%;
+    align-self: flex-start;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1000px) {
+  .mk-tile-slot-half .mk-tile {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  .mk-tile-slot-half .mk-tile-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 8px;
+  }
+
+  .mk-tile-slot-half .mk-tile-copy h3 {
+    font-size: clamp(24px, 2.5vw, 34px);
+  }
+
+  .mk-tile-slot-half .mk-tile-go {
+    display: grid;
+    margin-top: auto;
+  }
+
+  .mk-tile-slot-half .mk-tile-photo {
+    flex: 0 0 52%;
+    align-self: flex-start;
+    margin-top: 0;
+  }
+}
+
+.mk-tile:hover .mk-tile-go {
+  background: var(--ink);
+  color: var(--mk-on-ink);
+  transform: translateX(6px);
+}
+
+/* How they're made: the printer on one side, three steps on the other. */
+.mk-made {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 80px);
+  padding-top: 112px;
+}
+
+.mk-made-scene {
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 4vw, 48px);
+  border-radius: var(--mk-radius-card);
+  background: var(--pastel-5);
+}
+
+.mk-printer {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  overflow: visible;
+}
+
+.mk-printer-reel {
+  transform-origin: 398px 78px;
+}
+
+.mk-printer-print {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.mk-printer-sparkles path {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mk-made-copy h2 {
+  margin-bottom: 28px;
+  font-family: var(--mk-display);
+  font-size: clamp(32px, 4.2vw, 58px);
+  font-weight: 600;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.mk-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mk-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 20px 22px;
+  border-radius: var(--mk-radius);
+  background: var(--mk-card);
+}
+
+.mk-step-number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--pastel-2);
+  font-family: var(--mk-display);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.mk-steps li:nth-child(3n + 2) .mk-step-number {
+  background: var(--pastel-3);
+}
+
+.mk-steps li:nth-child(3n + 3) .mk-step-number {
+  background: var(--pastel-1);
+}
+
+.mk-step h3 {
+  font-family: var(--mk-display);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mk-step p {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.mk-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 112px;
+  padding-bottom: 96px;
+}
+
+.mk-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 26px;
+  border-radius: var(--mk-radius);
+  background: var(--mk-card);
+}
+
+.mk-value-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  background: var(--pastel-5);
+  transition: rotate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mk-value:hover .mk-value-icon {
+  rotate: -8deg;
+  scale: 1.1;
+}
+
+.mk-value:nth-child(4n + 2) .mk-value-icon {
+  background: var(--pastel-2);
+}
+
+.mk-value:nth-child(4n + 3) .mk-value-icon {
+  background: var(--pastel-4);
+}
+
+.mk-value:nth-child(4n + 4) .mk-value-icon {
+  background: var(--pastel-3);
+}
+
+.mk-value-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mk-value h3 {
+  font-family: var(--mk-display);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mk-value p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.mk-help-wrap {
+  padding-bottom: 96px;
+}
+
+.mk-help {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 48px;
+  padding: clamp(28px, 5vw, 72px);
+  border-radius: var(--mk-radius-card);
+  background: var(--pastel-4);
+}
+
+.mk-help h2 {
+  margin-bottom: 12px;
+  font-size: clamp(34px, 4.6vw, 64px);
+  line-height: 1.04;
+}
+
+.mk-help p {
+  max-width: 34em;
+  font-size: 18px;
+  line-height: 1.5;
 }
 
 .ink-coming {
-  border: 1px solid var(--mk-line);
-  border-radius: var(--mk-radius);
-  background: var(--mk-surface);
+  border: 0;
+  border-radius: var(--mk-radius-card);
+  background: var(--mk-card);
+}
+
+@media (max-width: 1023px) {
+  .mk-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Below laptop width the hero and the "how they're made" section stack. */
+@media (max-width: 900px) {
+  .mk-hero-inner,
+  .mk-made {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mk-hero-inner {
+    gap: 40px;
+  }
+
+  .mk-deck {
+    width: min(86%, 380px);
+  }
+
+  .mk-sticker-squiggle {
+    left: -2%;
+  }
+
+  .mk-spin-badge {
+    left: 0;
+    width: 92px;
+  }
+
+  .mk-made {
+    padding-top: 80px;
+  }
 }
 
 @media (max-width: 750px) {
   .mk-hero {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding-top: 24px;
-    padding-bottom: 56px;
+    border-radius: 0 0 36px 36px;
+  }
+
+  .mk-hero-title {
+    margin: 18px 0;
+  }
+
+  .mk-hero-actions {
+    margin-top: 24px;
+  }
+
+  .mk-hero-facts {
+    margin-top: 22px;
+    font-size: 15px;
+  }
+
+  .mk-deck-card {
+    gap: 10px;
+    padding: 10px 10px 14px;
+    border-radius: 28px;
+  }
+
+  .mk-deck-photo {
+    border-radius: 20px;
+  }
+
+  .mk-sticker-sparkle {
+    width: 44px;
+  }
+
+  .mk-sticker-cube {
+    width: 48px;
+  }
+
+  .mk-sticker-squiggle {
+    width: 76px;
+  }
+
+  .mk-sticker-smile {
+    width: 46px;
+  }
+
+  .mk-spin-badge {
+    width: 78px;
+  }
+
+  .mk-marquee {
+    padding: 28px 0 8px;
+  }
+
+  .mk-marquee-band {
+    padding: 12px 0;
+  }
+
+  .mk-marquee-run,
+  .mk-marquee-run li {
+    gap: 24px;
+  }
+
+  .mk-marquee-run {
+    padding: 0 12px;
   }
 
   .ink-products {
-    padding-top: 8px;
+    padding-top: 56px;
+  }
+
+  .ink-section-head {
+    margin-bottom: 24px;
+  }
+
+  .mk-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .mk-tile-slot {
+    grid-column: span 1;
+  }
+
+  /* An odd one out takes the full row instead of leaving a hole. */
+  .mk-tile-slot:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+
+  .mk-tile {
+    gap: 14px;
+    padding: 12px;
+    border-radius: 26px;
+  }
+
+  .mk-tile-slot:last-child:nth-child(odd) .mk-tile {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .mk-tile-slot:last-child:nth-child(odd) .mk-tile .mk-tile-photo {
+    flex: 0 0 48%;
+    margin-top: 0;
+  }
+
+  .mk-tile-copy {
+    padding: 6px 6px 0;
+  }
+
+  .mk-tile-copy h3 {
+    font-size: 18px;
+  }
+
+  .mk-tile-copy p {
+    margin-top: 4px;
+    font-size: 16px;
+  }
+
+  .mk-tile-photo {
+    border-radius: 15px;
+  }
+
+  .mk-made {
+    padding-top: 64px;
+  }
+
+  .mk-step {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .mk-values {
+    gap: 12px;
+    padding-top: 64px;
     padding-bottom: 64px;
   }
 
-  .joy-product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 28px 12px;
+  .mk-value {
+    padding: 18px;
+  }
+
+  .mk-value h3 {
+    font-size: 18px;
+  }
+
+  .mk-value p {
+    font-size: 15px;
+  }
+
+  .mk-help-wrap {
+    padding-bottom: 64px;
   }
 }
 
-/* ---------- Product cards: the photo is the frame ---------- */
+/* ---------- Product cards: a white card around the photo ---------- */
+
+.joy-product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+}
 
 .mukky-product-card,
 .mukky-product-card:nth-child(2n),
 .mukky-product-card:nth-child(3n),
 .ink-product-reveal:nth-child(2n) .mukky-product-card,
 .ink-product-reveal:nth-child(3n) .mukky-product-card {
-  background: transparent;
+  background: var(--mk-card);
+}
+
+/* Cards in one row share a height, however long their names are. */
+.joy-product-grid > li,
+.mukky-store [data-testid="products-list"] > li {
+  display: flex;
+  min-width: 0;
 }
 
 .mukky-product-card {
-  padding: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 12px 12px 20px;
   border: 0;
-  border-radius: 0;
+  border-radius: var(--mk-radius);
   box-shadow: none;
-  transition: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .mukky-product-card:hover {
-  box-shadow: none;
-  transform: none;
+  box-shadow: var(--mk-shadow);
+  transform: translateY(-4px);
 }
 
 .mukky-card-photo {
   padding: 0;
-  border-radius: var(--mk-radius);
+  border-radius: 18px;
   background: var(--mk-surface);
   box-shadow: none !important;
 }
 
 .mukky-card-photo img {
-  transition: transform 0.35s ease;
+  transition: transform 0.4s ease;
 }
 
 .mukky-product-card:hover .mukky-card-photo img {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
 .mukky-card-details {
   gap: 2px;
-  padding-top: 12px;
+  padding: 14px 8px 0;
 }
 
+/* Never cut short: the colour name under the title is what tells two cards apart. */
 .mukky-product-card [data-testid="product-title"] {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
   color: var(--ink);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.mukky-product-card:hover [data-testid="product-title"] {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  font-family: var(--mk-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
 }
 
 .mukky-product-card [data-testid="variant-title"] {
   margin-top: 2px;
   color: var(--mk-muted);
-  font-size: 13px;
+  font-family: var(--mk-font);
+  font-size: 14px;
   font-weight: 400;
+  letter-spacing: 0;
 }
 
 .mukky-card-price {
@@ -431,81 +1617,114 @@ button:focus-visible {
 
 .mukky-card-price .mukky-card-amount {
   color: var(--ink);
-  font-size: 15px;
-  font-weight: 600;
+  font-family: var(--mk-display);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+@media (max-width: 750px) {
+  .joy-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .mukky-product-card {
+    padding: 8px 8px 14px;
+  }
+
+  .mukky-card-photo {
+    border-radius: 15px;
+  }
+
+  .mukky-card-details {
+    padding: 10px 6px 0;
+  }
+
+  .mukky-product-card [data-testid="product-title"] {
+    font-size: 16px;
+  }
+
+  .mukky-card-price .mukky-card-amount {
+    font-size: 15px;
+  }
 }
 
 /* ---------- Shop ---------- */
 
 .mukky-store {
-  padding-top: 48px;
+  padding-top: 20px;
   padding-bottom: 104px;
 }
 
+/* The heading sits on its own sheet of colour, like the top of the home page. */
 .mukky-store-heading {
   display: block;
   margin-bottom: 32px;
-  padding-bottom: 0;
+  padding: clamp(24px, 4.5vw, 56px);
   border-bottom: 0;
+  border-radius: var(--mk-radius-card);
+  background: var(--pastel-4);
 }
 
 .mukky-store-heading .mukky-eyebrow {
   max-width: none;
   margin: 0 0 10px;
   padding-bottom: 0;
-  font-size: 12px;
+  color: var(--ink);
+  font-size: 14px;
 }
 
 .mukky-store-heading h1 {
-  margin-bottom: 8px;
-  font-size: clamp(30px, 3.4vw, 40px);
-  line-height: 1.1;
+  margin-bottom: 12px;
+  font-size: clamp(40px, 6vw, 84px);
+  line-height: 1.03;
 }
 
 .mukky-store-heading > p:last-child {
   max-width: none;
-  color: var(--mk-muted);
-  font: 400 15px/1.6 var(--mukky-body);
+  color: var(--ink);
+  font: 400 18px/1.5 var(--mk-font);
   letter-spacing: 0;
 }
 
 .joy-store-layout {
-  grid-template-columns: 232px minmax(0, 1fr);
-  gap: 48px;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 32px;
 }
 
 .joy-store-filters {
   position: sticky;
   top: calc(var(--mk-header-height) + 24px);
   gap: 20px;
-  padding: 0;
+  padding: 24px;
   border: 0;
-  border-radius: 0;
-  background: transparent;
+  border-radius: var(--mk-radius);
+  background: var(--mk-card);
 }
 
 .joy-store-filters > h2 {
-  color: var(--mk-muted);
-  font: 600 12px/1.2 var(--mukky-body);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 600 21px/1.2 var(--mk-display);
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .joy-sort-label select {
-  min-height: 44px;
+  min-height: 46px;
   padding: 0 12px;
   border: 1px solid var(--mk-line-strong);
-  border-radius: var(--mk-radius);
-  background: transparent;
-  font-size: 14px;
+  border-radius: var(--mk-radius-field);
+  background: var(--mk-card);
+  font-size: 15px;
 }
 
 .joy-store-search {
-  min-height: 48px;
+  min-height: 54px;
   margin-bottom: 16px;
+  padding: 0 20px;
   border: 1px solid var(--mk-line-strong);
-  border-radius: var(--mk-radius);
-  background: transparent;
+  border-radius: var(--mk-radius-button);
+  background: var(--mk-card);
 }
 
 .joy-store-search:focus-within {
@@ -514,13 +1733,14 @@ button:focus-visible {
 }
 
 .joy-store-empty {
-  border: 1px solid var(--mk-line);
-  border-radius: var(--mk-radius);
-  background: var(--mk-surface);
+  border: 0;
+  border-radius: var(--mk-radius-card);
+  background: var(--mk-card);
 }
 
 .mukky-store [data-testid="products-list"] {
-  row-gap: 40px;
+  column-gap: 20px;
+  row-gap: 20px;
 }
 
 /* Colour chips, and the swatch dot they share with the product page's options. */
@@ -536,13 +1756,14 @@ button:focus-visible {
   flex: none;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--mk-line-strong);
-  border-radius: 999px;
-  background: transparent;
+  min-height: 42px;
+  padding: 0 18px 0 14px;
+  border: 1px solid var(--mk-line-control);
+  border-radius: var(--mk-radius-tag);
+  background: var(--mk-card);
   color: var(--ink);
-  font-size: 14px;
+  font-family: var(--mk-display);
+  font-size: 16px;
   font-weight: 500;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -554,7 +1775,7 @@ button:focus-visible {
 .mk-chip[aria-pressed="true"] {
   border-color: var(--ink);
   background: var(--ink);
-  color: var(--paper);
+  color: var(--mk-on-ink);
 }
 
 .mk-swatch {
@@ -562,17 +1783,21 @@ button:focus-visible {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 1px #28232333;
+  box-shadow: inset 0 0 0 1px #00000026;
 }
 
 .mk-chip[aria-pressed="true"] .mk-swatch {
-  box-shadow: 0 0 0 1.5px var(--paper);
+  box-shadow: 0 0 0 1.5px var(--mk-on-ink);
 }
 
 @media (max-width: 1000px) {
   .joy-store-layout {
-    grid-template-columns: 200px minmax(0, 1fr);
-    gap: 28px;
+    grid-template-columns: 216px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .joy-store-filters {
+    padding: 18px;
   }
 }
 
@@ -582,25 +1807,35 @@ button:focus-visible {
     padding-bottom: 64px;
   }
 
+  .mukky-store-heading {
+    margin-bottom: 24px;
+  }
+
   .joy-store-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
 
+  /* On a phone the filters are a button and a panel, so the card frame goes. */
   .joy-store-filters {
     position: static;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
   }
 
-  /* The "Filters & sort" pill and the panel it opens. */
   .joy-store-filters > button[aria-controls] {
-    border: 1px solid var(--mk-line-strong);
-    background: transparent;
+    border: 1px solid var(--mk-line-control);
+    border-radius: var(--mk-radius-button);
+    background: var(--mk-card);
+    font-family: var(--mk-display);
+    font-weight: 500;
   }
 
   .joy-store-filters > div[data-open] {
     border-color: var(--mk-line);
     border-radius: var(--mk-radius);
-    background: var(--paper);
+    background: var(--mk-card);
   }
 
   /* One swipeable row instead of three wrapped ones. */
@@ -623,7 +1858,7 @@ button:focus-visible {
 
   .mukky-store [data-testid="products-list"] {
     column-gap: 12px;
-    row-gap: 28px;
+    row-gap: 12px;
   }
 }
 
@@ -631,10 +1866,10 @@ button:focus-visible {
 
 .mk-product {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   align-items: start;
-  gap: 64px;
-  padding-top: 40px;
+  gap: 56px;
+  padding-top: 32px;
   padding-bottom: 40px;
 }
 
@@ -647,7 +1882,7 @@ button:focus-visible {
 .mk-product-summary {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   min-width: 0;
   max-width: 520px;
 }
@@ -659,32 +1894,39 @@ button:focus-visible {
 }
 
 .mk-product-title {
-  font-size: clamp(28px, 3vw, 38px);
-  line-height: 1.12;
+  font-size: clamp(34px, 4.2vw, 58px);
+  line-height: 1.04;
 }
 
+/* Price, choices and the add-to-cart button share one white card. */
 .mk-product-purchase {
-  padding: 0;
+  padding: 26px;
+  border-radius: var(--mk-radius);
+  background: var(--mk-card);
 }
 
 .mk-product-purchase form {
-  gap: 16px;
+  gap: 18px;
 }
 
 .mk-product-purchase .text-xl-semi {
-  font-size: 28px;
+  font-family: var(--mk-display);
+  font-size: 34px;
   font-weight: 600;
-  line-height: 1.2;
+  letter-spacing: 0;
+  line-height: 1.15;
 }
 
 .mk-product-purchase .mukky-ui-button {
-  font-size: 15px;
-  font-weight: 600;
+  height: 54px;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .mk-option-legend {
   margin-bottom: 10px;
-  font-size: 14px;
+  font-family: var(--mk-display);
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -709,16 +1951,17 @@ button:focus-visible {
   gap: 8px;
   min-height: 44px;
   padding: 0 16px 0 12px;
-  border: 1px solid var(--mk-line-strong);
-  border-radius: 999px;
-  background: transparent;
+  border: 1px solid var(--mk-line-control);
+  border-radius: var(--mk-radius-tag);
+  background: var(--mk-card);
   color: var(--ink);
-  font-size: 14px;
+  font-family: var(--mk-display);
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
   cursor: pointer;
   transform: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .mk-option-list label.mk-option:hover {
@@ -727,6 +1970,7 @@ button:focus-visible {
 
 .mk-option-list label.mk-option-selected {
   border-color: var(--ink);
+  background: var(--pastel-soft);
   box-shadow: inset 0 0 0 1px var(--ink);
 }
 
@@ -737,20 +1981,21 @@ button:focus-visible {
 }
 
 .mk-product-description [data-testid="product-description"] {
-  color: var(--mk-muted);
-  font-size: 15px;
-  line-height: 1.7;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.65;
 }
 
 .mk-product-description [aria-label="Gradient colour guide"] {
   margin-top: 0;
-  border-color: var(--mk-line);
+  padding: 24px;
+  border: 0;
   border-radius: var(--mk-radius);
-  background: var(--mk-surface);
+  background: var(--pastel-soft);
 }
 
 .mk-related {
-  margin-top: 72px;
+  margin-top: 88px;
   margin-bottom: 104px;
 }
 
@@ -764,8 +2009,8 @@ button:focus-visible {
 .mk-gallery-stage {
   position: relative;
   overflow: hidden;
-  border-radius: var(--mk-radius);
-  background: var(--mk-surface);
+  border-radius: var(--mk-radius-card);
+  background: var(--mk-card);
 }
 
 .mk-gallery-track {
@@ -788,12 +2033,12 @@ button:focus-visible {
   top: 50%;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border: 0;
   border-radius: 50%;
-  background: var(--paper);
-  box-shadow: 0 1px 4px #28232333;
+  background: var(--mk-card);
+  box-shadow: var(--mk-shadow);
   color: var(--ink);
   opacity: 0;
   transform: translateY(-50%);
@@ -806,11 +2051,11 @@ button:focus-visible {
 }
 
 .mk-gallery-arrow-previous {
-  left: 12px;
+  left: 16px;
 }
 
 .mk-gallery-arrow-next {
-  right: 12px;
+  right: 16px;
 }
 
 .mk-gallery-stage:hover .mk-gallery-arrow,
@@ -825,15 +2070,16 @@ button:focus-visible {
 
 .mk-gallery-count {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #fffdf5e6;
+  right: 18px;
+  bottom: 18px;
+  padding: 5px 12px;
+  border-radius: var(--mk-radius-tag);
+  background: #fffffff0;
   color: var(--ink);
-  font-size: 12px;
+  font-family: var(--mk-display);
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .mk-gallery-thumbs {
@@ -850,9 +2096,9 @@ button:focus-visible {
   padding: 0;
   overflow: hidden;
   border: 0;
-  border-radius: 6px;
-  background: var(--mk-surface);
-  opacity: 0.6;
+  border-radius: var(--mk-radius-image);
+  background: var(--mk-card);
+  opacity: 0.65;
   transition: opacity 0.15s ease;
 }
 
@@ -880,7 +2126,11 @@ button:focus-visible {
 
   .mk-product-summary {
     max-width: none;
-    gap: 24px;
+    gap: 20px;
+  }
+
+  .mk-product-purchase {
+    padding: 20px;
   }
 
   .mk-gallery-thumbs {
@@ -898,45 +2148,69 @@ button:focus-visible {
   .mk-gallery-thumb {
     width: 64px;
     height: 64px;
+    border-radius: 12px;
   }
 
   .mk-related {
-    margin-top: 40px;
+    margin-top: 48px;
     margin-bottom: 56px;
   }
 }
 
-/* ---------- Footer ---------- */
+/* ---------- Footer: a dark card with the shop's name written huge ---------- */
 
 .mk-footer {
-  padding-top: 64px;
-  border-top: 1px solid var(--mk-line);
-  background: var(--paper);
+  padding: 0 0 28px;
+  border-top: 0;
+  background: transparent;
+}
+
+.mk-footer > .content-container {
+  width: calc(100% - 96px);
+  max-width: 1200px;
+  padding: 56px 56px 0;
+  overflow: hidden;
+  border-radius: var(--mk-radius-card);
+  background: var(--ink);
+  color: var(--mk-on-ink);
+}
+
+.mk-footer a:focus-visible {
+  outline-color: var(--pastel-1);
 }
 
 .mk-footer-top {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr;
   gap: 48px;
-  padding-bottom: 56px;
+  padding-bottom: 40px;
 }
 
-.mk-footer .joy-footer-logo {
-  max-width: 150px;
-  margin: 0 0 18px;
+.mk-footer-logo {
+  display: inline-flex;
+  margin-bottom: 18px;
+}
+
+.mk-footer .mk-logo {
+  color: var(--mk-on-ink);
+}
+
+.mk-footer .mk-logo-tag {
+  background: var(--pastel-1);
+  color: var(--ink);
 }
 
 .mk-footer-brand p {
   max-width: 320px;
-  color: var(--mk-muted);
-  font-size: 14px;
-  line-height: 1.7;
+  color: #ffffffcc;
+  font-size: 16px;
+  line-height: 1.55;
 }
 
 .mk-footer .mukky-footer-est {
   margin-top: 14px;
-  color: var(--mk-muted);
-  font-size: 12px;
+  color: #ffffff99;
+  font-size: 13px;
 }
 
 .mk-footer-column {
@@ -947,40 +2221,96 @@ button:focus-visible {
 
 .mk-footer-column h2 {
   margin-bottom: 12px;
-  color: var(--mk-muted);
-  font: 600 12px/1.2 var(--mukky-body);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--pastel-1);
+  font: 600 19px/1.2 var(--mk-display);
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .mk-footer-column a {
   display: inline-flex;
   align-items: center;
   min-height: 36px;
-  color: var(--ink);
-  font-size: 14px;
+  color: var(--mk-on-ink);
+  font-size: 16px;
+  transition: color 0.15s ease, translate 0.2s ease;
 }
 
 .mk-footer-column a:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  color: var(--pastel-1);
+  translate: 4px 0;
+}
+
+/* The name, as wide as the card, each letter in its own colour. */
+.mk-footer-word {
+  display: flex;
+  justify-content: center;
+  margin: -0.1em 0 0.06em;
+  font-family: var(--mk-display);
+  font-size: clamp(64px, 20vw, 256px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mk-footer-word span {
+  display: inline-block;
+  color: var(--pastel-1);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mk-footer-word span:nth-child(5n + 2) {
+  color: var(--pastel-3);
+}
+
+.mk-footer-word span:nth-child(5n + 3) {
+  color: var(--pastel-5);
+}
+
+.mk-footer-word span:nth-child(5n + 4) {
+  color: var(--pastel-2);
+}
+
+.mk-footer-word span:nth-child(5n + 5) {
+  color: var(--pastel-4);
+}
+
+.mk-footer-word span:hover {
+  transform: translateY(-7%) rotate(-5deg);
+}
+
+.mk-footer-word span:nth-child(even):hover {
+  transform: translateY(-7%) rotate(5deg);
 }
 
 .mk-footer .mukky-footer-bottom {
-  border-top: 1px solid var(--mk-line);
-  color: var(--mk-muted);
-  font-size: 12px;
+  border-top: 1px solid #ffffff26;
+  color: #ffffffb3;
+  font-size: 13px;
+}
+
+.mk-footer .mukky-footer-bottom a:hover {
+  color: var(--mk-on-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 @media (max-width: 750px) {
   .mk-footer {
-    padding-top: 40px;
+    padding-bottom: 12px;
+  }
+
+  .mk-footer > .content-container {
+    width: calc(100% - 24px);
+    padding: 32px 22px 0;
   }
 
   .mk-footer-top {
     grid-template-columns: 1fr 1fr;
-    gap: 32px 24px;
-    padding-bottom: 40px;
+    gap: 28px 24px;
+    padding-bottom: 28px;
   }
 
   .mk-footer-brand {
@@ -996,14 +2326,23 @@ button:focus-visible {
 
 .joy-menu-panel {
   border-right: 0;
-  box-shadow: 0 0 60px #0000001f;
+  border-radius: 0 var(--mk-radius-card) var(--mk-radius-card) 0;
+  background: var(--mk-card);
+  box-shadow: var(--mk-shadow);
+}
+
+/* On a phone the drawer covers the whole screen, so round corners would show gaps. */
+@media (max-width: 450px) {
+  .joy-menu-panel {
+    border-radius: 0;
+  }
 }
 
 .joy-menu-close {
   display: grid;
   place-items: center;
   border: 0;
-  background: #2823230f;
+  background: var(--pastel-soft);
 }
 
 .joy-menu-close svg {
@@ -1012,13 +2351,13 @@ button:focus-visible {
 }
 
 .joy-menu-links a {
-  font: 500 22px/1.2 var(--mukky-body);
-  letter-spacing: -0.01em;
+  font: 600 28px/1.15 var(--mk-display);
+  letter-spacing: 0;
 }
 
 .joy-menu-links a:hover,
 .joy-menu-links a[aria-current="page"] {
-  background: #2823230a;
+  background: var(--pastel-soft);
 }
 
 .joy-menu-arrow {
@@ -1026,65 +2365,576 @@ button:focus-visible {
   color: var(--mk-muted);
 }
 
-/* ---------- Cart, checkout and account: same shapes, quieter frames ---------- */
+/* ---------- Policy pages: a reading-width white card ---------- */
+
+/* Long legal text is hard to follow at full page width. */
+.joy-policy {
+  width: calc(100% - 96px);
+  max-width: 880px;
+  margin: 24px auto 96px;
+  padding: clamp(28px, 5vw, 64px);
+  border-radius: var(--mk-radius-card);
+  background: var(--mk-card);
+}
+
+.joy-policy-title {
+  font-size: clamp(38px, 5vw, 66px);
+  line-height: 1.04;
+}
+
+.joy-policy h2 {
+  font: 600 24px/1.25 var(--mk-display);
+  letter-spacing: 0;
+}
+
+.joy-policy p,
+.joy-policy li {
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.joy-policy .joy-button {
+  padding: 0 26px;
+  min-height: 50px;
+  align-items: center;
+  border: 0;
+  border-radius: var(--mk-radius-button);
+  background: var(--ink);
+  box-shadow: none;
+  color: var(--mk-on-ink);
+  font-family: var(--mk-display);
+  font-weight: 500;
+}
+
+.mk-cookie-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.mk-cookie-table th,
+.mk-cookie-table td {
+  padding: 12px 16px 12px 0;
+  border-bottom: 1px solid var(--mk-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.mk-cookie-table th {
+  color: var(--mk-muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Cookie names stay in one piece. */
+.mk-cookie-table code {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 750px) {
+  .joy-policy {
+    width: calc(100% - 24px);
+    margin: 12px auto 56px;
+  }
+
+  /* Three columns do not fit a phone, so each cookie becomes a small stacked block. */
+  .mk-cookie-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .mk-cookie-table tr {
+    display: block;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--mk-line);
+  }
+
+  .mk-cookie-table td {
+    display: block;
+    padding: 2px 0;
+    border-bottom: 0;
+  }
+
+  .mk-cookie-table td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: var(--mk-muted);
+    font-weight: 600;
+  }
+}
+
+/* ---------- Cart, checkout and account: the same white cards ---------- */
 
 .ink-page-heading h1 {
-  font-size: clamp(30px, 3.4vw, 40px);
-  line-height: 1.1;
+  font-size: clamp(38px, 5vw, 66px);
+  line-height: 1.04;
 }
 
 .ink-cart-items,
 .ink-cart-summary,
 .joy-checkout-summary {
-  border: 1px solid var(--mk-line);
+  border: 0;
   border-radius: var(--mk-radius);
+  background: var(--mk-card);
   box-shadow: none;
 }
 
 .ink-empty-bag {
   border: 0;
-  border-radius: var(--mk-radius);
-  background: var(--mk-surface);
+  border-radius: var(--mk-radius-card);
+  background: var(--mk-card);
 }
 
 .ink-login-layout {
-  border: 1px solid var(--mk-line);
-  border-radius: 12px;
+  border: 0;
+  border-radius: var(--mk-radius-card);
   box-shadow: none;
 }
 
 .ink-login-aside {
-  background: var(--mk-surface);
+  background: var(--pastel-1);
+}
+
+.ink-login-aside .mk-logo {
+  margin-bottom: 20px;
+}
+
+.ink-login-form {
+  background: var(--mk-card);
 }
 
 .ink-account-sidebar {
-  border: 1px solid var(--mk-line);
+  border: 0;
   border-radius: var(--mk-radius);
-  background: transparent;
+  background: var(--mk-card);
 }
 
 .joy-checkout-header {
   border-bottom: 1px solid var(--mk-line);
-  background: var(--paper);
+  background: var(--mk-card);
 }
 
-.joy-policy .joy-button {
+.joy-checkout-steps > div {
   border: 0;
   border-radius: var(--mk-radius);
-  background: var(--ink);
-  box-shadow: none;
-  color: var(--paper);
+  background: var(--mk-card);
+}
+
+/* ---------- Motion ----------
+ * Entrances and loops are only switched on for people who have not asked their
+ * device for less motion. Every keyframe set describes where a thing starts
+ * from; it always ends in its normal place, so without the animation
+ * everything is simply there.
+ *
+ * Entrances animate `translate`, `scale` and `rotate` rather than `transform`,
+ * so they never fight a hover or a resting tilt that uses the other one.
+ */
+
+@keyframes mk-page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes mk-rise {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@keyframes mk-word-in {
+  from {
+    opacity: 0;
+    translate: 0 0.5em;
+    rotate: 5deg;
+  }
+}
+
+/* Uncovers the hand-drawn underline from left to right. */
+@keyframes mk-wipe {
+  from {
+    clip-path: inset(-40% 100% -40% 0);
+  }
+
+  to {
+    clip-path: inset(-40% -5% -40% 0);
+  }
+}
+
+@keyframes mk-deck-in {
+  from {
+    opacity: 0;
+    translate: 0 48px;
+    scale: 0.82;
+    rotate: 7deg;
+  }
+}
+
+@keyframes mk-pop {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+
+  70% {
+    scale: 1.18;
+  }
+}
+
+@keyframes mk-bob {
+  to {
+    translate: 0 -12px;
+  }
+}
+
+@keyframes mk-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes mk-wiggle {
+  25% {
+    rotate: -18deg;
+  }
+
+  50% {
+    rotate: 4deg;
+  }
+
+  75% {
+    rotate: -12deg;
+  }
+}
+
+/* The track holds the words several times over; half its width is a whole number of copies. */
+@keyframes mk-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* A thrown card: out to the side on top of the stack, then back in underneath.
+   --toss is the direction (1 or -1), --toss-from how far it was already dragged.
+   The last frame leaves transform and opacity alone, so the card settles into
+   whatever its new place in the stack asks for. */
+@keyframes mk-toss {
+  0% {
+    z-index: 6;
+    opacity: 1;
+    transform: translateX(calc(var(--toss-from, 0) * 1px))
+      rotate(calc(-3deg + var(--toss-from, 0) * 0.05deg));
+  }
+
+  45% {
+    z-index: 6;
+    opacity: 1;
+    transform: translateX(calc(var(--toss, 1) * 112%)) rotate(calc(var(--toss, 1) * 16deg));
+  }
+
+  46% {
+    z-index: 0;
+  }
+
+  100% {
+    z-index: 0;
+  }
+}
+
+/* The printer: ten seconds to print the star in eight layers, show it off, and start again. */
+@keyframes mk-print {
+  0% {
+    opacity: 1;
+    scale: 1;
+    clip-path: inset(100% -6% -6% -6%);
+    animation-timing-function: steps(8, end);
+  }
+
+  68% {
+    opacity: 1;
+    scale: 1;
+    clip-path: inset(0% -6% -6% -6%);
+    animation-timing-function: ease-out;
+  }
+
+  72% {
+    scale: 1.07;
+    clip-path: inset(-6% -6% -6% -6%);
+  }
+
+  77% {
+    scale: 1;
+  }
+
+  93% {
+    opacity: 1;
+    scale: 1;
+    clip-path: inset(-6% -6% -6% -6%);
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1;
+    clip-path: inset(-6% -6% -6% -6%);
+  }
+}
+
+@keyframes mk-rail {
+  0% {
+    translate: 0 10px;
+    animation-timing-function: steps(8, end);
+  }
+
+  68% {
+    translate: 0 -110px;
+    animation-timing-function: ease-in-out;
+  }
+
+  90% {
+    translate: 0 -110px;
+  }
+
+  100% {
+    translate: 0 10px;
+  }
+}
+
+@keyframes mk-head-sweep {
+  from {
+    translate: -56px 0;
+  }
+
+  to {
+    translate: 56px 0;
+  }
+}
+
+@keyframes mk-twinkle {
+  0%,
+  66% {
+    opacity: 0;
+    scale: 0.3;
+  }
+
+  72% {
+    opacity: 1;
+    scale: 1.25;
+  }
+
+  78%,
+  90% {
+    opacity: 1;
+    scale: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 0.3;
+  }
+}
+
+@keyframes mk-letter-rise {
+  from {
+    opacity: 0;
+    translate: 0 45%;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Each page fades in as it arrives (see app/[countryCode]/(main)/template.tsx).
+     Opacity only: a transform here would trap the phone's fixed buy bar. */
+  .mk-page {
+    animation: mk-page-in 0.45s ease backwards;
+  }
+
+  /* The hero arrives in order: label, headline word by word, underline, then the rest. */
+  .mk-hero-kicker {
+    animation: mk-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  .mk-word {
+    animation: mk-word-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms + 100ms);
+  }
+
+  .mk-underlined svg {
+    animation: mk-wipe 0.6s ease-out 0.95s backwards;
+  }
+
+  .mk-hero-lede {
+    animation: mk-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.62s backwards;
+  }
+
+  .mk-hero-actions {
+    animation: mk-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.74s backwards;
+  }
+
+  .mk-hero-facts {
+    animation: mk-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.86s backwards;
+  }
+
+  .mk-deck {
+    animation: mk-deck-in 0.95s cubic-bezier(0.34, 1.3, 0.64, 1) 0.3s backwards;
+  }
+
+  /* Stickers pop in late, then drift up and down for good. */
+  .mk-hero-stage .mk-sticker {
+    animation: mk-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) var(--pop-delay, 0.9s) backwards,
+      mk-bob var(--bob-time, 5s) ease-in-out var(--pop-delay, 0.9s) infinite alternate;
+  }
+
+  .mk-spin-badge {
+    animation: mk-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.25s backwards,
+      mk-spin 16s linear infinite;
+  }
+
+  .mk-deck-card[data-tossed] {
+    animation: mk-toss 0.62s cubic-bezier(0.3, 0.7, 0.3, 1);
+  }
+
+  .mk-marquee-track {
+    animation: mk-marquee 46s linear infinite;
+  }
+
+  .mk-marquee:hover .mk-marquee-track {
+    animation-play-state: paused;
+  }
+
+  a:hover > .mk-logo .mk-logo-mark {
+    animation: mk-wiggle 0.6s ease;
+  }
+
+  /* Shop cards arrive one after another, also after a filter changes the list. */
+  .mukky-store [data-testid="products-list"] > li {
+    animation: mk-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  .mukky-store [data-testid="products-list"] > li:nth-child(2) { animation-delay: 50ms; }
+  .mukky-store [data-testid="products-list"] > li:nth-child(3) { animation-delay: 100ms; }
+  .mukky-store [data-testid="products-list"] > li:nth-child(4) { animation-delay: 150ms; }
+  .mukky-store [data-testid="products-list"] > li:nth-child(5) { animation-delay: 200ms; }
+  .mukky-store [data-testid="products-list"] > li:nth-child(6) { animation-delay: 250ms; }
+  .mukky-store [data-testid="products-list"] > li:nth-child(7) { animation-delay: 300ms; }
+  .mukky-store [data-testid="products-list"] > li:nth-child(n + 8) { animation-delay: 350ms; }
+
+  .mukky-store-heading h1 {
+    animation: mk-word-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  /* Product page: the photo rises in, then the buying column fades in.
+     The column only fades: moving it would briefly trap the phone buy bar,
+     which is fixed to the screen from inside it. */
+  .mk-product-media {
+    animation: mk-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  .mk-product-summary {
+    animation: mk-page-in 0.6s ease 0.15s backwards;
+  }
+
+  .mk-printer-print {
+    animation: mk-print 10s linear infinite;
+  }
+
+  .mk-printer-rail {
+    animation: mk-rail 10s linear infinite;
+  }
+
+  .mk-printer-head {
+    animation: mk-head-sweep 0.8s ease-in-out infinite alternate;
+  }
+
+  .mk-printer-reel {
+    animation: mk-spin 7s linear infinite;
+  }
+
+  .mk-printer-sparkles path {
+    animation: mk-twinkle 10s ease-in-out infinite;
+  }
+
+  .mk-printer-sparkles path:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+
+  .mk-printer-sparkles path:nth-child(3) {
+    animation-delay: 0.24s;
+  }
+
+  /* Where the browser can tie an animation to scrolling, the big name in the
+     footer rises letter by letter as it comes into view. Each letter is done
+     by the time the name is fully on screen: it sits near the end of the page,
+     so an animation that waited for it to cross the screen would never finish. */
+  @supports (animation-timeline: view()) {
+    .mk-footer-word span {
+      animation: mk-letter-rise linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 8%) entry calc(52% + var(--i, 0) * 8%);
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ink-button,
+  .mk-ghost-button,
+  .mk-tile,
+  .mk-tile-go,
+  .mk-deck-cards,
+  .mk-deck-card,
+  .mk-deck-shuffle,
+  .mk-deck-shuffle svg,
+  .mk-value-icon,
+  .mk-header-row,
+  .mk-footer-column a,
+  .mk-footer-word span,
+  .mukky-product-card,
   .mukky-card-photo img,
+  .mk-tile-photo img,
   .ink-button svg,
+  .mk-arrow-link svg,
   .mk-gallery-arrow {
     transition: none;
   }
 
-  .mukky-product-card:hover .mukky-card-photo img,
-  .ink-button:hover svg {
+  .mk-deck-cards {
     transform: none;
+  }
+
+  .ink-button:hover,
+  .mk-ghost-button:hover,
+  .mk-tile:hover,
+  .mk-tile-slot:nth-child(even) .mk-tile:hover,
+  .mk-deck-shuffle:hover,
+  .mk-footer-word span:hover,
+  .mk-footer-word span:nth-child(even):hover,
+  .mukky-product-card:hover,
+  .mukky-product-card:hover .mukky-card-photo img,
+  .mk-tile:hover .mk-tile-photo img,
+  .mk-tile:hover .mk-tile-go,
+  .ink-button:hover svg,
+  .mk-arrow-link:hover svg {
+    transform: none;
+  }
+
+  .mk-value:hover .mk-value-icon,
+  .mk-deck-shuffle:hover svg {
+    rotate: none;
+    scale: none;
+  }
+
+  .mk-footer-column a:hover {
+    translate: none;
   }
 }

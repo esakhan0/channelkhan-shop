@@ -8,6 +8,7 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
+import HeaderShell from "@modules/layout/components/header-shell"
 import SideMenu from "@modules/layout/components/side-menu"
 import Search from "@modules/layout/components/search"
 import NavCartLabel from "@modules/layout/components/nav-cart-label"
@@ -27,8 +28,9 @@ export default async function Nav() {
   ])
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
-      {/* Wide screens: logo, page links, then search, account and cart.
+    <HeaderShell>
+      {/* A white bar that floats over the page.
+          Wide screens: logo, page links, then search, account and cart.
           Small screens: menu, centred logo, then search and cart. */}
       <header className="mk-header">
         <nav className="content-container mk-header-row" aria-label="Main">
@@ -40,6 +42,7 @@ export default async function Nav() {
             href="/"
             className="mukky-brand-link mk-header-logo"
             data-testid="nav-store-link"
+            aria-label="Mukky’s 3D Shop, home"
           >
             <BrandLogo />
           </LocalizedClientLink>
@@ -78,6 +81,6 @@ export default async function Nav() {
           </div>
         </nav>
       </header>
-    </div>
+    </HeaderShell>
   )
 }

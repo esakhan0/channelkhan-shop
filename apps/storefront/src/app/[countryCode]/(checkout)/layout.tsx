@@ -1,6 +1,6 @@
+import BrandLogo from "@modules/common/components/brand-logo"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
-import Image from "next/image"
 
 export default function CheckoutLayout({
   children,
@@ -26,10 +26,11 @@ export default function CheckoutLayout({
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/"
-            className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
+            className="mk-checkout-logo"
             data-testid="store-link"
+            aria-label="Mukky’s 3D Shop, home"
           >
-            <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop — home" width={1792} height={896} className="joy-checkout-logo" sizes="140px" />
+            <BrandLogo />
           </LocalizedClientLink>
           <div className="joy-checkout-note flex-1 basis-0">Checkout</div>
         </nav>

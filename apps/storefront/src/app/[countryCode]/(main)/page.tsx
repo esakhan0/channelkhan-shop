@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 
 import ShopShowcase from "@modules/home/components/shop-showcase"
-import Hero from "@modules/home/components/hero"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { toJsonLd } from "@lib/util/product-structured-data"
 import { getSiteOrigin, listCountryCodes, STORE_NAME } from "@lib/util/site"
@@ -83,7 +82,6 @@ export default async function Home(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: toJsonLd(structuredData) }}
       />
-      <Hero countryCode={countryCode} />
       <ShopShowcase countryCode={countryCode} />
     </>
   )

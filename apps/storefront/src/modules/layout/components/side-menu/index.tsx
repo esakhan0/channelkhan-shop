@@ -3,10 +3,10 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { ArrowUpRightMini, BarsThree, XMark } from "@medusajs/icons"
 import { useState } from "react"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { HttpTypes } from "@medusajs/types"
+import BrandLogo from "@modules/common/components/brand-logo"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import LanguageSelect from "../language-select"
@@ -36,7 +36,7 @@ export default function SideMenu({ regions, locales, currentLocale }: SideMenuPr
         <DialogPanel className="joy-menu-panel" data-testid="nav-menu-popup">
           <div className="joy-menu-top">
             <DialogTitle className="sr-only">Explore Mukky’s shop</DialogTitle>
-            <Image src="/brand/mukkys-logo.png" alt="Mukky’s 3D Shop" width={1792} height={896} className="joy-menu-logo" sizes="190px" />
+            <BrandLogo className="mk-logo-lg" />
             <button type="button" className="joy-menu-close" onClick={() => setOpen(false)} aria-label="Close menu" data-testid="close-menu-button"><XMark aria-hidden="true" /></button>
           </div>
           <p className="ink-kicker">EXPLORE THE FIDGET SHOP</p>

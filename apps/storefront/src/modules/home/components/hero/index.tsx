@@ -29,7 +29,8 @@ export default function Hero({ cards, fromPrice }: HeroProps) {
     <section className="mk-hero">
       <div className="content-container mk-hero-inner">
         <div className="mk-hero-copy">
-          <p className="ink-kicker mk-hero-kicker">3D printed fidget toys</p>
+          {/* The shop's own strapline, as used at the foot of its emails. */}
+          <p className="ink-kicker mk-hero-kicker">Small objects. Big personality.</p>
           <h1 className="mk-hero-title">
             {/* The space sits outside each word's box, or the words would run together. */}
             {headline.map((word, index) => (

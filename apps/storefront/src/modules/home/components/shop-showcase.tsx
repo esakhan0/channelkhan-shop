@@ -2,7 +2,7 @@ import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
 import {
   ArrowRightMini,
-  ArrowUturnLeft,
+  ChatBubbleLeftRight,
   CubeSolid,
   ShieldCheck,
   TruckFast,
@@ -30,9 +30,9 @@ const values = [
     text: "Delivery options and prices are shown before you pay.",
   },
   {
-    icon: ArrowUturnLeft,
-    title: "14 days to change your mind",
-    text: "Cancel a standard order within 14 days of it arriving.",
+    icon: ChatBubbleLeftRight,
+    title: "Faulty? We’ll put it right",
+    text: "If your item arrives damaged or faulty, email us and we’ll sort it out.",
   },
   {
     icon: ShieldCheck,

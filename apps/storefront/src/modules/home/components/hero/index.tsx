@@ -1,4 +1,4 @@
-import { ArrowRightMini, ArrowUturnLeft, Tag } from "@medusajs/icons"
+import { ArrowRightMini, Tag } from "@medusajs/icons"
 import { Fragment, type CSSProperties } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import HeroDeck, { type DeckCard } from "@modules/home/components/hero-deck"
@@ -56,12 +56,11 @@ export default function Hero({ cards, fromPrice }: HeroProps) {
               How they’re made
             </a>
           </div>
-          <ul className="mk-hero-facts">
-            {fromPrice && (
+          {fromPrice && (
+            <ul className="mk-hero-facts">
               <li><Tag aria-hidden="true" /> Fidgets from {fromPrice}</li>
-            )}
-            <li><ArrowUturnLeft aria-hidden="true" /> 14 days to change your mind</li>
-          </ul>
+            </ul>
+          )}
         </div>
 
         {cards.length > 0 && (

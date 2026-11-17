@@ -4,6 +4,7 @@ import Back from "@modules/common/icons/back"
 import FastDelivery from "@modules/common/icons/fast-delivery"
 import Refresh from "@modules/common/icons/refresh"
 
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Accordion from "./accordion"
 import { HttpTypes } from "@medusajs/types"
 
@@ -85,31 +86,36 @@ const ShippingInfoTab = () => {
         <div className="flex items-start gap-x-2">
           <FastDelivery />
           <div>
-            <span className="font-semibold">Fast delivery</span>
+            <span className="font-semibold">Delivery</span>
             <p className="max-w-sm">
-              Your package will arrive in 3-5 business days at your pick up
-              location or in the comfort of your home.
+              Delivery options and prices are shown before you pay. See our{" "}
+              <LocalizedClientLink href="/shipping" className="underline">
+                delivery information
+              </LocalizedClientLink>
+              .
             </p>
           </div>
         </div>
         <div className="flex items-start gap-x-2">
           <Refresh />
           <div>
-            <span className="font-semibold">Simple exchanges</span>
+            <span className="font-semibold">Something not right?</span>
             <p className="max-w-sm">
-              Is the fit not quite right? No worries - we&apos;ll exchange your
-              product for a new one.
+              If your item arrives damaged, faulty or not as described, email
+              us with your order number and we&apos;ll put it right.
             </p>
           </div>
         </div>
         <div className="flex items-start gap-x-2">
           <Back />
           <div>
-            <span className="font-semibold">Easy returns</span>
+            <span className="font-semibold">Returns</span>
             <p className="max-w-sm">
-              Just return your product and we&apos;ll refund your money. No
-              questions asked – we&apos;ll do our best to make sure your return
-              is hassle-free.
+              Our{" "}
+              <LocalizedClientLink href="/returns" className="underline">
+                returns policy
+              </LocalizedClientLink>{" "}
+              explains when an item can be sent back and how to start.
             </p>
           </div>
         </div>

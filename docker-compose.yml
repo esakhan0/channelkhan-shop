@@ -94,6 +94,10 @@ services:
         NEXT_PUBLIC_BASE_URL: https://mukkys3d.com
         NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
     restart: unless-stopped
+    # Use Cloudflare for external DNS instead of a stale host resolver.
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     depends_on:
       medusa:
         condition: service_healthy
